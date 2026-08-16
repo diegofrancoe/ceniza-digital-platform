@@ -3272,11 +3272,6 @@ function ContactPage() {
                       <img src={image.src} alt={image.alt} />
                     </figure>
                   ))}
-                  {row.map((image) => (
-                    <figure className="contact-inspiration-card" key={`${image.alt}-loop`} aria-hidden="true">
-                      <img src={image.src} alt="" />
-                    </figure>
-                  ))}
                 </div>
               </div>
             ))}
