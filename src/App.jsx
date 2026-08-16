@@ -6,16 +6,16 @@ import catalogAccentLight from "./assets/lumina2.png";
 import portfolioLight from "./assets/lumina1.png";
 import servicesVideo from "./assets/video luces1.mp4";
 import studioVideo from "./assets/video studio.mp4";
-import portfolioVideo from "./assets/video.mp4";
-import eventVideo from "./assets/video evento.mp4";
-import portfolioImage from "./assets/estudio 2.png";
-import studioImage from "./assets/estudio.png";
+import portfolioVideo from "./assets/reel-editorial-semilla.mp4";
+import atmosphereVideo from "./assets/reel-atmosferas-diego.mp4";
+import portfolioSpaceVideo from "./assets/reel-diego-detras-de-camaras.mp4";
+import characterVideo from "./assets/video-ambientes-con-caracter.mp4";
 import eventTwoImage from "./assets/evento 2.png";
 import eventThreeImage from "./assets/evento 3.png";
 import eventFourImage from "./assets/evento 4.png";
 import eventFiveImage from "./assets/evento 5 .png";
 import eventSixImage from "./assets/evento 6.png";
-import eventEightImage from "./assets/evento 8.png";
+import portfolioCasesImage from "./assets/portafolio-cases-ceniza.png";
 import serviceOneImage from "./assets/servicios 1.png";
 import catalogOneImage from "./assets/catalogo 1.png";
 import comboOneHomeImage from "./assets/combo 1.1.png";
@@ -2883,39 +2883,156 @@ function ProductDetailPage({ product }) {
   );
 }
 
+function SmoothLoopVideo({ src, syncId, syncToken, onReady }) {
+  const firstVideoRef = useRef(null);
+  const secondVideoRef = useRef(null);
+  const activeVideoRef = useRef(0);
+  const isCrossfadingRef = useRef(false);
+  const crossfadeTimeoutRef = useRef(null);
+  const [activeVideo, setActiveVideo] = useState(0);
+
+  useEffect(() => () => {
+    if (crossfadeTimeoutRef.current) {
+      window.clearTimeout(crossfadeTimeoutRef.current);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!syncToken) return;
+
+    const videos = [firstVideoRef.current, secondVideoRef.current];
+    if (crossfadeTimeoutRef.current) {
+      window.clearTimeout(crossfadeTimeoutRef.current);
+    }
+
+    videos.forEach((video) => {
+      if (!video) return;
+      video.pause();
+      video.currentTime = 0;
+    });
+
+    activeVideoRef.current = 0;
+    isCrossfadingRef.current = false;
+    setActiveVideo(0);
+
+    window.requestAnimationFrame(() => {
+      firstVideoRef.current?.play().catch(() => {});
+    });
+  }, [src, syncToken]);
+
+  const handleTimeUpdate = async (index) => {
+    if (index !== activeVideoRef.current || isCrossfadingRef.current) return;
+
+    const videos = [firstVideoRef.current, secondVideoRef.current];
+    const currentVideo = videos[index];
+    const remainingTime = currentVideo?.duration - currentVideo?.currentTime;
+
+    if (!Number.isFinite(remainingTime) || remainingTime > 0.85) return;
+
+    const nextIndex = index === 0 ? 1 : 0;
+    const nextVideo = videos[nextIndex];
+    if (!nextVideo) return;
+
+    isCrossfadingRef.current = true;
+    nextVideo.currentTime = 0;
+
+    try {
+      await nextVideo.play();
+      setActiveVideo(nextIndex);
+
+      crossfadeTimeoutRef.current = window.setTimeout(() => {
+        currentVideo.pause();
+        currentVideo.currentTime = 0;
+        activeVideoRef.current = nextIndex;
+        isCrossfadingRef.current = false;
+      }, 850);
+    } catch {
+      isCrossfadingRef.current = false;
+    }
+  };
+
+  const handleEnded = (index) => {
+    if (index !== activeVideoRef.current || isCrossfadingRef.current) return;
+
+    const video = index === 0 ? firstVideoRef.current : secondVideoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  };
+
+  return (
+    <div className="portfolio-smooth-loop" aria-hidden="true">
+      {[firstVideoRef, secondVideoRef].map((videoRef, index) => (
+        <video
+          ref={videoRef}
+          className={`portfolio-showcase-video portfolio-smooth-loop-layer ${activeVideo === index ? "is-active" : ""}`}
+          muted
+          playsInline
+          preload="auto"
+          onCanPlay={() => index === 0 && onReady(syncId)}
+          onTimeUpdate={() => handleTimeUpdate(index)}
+          onEnded={() => handleEnded(index)}
+          key={index}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      ))}
+    </div>
+  );
+}
+
 function PortfolioPage() {
   const portfolioShowcaseItems = [
     {
       type: "video",
       eyebrow: "VISUAL REEL",
-      title: "Proyectos con atmosfera y precision.",
+      title: "Proyectos con atmósfera y precisión.",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
-    },
-    {
-      type: "image",
-      eyebrow: "IMAGEN",
-      title: "Composicion para espacios.",
-      copy: "Referencias visuales para atmósfera, profundidad y look final.",
-      src: portfolioImage,
-      alt: "Montaje de iluminación Ceniza",
-    },
-    {
-      type: "image",
-      eyebrow: "ESCENA",
-      title: "Ambientes con carácter.",
-      copy: "Composición escénica y acentos de luz para propuestas premium.",
-      src: studioImage,
-      alt: "Proyecto de iluminación Ceniza",
+      smoothLoop: true,
     },
     {
       type: "video",
       eyebrow: "STUDIO",
-      title: "Ritmo visual de produccion.",
+      title: "Composición para espacios.",
+      copy: "Referencias visuales para atmósfera, profundidad y look final.",
+      src: portfolioSpaceVideo,
+      smoothLoop: true,
+    },
+    {
+      type: "video",
+      eyebrow: "ESCENA",
+      title: "Ritmo visual de producción.",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
-      src: eventVideo,
+      src: atmosphereVideo,
+      smoothLoop: true,
+    },
+    {
+      type: "video",
+      eyebrow: "VIDEO",
+      title: "Ambiente con carácter.",
+      copy: "Composición escénica y acentos de luz para propuestas de eventos.",
+      src: characterVideo,
+      smoothLoop: true,
     },
   ];
+
+  const synchronizedVideoCount = portfolioShowcaseItems.filter((item) => item.smoothLoop).length;
+  const readyVideoIdsRef = useRef(new Set());
+  const [readyVideoCount, setReadyVideoCount] = useState(0);
+  const [videoSyncToken, setVideoSyncToken] = useState(0);
+
+  const handleVideoReady = (videoId) => {
+    if (readyVideoIdsRef.current.has(videoId)) return;
+    readyVideoIdsRef.current.add(videoId);
+    setReadyVideoCount(readyVideoIdsRef.current.size);
+  };
+
+  useEffect(() => {
+    if (readyVideoCount === synchronizedVideoCount && synchronizedVideoCount > 0) {
+      setVideoSyncToken((currentToken) => currentToken + 1);
+    }
+  }, [readyVideoCount, synchronizedVideoCount]);
 
   return (
     <div className="page-shell services-page-shell portfolio-page-shell">
@@ -2941,10 +3058,10 @@ function PortfolioPage() {
           </div>
           <div className="services-page-highlight portfolio-page-highlight">
             <div className="services-page-highlight-card portfolio-page-highlight-card">
-              <img src={eventEightImage} alt="Proyecto de iluminación Ceniza" />
+              <img src={portfolioCasesImage} alt="Cases de producción Ceniza" />
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
-                <span>VISUAL REEL</span>
+                <span>PORTAFOLIO</span>
                 <strong>Proyectos con atmósfera y precisión.</strong>
                 <p>Una lectura rápida del lenguaje visual que buscamos en cada montaje.</p>
               </div>
@@ -2956,7 +3073,14 @@ function PortfolioPage() {
           {portfolioShowcaseItems.map((item, index) => (
             <article className={`portfolio-showcase-card portfolio-showcase-square is-${item.type}`} key={`${item.eyebrow}-${index}`}>
               <div className="portfolio-showcase-media">
-                {item.type === "video" ? (
+                {item.type === "video" && item.smoothLoop ? (
+                  <SmoothLoopVideo
+                    src={item.src}
+                    syncId={`${item.eyebrow}-${index}`}
+                    syncToken={videoSyncToken}
+                    onReady={handleVideoReady}
+                  />
+                ) : item.type === "video" ? (
                   <video
                     key={`${item.eyebrow}-${index}`}
                     className="portfolio-showcase-video"
@@ -3549,65 +3673,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (currentPath !== "/") return undefined;
-
-    const heroCard = document.querySelector(".hero-card");
-    const heroArt = document.querySelector(".hero-art");
-    const heroImage = document.querySelector(".hero-combined-image");
-    const heroActions = document.querySelector(".hero-actions");
-    const contactNavLink = document.querySelector('.nav-pill a[href="/contacto"]');
-
-    if (!heroCard || !heroArt || !heroImage || !heroActions || !contactNavLink) return undefined;
-
-    const alignHeroArt = () => {
-      if (window.innerWidth <= 720) {
-        heroArt.style.removeProperty("--hero-aligned-top");
-        return;
-      }
-
-      const cardRect = heroCard.getBoundingClientRect();
-      const actionsRect = heroActions.getBoundingClientRect();
-      const contactRect = contactNavLink.getBoundingClientRect();
-      const top = contactRect.bottom - cardRect.top + 8;
-      const minimumImageHeight = window.innerWidth <= 820 ? 220 : 320;
-      const availableHeight = Math.max(
-        minimumImageHeight,
-        actionsRect.bottom - cardRect.top - top,
-      );
-      const imageRatio =
-        heroImage.naturalWidth && heroImage.naturalHeight
-          ? heroImage.naturalWidth / heroImage.naturalHeight
-          : 2901 / 4198;
-      const width = availableHeight * imageRatio;
-      const contactCenter = contactRect.left + contactRect.width / 2;
-      const horizontalNudge = window.innerWidth <= 820 ? 24 : 48;
-      const right = Math.max(
-        12,
-        cardRect.right - contactCenter - width * 0.12 + horizontalNudge,
-      );
-
-      heroArt.style.setProperty("--hero-aligned-top", `${Math.round(top)}px`);
-      heroArt.style.setProperty("--hero-aligned-width", `${Math.round(width)}px`);
-      heroArt.style.setProperty("--hero-aligned-right", `${Math.round(right)}px`);
-    };
-
-    const resizeObserver = new ResizeObserver(alignHeroArt);
-    resizeObserver.observe(heroCard);
-    resizeObserver.observe(heroActions);
-    resizeObserver.observe(heroImage);
-    resizeObserver.observe(contactNavLink);
-    heroImage.addEventListener("load", alignHeroArt);
-    window.addEventListener("resize", alignHeroArt);
-    alignHeroArt();
-
-    return () => {
-      resizeObserver.disconnect();
-      heroImage.removeEventListener("load", alignHeroArt);
-      window.removeEventListener("resize", alignHeroArt);
-    };
-  }, [currentPath]);
-
-  useEffect(() => {
     const metaDescription = document.querySelector('meta[name="description"]');
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDescription = document.querySelector('meta[property="og:description"]');
@@ -3980,7 +4045,7 @@ export default function App() {
           </article>
           <article className="about-panel about-video-panel" aria-label="Espacio para video de presentación">
             <div className="about-video-slot">
-              <video className="about-video-media" autoPlay loop playsInline controls preload="auto">
+              <video className="about-video-media" autoPlay loop muted playsInline controls preload="auto">
                 <source src={studioVideo} type="video/mp4" />
               </video>
               <span className="about-video-eyebrow">STUDIO REEL</span>
