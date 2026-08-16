@@ -8774,3 +8774,108 @@ a {
     right: -24px;
   }
 }
+
+/* Stable responsive contact gallery: desktop grid, tablet columns and touch rails on mobile. */
+.contact-inspiration-marquee {
+  width: min(1180px, calc(100% - 72px));
+  margin: 40px auto 0;
+  gap: 24px;
+  overflow: visible;
+}
+
+.contact-inspiration-row {
+  overflow: visible;
+}
+
+.contact-inspiration-row::before,
+.contact-inspiration-row::after {
+  display: none;
+}
+
+.contact-inspiration-track,
+.contact-inspiration-row:nth-child(2) .contact-inspiration-track {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 20px;
+  animation: none;
+  transform: none;
+  will-change: auto;
+}
+
+.contact-inspiration-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  flex: none;
+  border-radius: 24px;
+}
+
+.contact-inspiration-card img {
+  object-position: center;
+}
+
+@media (min-width: 721px) and (max-width: 960px) {
+  .contact-inspiration-marquee {
+    width: min(100%, calc(100% - 36px));
+    gap: 18px;
+  }
+
+  .contact-inspiration-track,
+  .contact-inspiration-row:nth-child(2) .contact-inspiration-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .contact-inspiration-card {
+    aspect-ratio: 4 / 3;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .contact-inspiration-section {
+    padding-inline: 0;
+  }
+
+  .contact-inspiration-head,
+  .contact-inspiration-closing {
+    width: min(100%, calc(100% - 36px));
+  }
+
+  .contact-inspiration-marquee {
+    width: 100%;
+    margin-top: 30px;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .contact-inspiration-row {
+    padding-inline: 18px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .contact-inspiration-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .contact-inspiration-track,
+  .contact-inspiration-row:nth-child(2) .contact-inspiration-track {
+    display: flex;
+    width: max-content;
+    gap: 14px;
+    padding-bottom: 4px;
+  }
+
+  .contact-inspiration-card {
+    width: min(78vw, 330px);
+    aspect-ratio: 4 / 3;
+    border-radius: 18px;
+    scroll-snap-align: start;
+  }
+}
+
