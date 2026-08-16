@@ -7606,6 +7606,19 @@ a {
 
   .portfolio-showcase {
     grid-template-columns: 1fr;
+    width: min(100%, calc(100% - 20px));
+    gap: 24px;
+    margin-top: 34px;
+  }
+
+  .portfolio-showcase-card,
+  .portfolio-showcase-card.is-image {
+    width: 100%;
+    border-radius: 28px;
+  }
+
+  .portfolio-showcase-square {
+    aspect-ratio: 1 / 1;
   }
 }
 
