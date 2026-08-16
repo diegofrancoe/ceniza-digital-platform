@@ -2898,6 +2898,25 @@ function SmoothLoopVideo({ src, syncId, syncToken, onReady }) {
   }, []);
 
   useEffect(() => {
+    const firstVideo = firstVideoRef.current;
+    if (!firstVideo) return undefined;
+
+    const startPlayback = () => {
+      firstVideo.muted = true;
+      firstVideo.play().catch(() => {});
+    };
+
+    startPlayback();
+    firstVideo.addEventListener("loadeddata", startPlayback);
+    firstVideo.addEventListener("canplay", startPlayback);
+
+    return () => {
+      firstVideo.removeEventListener("loadeddata", startPlayback);
+      firstVideo.removeEventListener("canplay", startPlayback);
+    };
+  }, [src]);
+
+  useEffect(() => {
     if (!syncToken) return;
 
     const videos = [firstVideoRef.current, secondVideoRef.current];
@@ -2966,6 +2985,7 @@ function SmoothLoopVideo({ src, syncId, syncToken, onReady }) {
         <video
           ref={videoRef}
           className={`portfolio-showcase-video portfolio-smooth-loop-layer ${activeVideo === index ? "is-active" : ""}`}
+          autoPlay={index === 0}
           muted
           playsInline
           preload="auto"
