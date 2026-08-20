@@ -4,8 +4,8 @@ Ceniza es un estudio de iluminación en Bogotá, Colombia. Ofrece alquiler de lu
 
 ## Páginas principales
 
-- Inicio: https://cenizaproducciones.com/
-- Catálogo: https://cenizaproducciones.com/catalogo
-- Combos: https://cenizaproducciones.com/servicios
-- Portafolio: https://cenizaproducciones.com/portafolio
-- Contacto: https://cenizaproducciones.com/contacto
+- Inicio: https://www.cenizaproducciones.com/
+- Catálogo: https://www.cenizaproducciones.com/catalogo
+- Combos: https://www.cenizaproducciones.com/servicios
+- Portafolio: https://www.cenizaproducciones.com/portafolio
+- Contacto: https://www.cenizaproducciones.com/contacto
