@@ -2892,7 +2892,7 @@ function ProductDetailPage({ product }) {
   );
 }
 
-function ViewportVideo({ src, poster }) {
+function ViewportVideo({ src }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -2945,7 +2945,6 @@ function ViewportVideo({ src, poster }) {
       loop
       playsInline
       preload="metadata"
-      poster={poster}
       aria-hidden="true"
     >
       <source src={src} type="video/mp4" />
@@ -2961,7 +2960,6 @@ function PortfolioPage() {
       title: "Proyectos con atmósfera y precisión.",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
-      poster: portfolioCasesImage,
     },
     {
       type: "video",
@@ -2969,7 +2967,6 @@ function PortfolioPage() {
       title: "Composición para espacios.",
       copy: "Referencias visuales para atmósfera, profundidad y look final.",
       src: portfolioSpaceVideo,
-      poster: eventTwoImage,
     },
     {
       type: "video",
@@ -2977,7 +2974,6 @@ function PortfolioPage() {
       title: "Ritmo visual de producción.",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
       src: atmosphereVideo,
-      poster: eventThreeImage,
     },
     {
       type: "video",
@@ -2985,7 +2981,6 @@ function PortfolioPage() {
       title: "Ambiente con carácter.",
       copy: "Composición escénica y acentos de luz para propuestas de eventos.",
       src: characterVideo,
-      poster: eventFourImage,
     },
   ];
 
@@ -3029,7 +3024,7 @@ function PortfolioPage() {
             <article className={`portfolio-showcase-card portfolio-showcase-square is-${item.type}`} key={`${item.eyebrow}-${index}`}>
               <div className="portfolio-showcase-media">
                 {item.type === "video" ? (
-                  <ViewportVideo src={item.src} poster={item.poster} />
+                  <ViewportVideo src={item.src} />
                 ) : (
                   <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
                 )}
