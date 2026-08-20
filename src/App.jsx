@@ -1,45 +1,37 @@
 import { useEffect, useRef, useState } from "react";
-import heroChairBlack from "./assets/chair-big.png";
+import heroChairBlack from "./assets/chair-big.webp";
 import cenizaLogo from "./assets/ceniza-logo-cropped.png";
 import aboutLight from "./assets/luz.png";
-import catalogAccentLight from "./assets/lumina2.png";
+import catalogAccentLight from "./assets/lumina2.webp";
 import portfolioLight from "./assets/lumina1.png";
-import servicesVideo from "./assets/video luces1.mp4";
-import studioVideo from "./assets/video studio.mp4";
+import studioVideo from "./assets/reel-juanita-detras-de-camara.mp4";
+import studioVideoPoster from "./assets/reel-juanita-poster.jpg";
 import portfolioVideo from "./assets/reel-editorial-semilla.mp4";
 import atmosphereVideo from "./assets/reel-atmosferas-diego.mp4";
 import portfolioSpaceVideo from "./assets/reel-diego-detras-de-camaras.mp4";
 import characterVideo from "./assets/video-ambientes-con-caracter.mp4";
-import eventTwoImage from "./assets/evento 2.png";
-import eventThreeImage from "./assets/evento 3.png";
-import eventFourImage from "./assets/evento 4.png";
-import eventFiveImage from "./assets/evento 5 .png";
-import eventSixImage from "./assets/evento 6.png";
-import portfolioCasesImage from "./assets/portafolio-cases-ceniza.png";
-import serviceOneImage from "./assets/servicios 1.png";
-import catalogOneImage from "./assets/catalogo 1.png";
-import comboOneHomeImage from "./assets/combo 1.1.png";
-import comboTwoHomeImage from "./assets/combo 2.2.png";
-import comboThreeHomeImage from "./assets/combo 3.3.png";
-import comboFourHomeImage from "./assets/combo 4.4.png";
-import comboCreatorStartImage from "./assets/combo-creador-start.png";
-import comboCreatorProImage from "./assets/combo-creador-pro.png";
-import comboDetailOneImage from "./assets/combo-detail-1.png";
-import comboDetailTwoImage from "./assets/combo-detail-2.png";
-import comboDetailThreeImage from "./assets/combo-detail-3.png";
-import comboDetailFourImage from "./assets/combo-detail-4.png";
-import comboDetailFiveImage from "./assets/combo-detail-5.png";
-import comboDetailSixImage from "./assets/combo-detail-6.png";
-import landingCreatorProImage from "./assets/landing-creador-pro.png";
-import landingProfessionalBrandImage from "./assets/landing-marca-profesional.png";
-import landingPhotographyProfessionalImage from "./assets/landing-fotografia-profesional.png";
+import eventTwoImage from "./assets/evento 2.webp";
+import eventThreeImage from "./assets/evento 3.webp";
+import eventFourImage from "./assets/evento 4.webp";
+import eventFiveImage from "./assets/evento 5 .webp";
+import eventSixImage from "./assets/evento 6.webp";
+import portfolioCasesImage from "./assets/portafolio-cases-ceniza.webp";
+import serviceOneImage from "./assets/servicios 1.webp";
+import catalogOneImage from "./assets/catalogo 1.webp";
+import comboOneHomeImage from "./assets/combo 1.1.webp";
+import comboFourHomeImage from "./assets/combo 4.4.webp";
+import comboCreatorStartImage from "./assets/combo-creador-start.webp";
+import comboDetailOneImage from "./assets/combo-detail-1.webp";
+import comboDetailTwoImage from "./assets/combo-detail-2.webp";
+import comboDetailThreeImage from "./assets/combo-detail-3.webp";
+import comboDetailFourImage from "./assets/combo-detail-4.webp";
+import comboDetailFiveImage from "./assets/combo-detail-5.webp";
+import comboDetailSixImage from "./assets/combo-detail-6.webp";
+import landingCreatorProImage from "./assets/landing-creador-pro.webp";
+import landingProfessionalBrandImage from "./assets/landing-marca-profesional.webp";
+import landingPhotographyProfessionalImage from "./assets/landing-fotografia-profesional.webp";
 
-const equipmentBannerModules = import.meta.glob("./assets/*equiposceniza.png", {
-  eager: true,
-  import: "default",
-});
-
-const contactFrameModules = import.meta.glob("./assets/cuadro *.{png,jpg,jpeg,JPG,JPEG,PNG}", {
+const equipmentBannerModules = import.meta.glob("./assets/*equiposceniza.webp", {
   eager: true,
   import: "default",
 });
@@ -62,6 +54,24 @@ const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
 const CART_WEBHOOK_URL = import.meta.env.VITE_N8N_CART_WEBHOOK_URL ?? "";
 const CONTACT_WEBHOOK_URL = import.meta.env.VITE_N8N_CONTACT_WEBHOOK_URL ?? "";
 const CART_PAYMENT_URL = import.meta.env.VITE_CENIZA_PAYMENT_URL ?? "";
+const GOOGLE_ANALYTICS_ID = "G-HDX27BVTHQ";
+
+function loadAnalytics() {
+  if (typeof window === "undefined" || document.getElementById("ceniza-google-analytics")) return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function gtag() {
+    window.dataLayer.push(arguments);
+  };
+  window.gtag("js", new Date());
+  window.gtag("config", GOOGLE_ANALYTICS_ID);
+
+  const script = document.createElement("script");
+  script.id = "ceniza-google-analytics";
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`;
+  document.head.appendChild(script);
+}
 
 function formDataToObject(formData) {
   return Object.fromEntries(formData.entries());
@@ -1116,7 +1126,7 @@ const hiddenEquipmentOrders = new Set([9, 12, 13, 15, 22, 23, 27, 32, 33, 36]);
 
 const allEquipmentImages = Object.entries(equipmentBannerModules)
   .map(([path, src]) => {
-    const match = path.match(/\/(\d*)equiposceniza\.png$/);
+    const match = path.match(/\/(\d*)equiposceniza\.webp$/);
     const number = match?.[1] ? Number(match[1]) : 0;
 
     return {
@@ -1144,24 +1154,6 @@ const catalogGalleryOrderOverrides = {
   "ulanzi-l024-40w-rgb-02": [45, 19, 23, 24],
   "ulanzi-ua12-air-tube": [8, 33],
 };
-
-const contactFrameImages = Object.entries(contactFrameModules)
-  .map(([path, src]) => {
-    const match = path.match(/cuadro\s+(\d+)\.(png|jpg|jpeg)$/i);
-    const number = match?.[1] ? Number(match[1]) : 0;
-
-    return {
-      src,
-      alt: number ? `Cuadro visual Ceniza ${number}` : "Cuadro visual Ceniza",
-      order: number,
-    };
-  })
-  .sort((a, b) => a.order - b.order);
-
-const contactFrameRows = [
-  contactFrameImages.slice(0, Math.ceil(contactFrameImages.length / 2)),
-  contactFrameImages.slice(Math.ceil(contactFrameImages.length / 2)),
-];
 
 const catalogSpotlight = equipmentBannerImages
   .filter((item) => item.order > 0)
@@ -1567,8 +1559,8 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
         </button>
       )}
       <a className="brand" href={isSubPage ? "/" : "#inicio"}>
-        <img className="brand-word-image" src={cenizaLogo} alt="Ceniza" />
-        <img className="brand-word-image brand-word-image-accent" src={cenizaLogo} alt="" aria-hidden="true" />
+        <img className="brand-word-image" src={cenizaLogo} alt="Ceniza" width="880" height="141" />
+        <img className="brand-word-image brand-word-image-accent" src={cenizaLogo} alt="" width="880" height="141" aria-hidden="true" />
       </a>
       {!isMobileLayout && (
         <nav className="nav-pill" aria-label="Principal">
@@ -1616,12 +1608,12 @@ function SiteFooter() {
     <footer className="footer" id="contacto">
       <div className="footer-brand-block">
         <a className="footer-brand" href="/">
-          <img className="footer-brand-image" src={cenizaLogo} alt="Ceniza" />
-          <img className="footer-brand-image footer-brand-image-accent" src={cenizaLogo} alt="" aria-hidden="true" />
+          <img className="footer-brand-image" src={cenizaLogo} alt="Ceniza" width="880" height="141" loading="lazy" decoding="async" />
+          <img className="footer-brand-image footer-brand-image-accent" src={cenizaLogo} alt="" width="880" height="141" loading="lazy" decoding="async" aria-hidden="true" />
         </a>
         <div className="footer-socials" aria-label="Redes sociales">
           <a className="footer-social-link" href={FACEBOOK_URL} target="_blank" rel="noreferrer" aria-label="Facebook">
-            <svg viewBox="0 0 24 24" role="img">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="currentColor"
                 d="M13.5 21v-7h2.3l.4-2.7h-2.7V9.6c0-.8.2-1.3 1.4-1.3H16V5.9c-.5-.1-1.4-.1-2.2-.1-2.2 0-3.8 1.3-3.8 3.8v1.7H7.7V14H10v7h3.5Z"
@@ -1629,7 +1621,7 @@ function SiteFooter() {
             </svg>
           </a>
           <a className="footer-social-link" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" role="img">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="currentColor"
                 d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Zm0 2.2A1.8 1.8 0 0 0 5.2 7v10c0 1 .8 1.8 1.8 1.8h10c1 0 1.8-.8 1.8-1.8V7c0-1-.8-1.8-1.8-1.8H7Zm10.4 1.7a1 1 0 1 1 0 2.1 1 1 0 0 1 0-2.1ZM12 7.7A4.3 4.3 0 1 1 7.7 12 4.3 4.3 0 0 1 12 7.7Zm0 2.2A2.1 2.1 0 1 0 14.1 12 2.1 2.1 0 0 0 12 9.9Z"
@@ -1671,7 +1663,19 @@ function CookieBanner() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted") return;
+    if (window.localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted") {
+      const loadId = "requestIdleCallback" in window
+        ? window.requestIdleCallback(loadAnalytics, { timeout: 2500 })
+        : window.setTimeout(loadAnalytics, 1500);
+
+      return () => {
+        if ("cancelIdleCallback" in window) {
+          window.cancelIdleCallback(loadId);
+        } else {
+          window.clearTimeout(loadId);
+        }
+      };
+    }
 
     const timerId = window.setTimeout(() => setIsVisible(true), 500);
     return () => window.clearTimeout(timerId);
@@ -1680,6 +1684,7 @@ function CookieBanner() {
   const handleAccept = () => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+      loadAnalytics();
     }
     setIsVisible(false);
   };
@@ -1717,7 +1722,7 @@ function FloatingActions() {
       rel="noreferrer"
       aria-label="Escribir por WhatsApp"
     >
-        <svg viewBox="0 0 24 24" role="img">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="currentColor"
             d="M19.05 4.94A9.77 9.77 0 0 0 12.09 2C6.7 2 2.32 6.38 2.32 11.78c0 1.73.45 3.42 1.31 4.91L2.25 22l5.46-1.43a9.7 9.7 0 0 0 4.38 1.04h.01c5.39 0 9.78-4.38 9.78-9.78 0-2.61-1.02-5.06-2.83-6.89Zm-6.95 14.99h-.01a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.24.85.87-3.16-.2-.32a8.1 8.1 0 0 1-1.24-4.21c0-4.49 3.65-8.14 8.15-8.14 2.17 0 4.21.84 5.74 2.38a8.08 8.08 0 0 1 2.39 5.76c0 4.49-3.66 8.15-8.13 8.15Zm4.47-6.11c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.55.12-.16.24-.63.77-.78.93-.14.16-.29.18-.53.06-.24-.12-1-.37-1.91-1.18-.7-.62-1.17-1.39-1.31-1.62-.14-.24-.01-.36.1-.48.11-.11.24-.29.37-.43.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.75-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.68 2.57 4.08 3.6.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.4-.57 1.6-1.12.2-.55.2-1.02.14-1.12-.06-.11-.22-.17-.46-.29Z"
@@ -2146,7 +2151,7 @@ function CartPage() {
                       ×
                     </button>
                     <div className="cart-draft-card-media">
-                      <img src={item.image} alt={item.title} />
+                      <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
                     </div>
                     <div className="cart-draft-card-copy">
                       <div className="cart-draft-card-top">
@@ -2233,7 +2238,7 @@ function CartPage() {
                 {recommendationItems.map((item) => (
                   <article className="cart-recommendation-card" key={item.slug}>
                     <div className="cart-recommendation-media">
-                      <img src={item.src} alt={item.label} />
+                      <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
                     </div>
                     <div className="cart-recommendation-copy">
                       <span>{item.accent}</span>
@@ -2262,7 +2267,7 @@ function CartPage() {
                 {recommendationItems.map((item) => (
                   <article className="cart-recommendation-card" key={`${item.slug}-loop`} aria-hidden="true">
                     <div className="cart-recommendation-media">
-                      <img src={item.src} alt="" />
+                      <img src={item.src} alt="" loading="lazy" decoding="async" />
                     </div>
                     <div className="cart-recommendation-copy">
                       <span>{item.accent}</span>
@@ -2315,12 +2320,16 @@ function FaqAccordionSection({
         className="faq-accent-light"
         src={catalogAccentLight}
         alt=""
+        loading="lazy"
+        decoding="async"
         aria-hidden="true"
       />
       <img
         className="faq-accent-star"
         src={aboutLight}
         alt=""
+        loading="lazy"
+        decoding="async"
         aria-hidden="true"
       />
       <div className="faq-shell">
@@ -2330,7 +2339,7 @@ function FaqAccordionSection({
           </a>
           <div className="faq-title-wrap">
             {showSideLights ? (
-              <img className="faq-title-light faq-title-light-left" src={portfolioLight} alt="" aria-hidden="true" />
+              <img className="faq-title-light faq-title-light-left" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
             ) : null}
             <div className="faq-title-row">
               <h2 id="faq-title">
@@ -2344,7 +2353,7 @@ function FaqAccordionSection({
               </h2>
             </div>
             {showSideLights ? (
-              <img className="faq-title-light faq-title-light-right" src={portfolioLight} alt="" aria-hidden="true" />
+              <img className="faq-title-light faq-title-light-right" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
             ) : null}
           </div>
           <p className="section-subtitle faq-subtitle">{subtitle}</p>
@@ -2440,7 +2449,7 @@ function ServicesPage() {
           </div>
           <div className="services-page-highlight">
             <div className="services-page-highlight-card">
-              <img className="services-page-highlight-image" src={serviceOneImage} alt="" aria-hidden="true" />
+              <img className="services-page-highlight-image" src={serviceOneImage} alt="" fetchPriority="high" decoding="async" aria-hidden="true" />
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>Rider flexible</span>
@@ -2460,7 +2469,7 @@ function ServicesPage() {
             >
               <div className={`service-detail-visual ${service.image ? "" : "is-placeholder"}`}>
                 {service.image ? (
-                  <img src={service.image} alt={service.title} />
+                  <img src={service.image} alt={service.title} loading="lazy" decoding="async" />
                 ) : (
                   <div className="service-detail-placeholder">
                     <span className="service-detail-placeholder-chip">{service.eyebrow}</span>
@@ -2534,7 +2543,7 @@ function ServicesPage() {
                   key={`${item.slug}-services-${index}`}
                   aria-label={`Ver ${item.label}`}
                 >
-                  <img src={item.src} alt={item.label} />
+                  <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
                 </a>
               ))}
             </div>
@@ -2621,7 +2630,7 @@ function EquipmentPage() {
           </div>
           <div className="services-page-highlight">
             <div className="services-page-highlight-card">
-              <img className="services-page-highlight-image" src={catalogOneImage} alt="" aria-hidden="true" />
+              <img className="services-page-highlight-image" src={catalogOneImage} alt="" fetchPriority="high" decoding="async" aria-hidden="true" />
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>CATÁLOGO</span>
@@ -2736,7 +2745,7 @@ function EquipmentPage() {
                   }}
                 >
                   <div className="catalog-browser-card-media">
-                    <img src={cardImageSrc} alt={cardImageAlt} />
+                    <img src={cardImageSrc} alt={cardImageAlt} loading="lazy" decoding="async" />
                   </div>
                   <div className="catalog-browser-card-copy">
                     <strong>{image.label}</strong>
@@ -2838,7 +2847,7 @@ function ProductDetailPage({ product }) {
 
           <div className="product-detail-visual">
             <div className="product-detail-visual-frame">
-              <img src={activeGalleryImage.src} alt={activeGalleryImage.alt ?? product.label} />
+              <img src={activeGalleryImage.src} alt={activeGalleryImage.alt ?? product.label} fetchPriority="high" decoding="async" />
             </div>
             {galleryImages.length > 1 ? (
               <div className="product-detail-gallery" aria-label={`Galería de ${product.label}`}>
@@ -2850,7 +2859,7 @@ function ProductDetailPage({ product }) {
                     onClick={() => setActiveImageIndex(index)}
                     aria-label={`Ver imagen ${index + 1} de ${product.label}`}
                   >
-                    <img src={image.src} alt="" />
+                    <img src={image.src} alt="" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
@@ -2868,7 +2877,7 @@ function ProductDetailPage({ product }) {
                   key={`${item.slug}-product-${index}`}
                   aria-label={`Ver ${item.label}`}
                 >
-                  <img src={item.src} alt={item.label} />
+                  <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
                 </a>
               ))}
             </div>
@@ -2883,121 +2892,49 @@ function ProductDetailPage({ product }) {
   );
 }
 
-function SmoothLoopVideo({ src, syncId, syncToken, onReady }) {
-  const firstVideoRef = useRef(null);
-  const secondVideoRef = useRef(null);
-  const activeVideoRef = useRef(0);
-  const isCrossfadingRef = useRef(false);
-  const crossfadeTimeoutRef = useRef(null);
-  const [activeVideo, setActiveVideo] = useState(0);
-
-  useEffect(() => () => {
-    if (crossfadeTimeoutRef.current) {
-      window.clearTimeout(crossfadeTimeoutRef.current);
-    }
-  }, []);
+function ViewportVideo({ src }) {
+  const videoRef = useRef(null);
 
   useEffect(() => {
-    const firstVideo = firstVideoRef.current;
-    if (!firstVideo) return undefined;
+    const video = videoRef.current;
+    if (!video) return undefined;
 
-    const startPlayback = () => {
-      firstVideo.muted = true;
-      firstVideo.play().catch(() => {});
-    };
+    if (!("IntersectionObserver" in window)) {
+      video.play().catch(() => undefined);
+      return () => video.pause();
+    }
 
-    startPlayback();
-    firstVideo.addEventListener("loadeddata", startPlayback);
-    firstVideo.addEventListener("canplay", startPlayback);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => undefined);
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "0px", threshold: 0.35 },
+    );
+
+    observer.observe(video);
 
     return () => {
-      firstVideo.removeEventListener("loadeddata", startPlayback);
-      firstVideo.removeEventListener("canplay", startPlayback);
+      observer.disconnect();
+      video.pause();
     };
   }, [src]);
 
-  useEffect(() => {
-    if (!syncToken) return;
-
-    const videos = [firstVideoRef.current, secondVideoRef.current];
-    if (crossfadeTimeoutRef.current) {
-      window.clearTimeout(crossfadeTimeoutRef.current);
-    }
-
-    videos.forEach((video) => {
-      if (!video) return;
-      video.pause();
-      video.currentTime = 0;
-    });
-
-    activeVideoRef.current = 0;
-    isCrossfadingRef.current = false;
-    setActiveVideo(0);
-
-    window.requestAnimationFrame(() => {
-      firstVideoRef.current?.play().catch(() => {});
-    });
-  }, [src, syncToken]);
-
-  const handleTimeUpdate = async (index) => {
-    if (index !== activeVideoRef.current || isCrossfadingRef.current) return;
-
-    const videos = [firstVideoRef.current, secondVideoRef.current];
-    const currentVideo = videos[index];
-    const remainingTime = currentVideo?.duration - currentVideo?.currentTime;
-
-    if (!Number.isFinite(remainingTime) || remainingTime > 0.85) return;
-
-    const nextIndex = index === 0 ? 1 : 0;
-    const nextVideo = videos[nextIndex];
-    if (!nextVideo) return;
-
-    isCrossfadingRef.current = true;
-    nextVideo.currentTime = 0;
-
-    try {
-      await nextVideo.play();
-      setActiveVideo(nextIndex);
-
-      crossfadeTimeoutRef.current = window.setTimeout(() => {
-        currentVideo.pause();
-        currentVideo.currentTime = 0;
-        activeVideoRef.current = nextIndex;
-        isCrossfadingRef.current = false;
-      }, 850);
-    } catch {
-      isCrossfadingRef.current = false;
-    }
-  };
-
-  const handleEnded = (index) => {
-    if (index !== activeVideoRef.current || isCrossfadingRef.current) return;
-
-    const video = index === 0 ? firstVideoRef.current : secondVideoRef.current;
-    if (!video) return;
-    video.currentTime = 0;
-    video.play().catch(() => {});
-  };
-
   return (
-    <div className="portfolio-smooth-loop" aria-hidden="true">
-      {[firstVideoRef, secondVideoRef].map((videoRef, index) => (
-        <video
-          ref={videoRef}
-          className={`portfolio-showcase-video portfolio-smooth-loop-layer ${activeVideo === index ? "is-active" : ""}`}
-          autoPlay={index === 0}
-          muted
-          playsInline
-          preload="auto"
-          onCanPlay={() => index === 0 && onReady(syncId)}
-          onTimeUpdate={() => handleTimeUpdate(index)}
-          onEnded={() => handleEnded(index)}
-          key={index}
-        >
-          <source src={src} type="video/mp4" />
-        </video>
-      ))}
-    </div>
+    <video
+      ref={videoRef}
+      className="portfolio-showcase-video"
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden="true"
+    >
+      <source src={src} type="video/mp4" />
+    </video>
   );
 }
 
@@ -3009,7 +2946,6 @@ function PortfolioPage() {
       title: "Proyectos con atmósfera y precisión.",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
-      smoothLoop: true,
     },
     {
       type: "video",
@@ -3017,7 +2953,6 @@ function PortfolioPage() {
       title: "Composición para espacios.",
       copy: "Referencias visuales para atmósfera, profundidad y look final.",
       src: portfolioSpaceVideo,
-      smoothLoop: true,
     },
     {
       type: "video",
@@ -3025,7 +2960,6 @@ function PortfolioPage() {
       title: "Ritmo visual de producción.",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
       src: atmosphereVideo,
-      smoothLoop: true,
     },
     {
       type: "video",
@@ -3033,26 +2967,8 @@ function PortfolioPage() {
       title: "Ambiente con carácter.",
       copy: "Composición escénica y acentos de luz para propuestas de eventos.",
       src: characterVideo,
-      smoothLoop: true,
     },
   ];
-
-  const synchronizedVideoCount = portfolioShowcaseItems.filter((item) => item.smoothLoop).length;
-  const readyVideoIdsRef = useRef(new Set());
-  const [readyVideoCount, setReadyVideoCount] = useState(0);
-  const [videoSyncToken, setVideoSyncToken] = useState(0);
-
-  const handleVideoReady = (videoId) => {
-    if (readyVideoIdsRef.current.has(videoId)) return;
-    readyVideoIdsRef.current.add(videoId);
-    setReadyVideoCount(readyVideoIdsRef.current.size);
-  };
-
-  useEffect(() => {
-    if (readyVideoCount === synchronizedVideoCount && synchronizedVideoCount > 0) {
-      setVideoSyncToken((currentToken) => currentToken + 1);
-    }
-  }, [readyVideoCount, synchronizedVideoCount]);
 
   return (
     <div className="page-shell services-page-shell portfolio-page-shell">
@@ -3078,7 +2994,7 @@ function PortfolioPage() {
           </div>
           <div className="services-page-highlight portfolio-page-highlight">
             <div className="services-page-highlight-card portfolio-page-highlight-card">
-              <img src={portfolioCasesImage} alt="Cases de producción Ceniza" />
+              <img src={portfolioCasesImage} alt="Cases de producción Ceniza" fetchPriority="high" decoding="async" />
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>PORTAFOLIO</span>
@@ -3093,27 +3009,10 @@ function PortfolioPage() {
           {portfolioShowcaseItems.map((item, index) => (
             <article className={`portfolio-showcase-card portfolio-showcase-square is-${item.type}`} key={`${item.eyebrow}-${index}`}>
               <div className="portfolio-showcase-media">
-                {item.type === "video" && item.smoothLoop ? (
-                  <SmoothLoopVideo
-                    src={item.src}
-                    syncId={`${item.eyebrow}-${index}`}
-                    syncToken={videoSyncToken}
-                    onReady={handleVideoReady}
-                  />
-                ) : item.type === "video" ? (
-                  <video
-                    key={`${item.eyebrow}-${index}`}
-                    className="portfolio-showcase-video"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                  >
-                    <source src={item.src} type="video/mp4" />
-                  </video>
+                {item.type === "video" ? (
+                  <ViewportVideo src={item.src} />
                 ) : (
-                  <img src={item.src} alt={item.alt} />
+                  <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
                 )}
                 <div className="portfolio-showcase-copy portfolio-showcase-copy-overlay">
                   <p className="service-detail-eyebrow">{item.eyebrow}</p>
@@ -3254,32 +3153,6 @@ function ContactPage() {
           </form>
         </section>
 
-        <section className="contact-inspiration-section" aria-labelledby="contact-inspiration-title">
-          <div className="contact-inspiration-head">
-            <h2 id="contact-inspiration-title">
-              Referencias <span>visuales</span>
-            </h2>
-            <p>
-              Una selección de cuadros y <span>atmósferas</span> para leer el <span>lenguaje</span> visual de Ceniza.
-            </p>
-          </div>
-          <div className="contact-inspiration-marquee" aria-label="Galería visual Ceniza">
-            {contactFrameRows.map((row, rowIndex) => (
-              <div className="contact-inspiration-row" key={`row-${rowIndex}`}>
-                <div className="contact-inspiration-track">
-                  {row.map((image) => (
-                    <figure className="contact-inspiration-card" key={image.alt}>
-                      <img src={image.src} alt={image.alt} />
-                    </figure>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="contact-inspiration-closing">
-            No iluminamos sets. Construimos <span>atmósferas.</span>
-          </p>
-        </section>
       </main>
 
       <SiteFooter />
@@ -3522,6 +3395,8 @@ function RotatingPortfolioBackground({ images }) {
             className={`portfolio-bg-slide ${index === activeIndex ? "is-active" : ""}`}
             src={image.image}
             alt=""
+            loading="lazy"
+            decoding="async"
             key={image.alt}
           />
         )
@@ -3530,131 +3405,10 @@ function RotatingPortfolioBackground({ images }) {
   );
 }
 
-function SeamlessServicesVideo({ src }) {
-  const videoARef = useRef(null);
-  const videoBRef = useRef(null);
-  const activeRef = useRef("a");
-  const transitionLockRef = useRef(false);
-  const frameRef = useRef(0);
-  const [activeVideo, setActiveVideo] = useState("a");
-
-  useEffect(() => {
-    const fadeLeadTime = 3.4;
-    const fadeDuration = 2600;
-    const loopStartTime = 0.12;
-
-    const ensurePlayback = async (video) => {
-      if (!video) return;
-
-      try {
-        await video.play();
-      } catch {
-        // Ignore autoplay interruptions; user interaction can resume playback.
-      }
-    };
-
-    const waitForMediaEvent = (video, eventName) =>
-      new Promise((resolve) => {
-        const timeout = window.setTimeout(resolve, 600);
-        video.addEventListener(
-          eventName,
-          () => {
-            window.clearTimeout(timeout);
-            resolve();
-          },
-          { once: true },
-        );
-      });
-
-    const prepareNextVideo = async (video) => {
-      if (!video) return;
-
-      if (video.readyState === 0) {
-        await waitForMediaEvent(video, "loadedmetadata");
-      }
-
-      if (Math.abs(video.currentTime - loopStartTime) > 0.05) {
-        video.currentTime = loopStartTime;
-        await waitForMediaEvent(video, "seeked");
-      }
-
-      if (video.readyState < 2) {
-        await waitForMediaEvent(video, "canplay");
-      }
-
-      await ensurePlayback(video);
-    };
-
-    ensurePlayback(videoARef.current);
-
-    const tick = () => {
-      const currentVideo = activeRef.current === "a" ? videoARef.current : videoBRef.current;
-      const nextVideo = activeRef.current === "a" ? videoBRef.current : videoARef.current;
-
-      if (
-        currentVideo &&
-        nextVideo &&
-        currentVideo.duration &&
-        Number.isFinite(currentVideo.duration) &&
-        !transitionLockRef.current &&
-        currentVideo.duration - currentVideo.currentTime <= fadeLeadTime
-      ) {
-        transitionLockRef.current = true;
-        prepareNextVideo(nextVideo).then(() => {
-          const nextActive = activeRef.current === "a" ? "b" : "a";
-          setActiveVideo(nextActive);
-
-          window.setTimeout(() => {
-            currentVideo.pause();
-            currentVideo.currentTime = loopStartTime;
-            activeRef.current = nextActive;
-            transitionLockRef.current = false;
-          }, fadeDuration);
-        });
-      }
-
-      frameRef.current = window.requestAnimationFrame(tick);
-    };
-
-    frameRef.current = window.requestAnimationFrame(tick);
-
-    return () => {
-      window.cancelAnimationFrame(frameRef.current);
-      videoARef.current?.pause();
-      videoBRef.current?.pause();
-    };
-  }, []);
-
-  return (
-    <div className="services-video-wrap" aria-hidden="true">
-      <video
-        ref={videoARef}
-        className={`services-video ${activeVideo === "a" ? "is-active" : ""}`}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        loop
-      >
-        <source src={src} type="video/mp4" />
-      </video>
-      <video
-        ref={videoBRef}
-        className={`services-video ${activeVideo === "b" ? "is-active" : ""}`}
-        muted
-        playsInline
-        preload="auto"
-        loop
-      >
-        <source src={src} type="video/mp4" />
-      </video>
-    </div>
-  );
-}
-
 export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const [catalogMosaicOffset, setCatalogMosaicOffset] = useState(0);
+  const studioVideoRef = useRef(null);
   const currentPath =
     typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") || "/" : "/";
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -3678,14 +3432,53 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (catalogMosaicPool.length <= 1) return undefined;
+    if (currentPath !== "/") return undefined;
+
+    const video = studioVideoRef.current;
+    if (!video) return undefined;
+    let isCancelled = false;
+
+    const enableStudioVideoSound = () => {
+      window.removeEventListener("click", enableStudioVideoSound, true);
+      window.removeEventListener("keydown", enableStudioVideoSound, true);
+      video.muted = false;
+      video.volume = 1;
+      video.play().catch(() => undefined);
+    };
+
+    const startStudioVideo = async () => {
+      try {
+        video.muted = false;
+        video.volume = 1;
+        await video.play();
+      } catch {
+        video.muted = true;
+        await video.play().catch(() => undefined);
+        if (!isCancelled) {
+          window.addEventListener("click", enableStudioVideoSound, true);
+          window.addEventListener("keydown", enableStudioVideoSound, true);
+        }
+      }
+    };
+
+    startStudioVideo();
+
+    return () => {
+      isCancelled = true;
+      window.removeEventListener("click", enableStudioVideoSound, true);
+      window.removeEventListener("keydown", enableStudioVideoSound, true);
+    };
+  }, [currentPath]);
+
+  useEffect(() => {
+    if (currentPath !== "/" || catalogMosaicPool.length <= 1) return undefined;
 
     const intervalId = window.setInterval(() => {
       setCatalogMosaicOffset((current) => (current + 1) % catalogMosaicPool.length);
     }, 15000);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [currentPath]);
 
   useEffect(() => {
     const metaDescription = document.querySelector('meta[name="description"]');
@@ -4014,20 +3807,21 @@ export default function App() {
               </h1>
               <div className="hero-divider" aria-hidden="true" />
               <p className="lead">
-                Diseñamos atmósferas de luz para eventos, montajes y espacios
-                que necesitan presencia visual, precisión técnica y carácter.
+                Creamos iluminación profesional para podcasts, fotografía de marca,
+                contenido para redes sociales y producciones audiovisuales. No diseñamos
+                sets, creamos atmósferas.
               </p>
               <div className="hero-actions">
                 <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                  Cotizar
+                  Cotizar proyecto
                 </a>
                 <a className="button secondary" href={CATALOG_PATH}>
-                  Ver catalogo
+                  Ver catálogo
                 </a>
               </div>
             </div>
             <div className="hero-art">
-              <img className="hero-combined-image" src={heroChairBlack} alt="" />
+              <img className="hero-combined-image" src={heroChairBlack} alt="" fetchPriority="high" decoding="async" />
             </div>
           </div>
         </section>
@@ -4041,31 +3835,38 @@ export default function App() {
         </section>
 
         <section className="about-grid" id="about">
-          <article className="about-panel intro">
-            <div className="intro-pill" aria-hidden="true" />
-            <div className="intro-frame">
-              <img className="intro-star" src={portfolioLight} alt="" aria-hidden="true" />
-              <h2>Sobre Ceniza</h2>
-              <p className="section-subtitle about-subtitle">
-                Creamos soluciones visuales para eventos y montajes donde la luz
-                no solo ilumina: define la atmósfera y la narrativa del espacio.
-              </p>
-              <h3>Nuestro enfoque</h3>
-              <ul>
-                <li>Iluminación para eventos, sets y montajes</li>
-                <li>Dirección visual y atmósfera de escena</li>
-                <li>Soluciones técnicas para producción audiovisual</li>
-              </ul>
-            </div>
-          </article>
-          <article className="about-panel about-video-panel" aria-label="Espacio para video de presentación">
-            <div className="about-video-slot">
-              <video className="about-video-media" autoPlay loop muted playsInline controls preload="auto">
-                <source src={studioVideo} type="video/mp4" />
-              </video>
-              <span className="about-video-eyebrow">STUDIO REEL</span>
-              <h3>Studio reel de Ceniza.</h3>
-              <p>Un vistazo al lenguaje visual, montaje y atmósfera que construimos en cada producción.</p>
+          <article className="about-panel about-unified-panel">
+            <div className="about-unified-frame">
+              <div className="about-unified-media">
+                <video
+                  ref={studioVideoRef}
+                  className="about-video-media"
+                  autoPlay
+                  loop
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={studioVideoPoster}
+                >
+                  <source src={studioVideo} type="video/mp4" />
+                </video>
+              </div>
+              <div className="about-unified-copy">
+                <img className="intro-star" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                <h2>La luz cuenta historias</h2>
+                <p className="section-subtitle about-subtitle">
+                  En Ceniza entendemos la iluminación como una herramienta creativa:
+                  define el tono, dirige la mirada y convierte un espacio en una
+                  experiencia. Combinamos criterio visual, técnica y equipos
+                  profesionales para construir atmósferas con intención.
+                </p>
+                <h3>Nuestro enfoque</h3>
+                <ul>
+                  <li>Iluminación creativa para podcast, video y fotografía</li>
+                  <li>Dirección visual para marcas, contenidos y eventos</li>
+                  <li>Alquiler de luces y equipos profesionales</li>
+                </ul>
+              </div>
             </div>
           </article>
         </section>
@@ -4090,7 +3891,7 @@ export default function App() {
                   key={item.alt}
                 >
                   <div className="catalog-mosaic-visual">
-                    <img src={item.src} alt={item.alt} />
+                    <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
                   </div>
                   <div className="catalog-mosaic-overlay" />
                   <div className="catalog-mosaic-copy">
@@ -4110,8 +3911,8 @@ export default function App() {
         </section>
 
         <section className="services" id="servicios">
-          <img className="services-accent services-accent-top" src={aboutLight} alt="" aria-hidden="true" />
-          <img className="services-accent services-accent-bottom" src={aboutLight} alt="" aria-hidden="true" />
+          <img className="services-accent services-accent-top" src={aboutLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+          <img className="services-accent services-accent-bottom" src={aboutLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
           <a className="section-chip-link" href={SERVICES_PATH}>
             <p className="eyebrow center">COMBOS</p>
           </a>
@@ -4130,7 +3931,7 @@ export default function App() {
               >
                 <div className="services-centered-visual">
                   {service.image ? (
-                    <img src={service.image} alt={`Combo ${service.title} de Ceniza`} />
+                    <img src={service.image} alt={`Combo ${service.title} de Ceniza`} loading="lazy" decoding="async" />
                   ) : null}
                 </div>
                 <div className="services-centered-overlay" />

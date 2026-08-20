@@ -18,7 +18,10 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Portafolio con imágenes y videos.
 - Páginas de tratamiento de datos y términos y condiciones.
 - Aviso de cookies, enlaces de contacto y metadatos SEO.
-- Integración de medición web incluida en `index.html`.
+- Medición web cargada únicamente después de que el visitante acepta el aviso de cookies.
+- Imágenes optimizadas en WebP y carga diferida de contenido fuera de pantalla.
+- Reproducción de videos del portafolio limitada al contenido visible para reducir la descarga inicial.
+- Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
 
 El proyecto no procesa pagos directamente: solo puede abrir una URL externa configurada. Tampoco contiene un CRM. La conexión con un CRM, automatizaciones adicionales o persistencia de clientes debe considerarse una extensión demo o trabajo futuro.
 
@@ -39,9 +42,9 @@ La aplicación es una SPA ejecutada completamente en el navegador:
 - `src/main.jsx` monta la aplicación React.
 - `src/App.jsx` contiene las vistas, navegación, catálogo, carrito y formularios.
 - `src/styles.css` contiene los estilos globales y responsivos.
-- `src/assets/` contiene imágenes y videos importados por Vite, incluidos catálogos cargados dinámicamente.
-- `public/` contiene el icono público del sitio.
-- `vercel.json` define el fallback de rutas hacia `index.html`.
+- `src/assets/` contiene únicamente las imágenes y videos utilizados por la aplicación.
+- `public/` contiene el icono y los archivos públicos de descubrimiento para buscadores.
+- `vercel.json` define el fallback de rutas hacia `index.html` y la caché de recursos versionados.
 
 El carrito usa `localStorage`. Las solicitudes se envían directamente desde el navegador a endpoints externos; este repositorio no incluye base de datos, API propia ni almacenamiento persistente de clientes.
 
@@ -84,8 +87,20 @@ npm run build
 
 El resultado se genera en `dist/`, carpeta excluida del control de versiones.
 
+## Rendimiento
+
+La versión actual prioriza una buena experiencia en computadores, tablets y celulares:
+
+- Las imágenes fotográficas se sirven en WebP con dimensiones ajustadas a su uso real.
+- Los recursos inferiores a la pantalla usan carga diferida.
+- Los videos del portafolio no se descargan hasta que entran de forma suficiente en el área visible.
+- Los recursos versionados de Vite reciben caché inmutable en Vercel.
+- El video principal conserva reproducción automática por decisión de experiencia, por lo que es el recurso más pesado de la carga inicial.
+
+Antes de publicar se debe ejecutar `npm run build` y comprobar las rutas `/`, `/catalogo`, `/servicios`, `/portafolio` y `/contacto` en anchos móvil, tablet y escritorio.
+
 ## Estado actual
 
-La interfaz, navegación, catálogo, carrito, formularios e integración configurable con n8n están implementados. Para operar en un entorno real todavía se requiere configurar y asegurar los endpoints externos, validar el flujo de pago, revisar el contenido comercial y definir una estrategia de manejo de datos personales.
+La interfaz, navegación, catálogo, carrito, formularios e integración configurable con n8n están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché y archivos básicos de descubrimiento. Para operar todos los formularios en un entorno real se deben mantener configurados y protegidos los endpoints externos, validar el flujo de pago y aplicar la política de tratamiento de datos personales.
 
 No se incluye CRM. Cualquier automatización de CRM, panel administrativo, autenticación, base de datos o gestión interna debe tratarse como una extensión demo o trabajo futuro hasta que exista código verificable para esas capacidades.
