@@ -3460,6 +3460,7 @@ export default function App() {
       return () => video.pause();
     }
 
+    const isMobileViewport = window.matchMedia("(max-width: 640px)").matches;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -3468,7 +3469,10 @@ export default function App() {
           video.pause();
         }
       },
-      { rootMargin: "200px 0px", threshold: 0.01 },
+      {
+        rootMargin: isMobileViewport ? "0px" : "200px 0px",
+        threshold: 0.01,
+      },
     );
 
     observer.observe(video);
