@@ -9136,3 +9136,37 @@ a {
     font-size: max(0.78rem, 12px);
   }
 }
+
+
+/* Keep the unified studio reel visible on mobile WebKit.
+   An explicit block size avoids Safari collapsing an auto grid row
+   whose only child is absolutely positioned. */
+@media (max-width: 640px) {
+  .about-unified-media {
+    display: block;
+    width: 100%;
+    height: clamp(260px, 74vw, 360px);
+    min-height: clamp(260px, 74vw, 360px);
+    aspect-ratio: auto;
+    overflow: hidden;
+    background: #000000;
+    isolation: isolate;
+  }
+
+  .about-unified-media .about-video-media {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    opacity: 1;
+    visibility: visible;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
