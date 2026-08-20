@@ -5,10 +5,15 @@ import aboutLight from "./assets/luz.png";
 import catalogAccentLight from "./assets/lumina2.webp";
 import portfolioLight from "./assets/lumina1.png";
 import studioVideo from "./assets/reel-juanita-detras-de-camara.mp4";
+import studioVideoPoster from "./assets/reel-juanita-poster.jpg";
 import portfolioVideo from "./assets/reel-editorial-semilla.mp4";
+import portfolioVideoPoster from "./assets/reel-editorial-semilla-poster.jpg";
 import atmosphereVideo from "./assets/reel-atmosferas-diego.mp4";
+import atmosphereVideoPoster from "./assets/reel-atmosferas-diego-poster.jpg";
 import portfolioSpaceVideo from "./assets/reel-diego-detras-de-camaras.mp4";
+import portfolioSpaceVideoPoster from "./assets/reel-diego-detras-de-camaras-poster.jpg";
 import characterVideo from "./assets/video-ambientes-con-caracter.mp4";
+import characterVideoPoster from "./assets/video-ambientes-con-caracter-poster.jpg";
 import eventTwoImage from "./assets/evento 2.webp";
 import eventThreeImage from "./assets/evento 3.webp";
 import eventFourImage from "./assets/evento 4.webp";
@@ -2891,7 +2896,7 @@ function ProductDetailPage({ product }) {
   );
 }
 
-function ViewportVideo({ src }) {
+function ViewportVideo({ src, poster }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -2925,7 +2930,7 @@ function ViewportVideo({ src }) {
           video.pause();
         }
       },
-      { rootMargin: "240px 0px", threshold: 0.01 },
+      { rootMargin: "0px", threshold: 0.35 },
     );
 
     observer.observe(video);
@@ -2943,7 +2948,8 @@ function ViewportVideo({ src }) {
       muted
       loop
       playsInline
-      preload="metadata"
+      preload="none"
+      poster={poster}
       aria-hidden="true"
     >
       <source src={src} type="video/mp4" />
@@ -2959,6 +2965,7 @@ function PortfolioPage() {
       title: "Proyectos con atmósfera y precisión.",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
+      poster: portfolioVideoPoster,
     },
     {
       type: "video",
@@ -2966,6 +2973,7 @@ function PortfolioPage() {
       title: "Composición para espacios.",
       copy: "Referencias visuales para atmósfera, profundidad y look final.",
       src: portfolioSpaceVideo,
+      poster: portfolioSpaceVideoPoster,
     },
     {
       type: "video",
@@ -2973,6 +2981,7 @@ function PortfolioPage() {
       title: "Ritmo visual de producción.",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
       src: atmosphereVideo,
+      poster: atmosphereVideoPoster,
     },
     {
       type: "video",
@@ -2980,6 +2989,7 @@ function PortfolioPage() {
       title: "Ambiente con carácter.",
       copy: "Composición escénica y acentos de luz para propuestas de eventos.",
       src: characterVideo,
+      poster: characterVideoPoster,
     },
   ];
 
@@ -3023,7 +3033,7 @@ function PortfolioPage() {
             <article className={`portfolio-showcase-card portfolio-showcase-square is-${item.type}`} key={`${item.eyebrow}-${index}`}>
               <div className="portfolio-showcase-media">
                 {item.type === "video" ? (
-                  <ViewportVideo src={item.src} />
+                  <ViewportVideo src={item.src} poster={item.poster} />
                 ) : (
                   <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
                 )}
@@ -3854,12 +3864,12 @@ export default function App() {
                 <video
                   ref={studioVideoRef}
                   className="about-video-media"
-                  autoPlay
                   loop
                   muted
                   controls
                   playsInline
                   preload="none"
+                  poster={studioVideoPoster}
                 >
                   <source src={studioVideo} type="video/mp4" />
                 </video>

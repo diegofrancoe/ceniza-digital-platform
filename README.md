@@ -20,7 +20,7 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Aviso de cookies, enlaces de contacto y metadatos SEO.
 - Medición web cargada únicamente después de que el visitante acepta el aviso de cookies.
 - Imágenes optimizadas en WebP y carga diferida de contenido fuera de pantalla.
-- Reproducción de videos del portafolio limitada al contenido visible para reducir la descarga inicial.
+- Reproducción de videos del portafolio limitada al contenido visible, con portadas livianas para evitar cuadros vacíos durante la carga.
 - Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
 
 El proyecto no procesa pagos directamente: solo puede abrir una URL externa configurada. Tampoco contiene un CRM. La conexión con un CRM, automatizaciones adicionales o persistencia de clientes debe considerarse una extensión demo o trabajo futuro.
@@ -94,8 +94,9 @@ La versión actual prioriza una buena experiencia en computadores, tablets y cel
 - Las imágenes fotográficas se sirven en WebP con dimensiones ajustadas a su uso real.
 - Los recursos inferiores a la pantalla usan carga diferida.
 - Los videos del portafolio no se descargan hasta que entran de forma suficiente en el área visible.
+- Cada video del portafolio incluye una portada comprimida que se muestra antes de iniciar la descarga.
 - Los recursos versionados de Vite reciben caché inmutable en Vercel.
-- El video principal conserva reproducción automática por decisión de experiencia, por lo que es el recurso más pesado de la carga inicial.
+- El video principal se descarga únicamente al acercarse a su sección y permanece fuera de la carga inicial en celulares.
 
 Antes de publicar se debe ejecutar `npm run build` y comprobar las rutas `/`, `/catalogo`, `/servicios`, `/portafolio` y `/contacto` en anchos móvil, tablet y escritorio.
 
