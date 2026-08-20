@@ -2892,27 +2892,41 @@ function ProductDetailPage({ product }) {
   );
 }
 
-function ViewportVideo({ src }) {
+function ViewportVideo({ src, poster }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return undefined;
 
+    const playVideo = () => {
+      if (video.readyState === 0) video.load();
+
+      const attemptPlayback = () => {
+        video.play().catch(() => undefined);
+      };
+
+      if (video.readyState >= 2) {
+        attemptPlayback();
+      } else {
+        video.addEventListener("loadeddata", attemptPlayback, { once: true });
+      }
+    };
+
     if (!("IntersectionObserver" in window)) {
-      video.play().catch(() => undefined);
+      playVideo();
       return () => video.pause();
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play().catch(() => undefined);
+          playVideo();
         } else {
           video.pause();
         }
       },
-      { rootMargin: "0px", threshold: 0.35 },
+      { rootMargin: "240px 0px", threshold: 0.01 },
     );
 
     observer.observe(video);
@@ -2930,7 +2944,8 @@ function ViewportVideo({ src }) {
       muted
       loop
       playsInline
-      preload="none"
+      preload="metadata"
+      poster={poster}
       aria-hidden="true"
     >
       <source src={src} type="video/mp4" />
@@ -2946,6 +2961,7 @@ function PortfolioPage() {
       title: "Proyectos con atmósfera y precisión.",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
+      poster: portfolioCasesImage,
     },
     {
       type: "video",
@@ -2953,6 +2969,7 @@ function PortfolioPage() {
       title: "Composición para espacios.",
       copy: "Referencias visuales para atmósfera, profundidad y look final.",
       src: portfolioSpaceVideo,
+      poster: eventTwoImage,
     },
     {
       type: "video",
@@ -2960,6 +2977,7 @@ function PortfolioPage() {
       title: "Ritmo visual de producción.",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
       src: atmosphereVideo,
+      poster: eventThreeImage,
     },
     {
       type: "video",
@@ -2967,6 +2985,7 @@ function PortfolioPage() {
       title: "Ambiente con carácter.",
       copy: "Composición escénica y acentos de luz para propuestas de eventos.",
       src: characterVideo,
+      poster: eventFourImage,
     },
   ];
 
@@ -3010,7 +3029,7 @@ function PortfolioPage() {
             <article className={`portfolio-showcase-card portfolio-showcase-square is-${item.type}`} key={`${item.eyebrow}-${index}`}>
               <div className="portfolio-showcase-media">
                 {item.type === "video" ? (
-                  <ViewportVideo src={item.src} />
+                  <ViewportVideo src={item.src} poster={item.poster} />
                 ) : (
                   <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
                 )}
@@ -3446,22 +3465,13 @@ export default function App() {
       video.play().catch(() => undefined);
     };
 
-    const startStudioVideo = async () => {
-      try {
-        video.muted = false;
-        video.volume = 1;
-        await video.play();
-      } catch {
-        video.muted = true;
-        await video.play().catch(() => undefined);
-        if (!isCancelled) {
-          window.addEventListener("click", enableStudioVideoSound, true);
-          window.addEventListener("keydown", enableStudioVideoSound, true);
-        }
-      }
-    };
+    video.muted = true;
+    video.play().catch(() => undefined);
 
-    startStudioVideo();
+    if (!isCancelled) {
+      window.addEventListener("click", enableStudioVideoSound, true);
+      window.addEventListener("keydown", enableStudioVideoSound, true);
+    }
 
     return () => {
       isCancelled = true;
@@ -3843,6 +3853,7 @@ export default function App() {
                   className="about-video-media"
                   autoPlay
                   loop
+                  muted
                   controls
                   playsInline
                   preload="metadata"
