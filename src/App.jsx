@@ -3468,7 +3468,7 @@ export default function App() {
           video.pause();
         }
       },
-      { rootMargin: "500px 0px", threshold: 0.01 },
+      { rootMargin: "200px 0px", threshold: 0.01 },
     );
 
     observer.observe(video);
