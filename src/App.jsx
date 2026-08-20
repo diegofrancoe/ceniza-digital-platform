@@ -5,7 +5,6 @@ import aboutLight from "./assets/luz.png";
 import catalogAccentLight from "./assets/lumina2.webp";
 import portfolioLight from "./assets/lumina1.png";
 import studioVideo from "./assets/reel-juanita-detras-de-camara.mp4";
-import studioVideoPoster from "./assets/reel-juanita-poster.jpg";
 import portfolioVideo from "./assets/reel-editorial-semilla.mp4";
 import atmosphereVideo from "./assets/reel-atmosferas-diego.mp4";
 import portfolioSpaceVideo from "./assets/reel-diego-detras-de-camaras.mp4";
@@ -3450,28 +3449,33 @@ export default function App() {
 
     const video = studioVideoRef.current;
     if (!video) return undefined;
-    let isCancelled = false;
 
-    const enableStudioVideoSound = () => {
-      window.removeEventListener("click", enableStudioVideoSound, true);
-      window.removeEventListener("keydown", enableStudioVideoSound, true);
-      video.muted = false;
-      video.volume = 1;
+    const startVideo = () => {
+      if (video.readyState === 0) video.load();
       video.play().catch(() => undefined);
     };
 
-    video.muted = true;
-    video.play().catch(() => undefined);
-
-    if (!isCancelled) {
-      window.addEventListener("click", enableStudioVideoSound, true);
-      window.addEventListener("keydown", enableStudioVideoSound, true);
+    if (!("IntersectionObserver" in window)) {
+      startVideo();
+      return () => video.pause();
     }
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startVideo();
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "500px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(video);
+
     return () => {
-      isCancelled = true;
-      window.removeEventListener("click", enableStudioVideoSound, true);
-      window.removeEventListener("keydown", enableStudioVideoSound, true);
+      observer.disconnect();
+      video.pause();
     };
   }, [currentPath]);
 
@@ -3851,8 +3855,7 @@ export default function App() {
                   muted
                   controls
                   playsInline
-                  preload="metadata"
-                  poster={studioVideoPoster}
+                  preload="none"
                 >
                   <source src={studioVideo} type="video/mp4" />
                 </video>
