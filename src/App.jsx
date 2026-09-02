@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import heroChairBlack from "./assets/chair-big.webp";
+import heroSoftboxOff from "./assets/ceniza-godox-qrp70-left-off-grid.png";
+import heroSoftboxOn from "./assets/ceniza-godox-qrp70-left-on-cases-grid.png";
+import portfolioCardImage from "./assets/ceniza-card-portafolio-molus-x60-v3.png";
+import processCardImage from "./assets/ceniza-card-proceso-v2.png";
 import cenizaLogo from "./assets/ceniza-logo-cropped.png";
 import aboutLight from "./assets/luz.png";
 import catalogAccentLight from "./assets/lumina2.webp";
@@ -51,7 +54,6 @@ const TERMS_PATH = "/terminos-y-condiciones";
 const WHATSAPP_URL = "https://wa.me/573203624348";
 const CONTACT_EMAIL = "gerencia@cenizaproducciones.com";
 const INSTAGRAM_URL = "https://www.instagram.com/cenizaproducciones?igsh=NDdxam85cHV6cDRm";
-const FACEBOOK_URL = "https://facebook.com";
 const CART_STORAGE_KEY = "ceniza-cart-draft";
 const CART_UPDATED_EVENT = "ceniza-cart-updated";
 const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
@@ -1523,6 +1525,29 @@ const homeFaq = [
   },
 ];
 
+const contactFaq = [
+  {
+    question: "¿Qué información necesito para cotizar un proyecto de iluminación?",
+    answer:
+      "Comparte la fecha, ciudad, locación, tipo de producción o evento, duración, número de personas y referencias visuales. Con esos datos podemos definir equipos, montaje, transporte y soporte técnico.",
+  },
+  {
+    question: "¿Me ayudan a elegir las luces si no sé qué equipo necesito?",
+    answer:
+      "Sí. Revisamos el espacio, los encuadres, el estilo visual y el presupuesto para recomendar una solución funcional para fotografía, video, streaming, podcast o eventos.",
+  },
+  {
+    question: "¿Puedo alquilar equipos por unidad o necesito elegir un combo?",
+    answer:
+      "Puedes alquilar luces y accesorios por unidad o elegir un combo listo para producir. La opción adecuada depende del montaje, la duración y el nivel de acompañamiento que necesites.",
+  },
+  {
+    question: "¿Ceniza trabaja en Bogotá y otras ciudades de Colombia?",
+    answer:
+      "Nuestra operación principal está en Bogotá. También evaluamos proyectos en otras ciudades de Colombia según fechas, transporte, montaje y disponibilidad del equipo técnico.",
+  },
+];
+
 function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
@@ -1547,7 +1572,7 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
   }, []);
 
   return (
-    <header className="topbar">
+    <header className={`topbar ${isSubPage ? "topbar-subpage" : "topbar-home"}`}>
       {isMobileLayout && (
         <button
           className={`mobile-menu-button ${isMobileMenuOpen ? "is-open" : ""}`}
@@ -1575,20 +1600,6 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
           <a href={CONTACT_PATH}>Contacto</a>
         </nav>
       )}
-      <a
-        className="social-icon floating-instagram-link"
-        href={INSTAGRAM_URL}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Instagram de Ceniza Producciones"
-      >
-        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Zm0 2.2A1.8 1.8 0 0 0 5.2 7v10c0 1 .8 1.8 1.8 1.8h10c1 0 1.8-.8 1.8-1.8V7c0-1-.8-1.8-1.8-1.8H7Zm10.4 1.7a1 1 0 1 1 0 2.1 1 1 0 0 1 0-2.1ZM12 7.7A4.3 4.3 0 1 1 7.7 12 4.3 4.3 0 0 1 12 7.7Zm0 2.2A2.1 2.1 0 1 0 14.1 12 2.1 2.1 0 0 0 12 9.9Z"
-          />
-        </svg>
-      </a>
       {isMobileLayout && (
         <div
           className={`mobile-nav-panel ${isMobileMenuOpen ? "is-open" : ""}`}
@@ -1609,54 +1620,33 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
 
 function SiteFooter() {
   return (
-    <footer className="footer" id="contacto">
-      <div className="footer-brand-block">
+    <footer className="footer footer-minimal" id="contacto">
+      <div className="footer-minimal-lead">
         <a className="footer-brand" href="/">
           <img className="footer-brand-image" src={cenizaLogo} alt="Ceniza" width="880" height="141" loading="lazy" decoding="async" />
           <img className="footer-brand-image footer-brand-image-accent" src={cenizaLogo} alt="" width="880" height="141" loading="lazy" decoding="async" aria-hidden="true" />
         </a>
-        <div className="footer-socials" aria-label="Redes sociales">
-          <a className="footer-social-link" href={FACEBOOK_URL} target="_blank" rel="noreferrer" aria-label="Facebook">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M13.5 21v-7h2.3l.4-2.7h-2.7V9.6c0-.8.2-1.3 1.4-1.3H16V5.9c-.5-.1-1.4-.1-2.2-.1-2.2 0-3.8 1.3-3.8 3.8v1.7H7.7V14H10v7h3.5Z"
-              />
-            </svg>
-          </a>
-          <a className="footer-social-link" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Zm0 2.2A1.8 1.8 0 0 0 5.2 7v10c0 1 .8 1.8 1.8 1.8h10c1 0 1.8-.8 1.8-1.8V7c0-1-.8-1.8-1.8-1.8H7Zm10.4 1.7a1 1 0 1 1 0 2.1 1 1 0 0 1 0-2.1ZM12 7.7A4.3 4.3 0 1 1 7.7 12 4.3 4.3 0 0 1 12 7.7Zm0 2.2A2.1 2.1 0 1 0 14.1 12 2.1 2.1 0 0 0 12 9.9Z"
-              />
-            </svg>
-          </a>
+        <p>Dirección de iluminación, equipos y producción audiovisual.</p>
+        <a
+          className="footer-minimal-contact"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Hablar con Ceniza por WhatsApp"
+        >
+          Hablar por WhatsApp ↗
+        </a>
+      </div>
+
+      <div className="footer-minimal-meta">
+        <p>© 2026 CENIZA · BOGOTÁ, COLOMBIA</p>
+        <div className="footer-minimal-socials" aria-label="Redes sociales">
+          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Instagram ↗</a>
         </div>
-      </div>
-
-      <div className="footer-column">
-        <strong>Studio</strong>
-        <a href="/">Studio</a>
-        <a href={CATALOG_PATH}>Catálogo</a>
-        <a href={SERVICES_PATH}>Combos</a>
-        <a href={PORTFOLIO_PATH}>Portafolio</a>
-      </div>
-
-      <div className="footer-column">
-        <strong>Combos</strong>
-        <p>Podcast y streaming</p>
-        <p>Fotografía de producto</p>
-        <p>Producción audiovisual</p>
-        <p>Montajes y eventos</p>
-      </div>
-
-      <div className="footer-column footer-column-contact">
-        <strong>Contacto</strong>
-        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-        <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp</a>
-        <a href={CONTACT_PATH}>Enviar formulario</a>
-        <p>Bogotá, Colombia</p>
+        <div className="footer-minimal-legal">
+          <a href={DATA_POLICY_PATH}>Privacidad</a>
+          <a href={TERMS_PATH}>Términos</a>
+        </div>
       </div>
     </footer>
   );
@@ -1699,15 +1689,14 @@ function CookieBanner() {
     <aside className="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies">
       <div className="cookie-banner-copy">
         <span>COOKIES</span>
-        <strong>Usamos cookies para mejorar tu experiencia en Ceniza.</strong>
+        <strong>Preferencias de navegación</strong>
         <p>
-          Utilizamos cookies y almacenamiento local para recordar preferencias y optimizar la navegación.
-          Al continuar, aceptas este uso.
+          Usamos cookies para recordar tus preferencias y mejorar el sitio.
         </p>
       </div>
       <div className="cookie-banner-actions">
         <a className="cookie-button cookie-button-secondary" href={DATA_POLICY_PATH}>
-          Tratamiento de datos
+          Ver política
         </a>
         <button className="cookie-button cookie-button-primary" type="button" onClick={handleAccept}>
           Aceptar
@@ -1718,22 +1707,7 @@ function CookieBanner() {
 }
 
 function FloatingActions() {
-  return (
-    <a
-      className="social-icon whatsapp-float"
-      href={WHATSAPP_URL}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Escribir por WhatsApp"
-    >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M19.05 4.94A9.77 9.77 0 0 0 12.09 2C6.7 2 2.32 6.38 2.32 11.78c0 1.73.45 3.42 1.31 4.91L2.25 22l5.46-1.43a9.7 9.7 0 0 0 4.38 1.04h.01c5.39 0 9.78-4.38 9.78-9.78 0-2.61-1.02-5.06-2.83-6.89Zm-6.95 14.99h-.01a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.24.85.87-3.16-.2-.32a8.1 8.1 0 0 1-1.24-4.21c0-4.49 3.65-8.14 8.15-8.14 2.17 0 4.21.84 5.74 2.38a8.08 8.08 0 0 1 2.39 5.76c0 4.49-3.66 8.15-8.13 8.15Zm4.47-6.11c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.55.12-.16.24-.63.77-.78.93-.14.16-.29.18-.53.06-.24-.12-1-.37-1.91-1.18-.7-.62-1.17-1.39-1.31-1.62-.14-.24-.01-.36.1-.48.11-.11.24-.29.37-.43.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.75-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.68 2.57 4.08 3.6.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.4-.57 1.6-1.12.2-.55.2-1.02.14-1.12-.06-.11-.22-.17-.46-.29Z"
-          />
-        </svg>
-    </a>
-  );
+  return null;
 }
 
 function CartPage() {
@@ -2388,9 +2362,9 @@ function FaqAccordionSection({
   );
 }
 
-function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], primaryHref, primaryLabel, secondaryHref, secondaryLabel }) {
+function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], primaryHref, primaryLabel, secondaryHref, secondaryLabel, variant = "default" }) {
   return (
-    <section className="contact-cta inline-cta-section" aria-label={title}>
+    <section className={`contact-cta inline-cta-section inline-cta-${variant}`} aria-label={title}>
       <div className="contact-cta-shell inline-cta-shell">
         <p className="eyebrow center">{eyebrow}</p>
         <h2>{title}</h2>
@@ -2430,24 +2404,23 @@ function ServicesPage() {
   }, []);
 
   return (
-    <div className="page-shell services-page-shell">
+    <div className="page-shell services-page-shell combos-page-shell">
       <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
 
       <main className="services-page-main">
         <section className="services-page-hero">
           <div className="services-page-hero-copy mobile-hide-page-intro">
             <p className="eyebrow">COMBOS</p>
-            <h1>Combos de iluminación para contenido, fotografía y producción audiovisual.</h1>
+            <h1>Combos listos para producir.</h1>
             <p className="services-page-lead">
-              Organizamos nuestros servicios por setup para que sea más fácil cotizar según el tipo de
-              proyecto: creación de contenido, fotografía o producción audiovisual.
+              Setups de iluminación para fotografía, contenido y producción audiovisual.
             </p>
             <div className="services-page-actions">
               <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Cotizar
+                Cotizar combo ↗
               </a>
               <a className="button secondary" href={CATALOG_PATH}>
-                Ver catálogo técnico
+                Ver equipos →
               </a>
             </div>
           </div>
@@ -2457,8 +2430,8 @@ function ServicesPage() {
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>Rider flexible</span>
-                <strong>Combos listos para producción</strong>
-                <p>Podemos escalar cada kit según número de personas, tipo de locación y look deseado.</p>
+                <strong>El setup correcto.</strong>
+                <p>Escalable según locación, equipo y resultado visual.</p>
               </div>
             </div>
           </div>
@@ -2501,15 +2474,16 @@ function ServicesPage() {
                     service.title
                   )}
                 </h2>
-                <p className="service-detail-description">
-                  {service.description}
-                </p>
+                <p className="service-detail-description">{service.summary}</p>
                 <p className="service-detail-ideal">{service.idealFor}</p>
-                <ul className="service-detail-list">
-                  {service.includes.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                <details className="service-detail-includes">
+                  <summary>Qué incluye <span aria-hidden="true">↘</span></summary>
+                  <ul className="service-detail-list">
+                    {service.includes.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </details>
                 {service.price ? (
                   <div className="service-detail-price-actions">
                     <div className="service-detail-price-stack">
@@ -2527,7 +2501,7 @@ function ServicesPage() {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Rentar
+                        Cotizar este combo ↗
                       </a>
                     </div>
                   </div>
@@ -2535,23 +2509,6 @@ function ServicesPage() {
               </div>
             </article>
           ))}
-        </section>
-
-        <section className="equipment-banner equipment-banner-large equipment-banner-internal-dark" aria-label="Catálogo Ceniza">
-          <div className="equipment-banner-marquee">
-            <div className="equipment-banner-track">
-              {[...catalogBrowserItems, ...catalogBrowserItems].map((item, index) => (
-                <a
-                  className="equipment-banner-item"
-                  href={item.href}
-                  key={`${item.slug}-services-${index}`}
-                  aria-label={`Ver ${item.label}`}
-                >
-                  <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
-                </a>
-              ))}
-            </div>
-          </div>
         </section>
 
       </main>
@@ -2618,17 +2575,16 @@ function EquipmentPage() {
         <section className="services-page-hero services-page-hero-inverse">
           <div className="services-page-hero-copy services-page-hero-copy-inverse mobile-hide-page-intro">
             <p className="eyebrow">CATÁLOGO</p>
-            <h1>Catálogo visual para armar riders flexibles según cada producción.</h1>
+            <h1>Equipos para cada producción.</h1>
             <p className="services-page-lead">
-              Aquí reunimos las luminarias, accesorios y piezas de apoyo que usamos para construir
-              setups de fotografía, video, streaming y montajes escénicos.
+              Luces y accesorios profesionales para fotografía, video, streaming y eventos.
             </p>
             <div className="services-page-actions">
               <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Cotizar
+                Cotizar equipo
               </a>
               <a className="button secondary" href={SERVICES_PATH}>
-                Ver combos
+                Explorar combos
               </a>
             </div>
           </div>
@@ -2638,8 +2594,8 @@ function EquipmentPage() {
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>CATÁLOGO</span>
-                <strong>Equipos listos para combinar.</strong>
-                <p>Podemos alquilar piezas individuales o integrarlas dentro de un combo completo.</p>
+                <strong>Listos para combinar.</strong>
+                <p>Renta por unidad o dentro de un combo.</p>
               </div>
             </div>
           </div>
@@ -2648,10 +2604,9 @@ function EquipmentPage() {
         <section className="services-equipment-section services-equipment-page-section">
           <div className="services-equipment-header">
             <p className="eyebrow">CATÁLOGO</p>
-            <h2>Todo el catálogo disponible.</h2>
+            <h2>Catálogo disponible.</h2>
             <p>
-              Si ya sabes qué necesitas, podemos cotizar por unidad. Si todavía estás definiendo el
-              montaje, te ayudamos a convertir estas piezas en una solución funcional.
+              Encuentra el equipo ideal o pídenos una recomendación.
             </p>
           </div>
           <div className="catalog-browser">
@@ -2754,7 +2709,7 @@ function EquipmentPage() {
                   <div className="catalog-browser-card-copy">
                     <strong>{image.label}</strong>
                     <p>{image.category}</p>
-                    <span>Ver información</span>
+                    <span>Ver ficha</span>
                   </div>
                 </a>
               )})}
@@ -2769,14 +2724,15 @@ function EquipmentPage() {
         </section>
 
         <InlineCtaSection
-          eyebrow="COTIZACIÓN"
-          title="¿Ya sabes qué equipo necesitas?"
-          copy="Cuéntanos qué referencias te interesan y armamos una cotización clara para tu montaje."
-          highlights={["Por unidad o combo", "Con lectura técnica", "Según fecha y montaje"]}
+          eyebrow="COTIZACIÓN DE EQUIPOS"
+          title="Equipo listo para tu montaje."
+          copy="Dinos qué vas a producir, la fecha y las referencias que necesitas. Te ayudamos a cotizar equipos de iluminación en Bogotá con una selección clara para tu montaje."
+          highlights={["Alquiler por unidad", "Recomendación técnica", "Disponibilidad por fecha"]}
           primaryHref={WHATSAPP_URL}
-          primaryLabel="Pedir cotización"
+          primaryLabel="Cotizar equipos"
           secondaryHref={SERVICES_PATH}
-          secondaryLabel="Ver combos"
+          secondaryLabel="Explorar combos"
+          variant="catalog"
         />
 
       </main>
@@ -3001,17 +2957,16 @@ function PortfolioPage() {
         <section className="services-page-hero portfolio-page-hero">
           <div className="services-page-hero-copy mobile-hide-page-intro">
             <p className="eyebrow">PORTAFOLIO</p>
-            <h1>Atmósferas, montajes y dirección visual con lectura premium.</h1>
+            <h1>Luz que transforma cada escena.</h1>
             <p className="services-page-lead">
-              Reunimos video, imagen y criterio técnico para mostrar cómo la luz transforma espacios,
-              producciones y experiencias con una intención visual clara.
+              Dirección de iluminación para producciones, espacios y eventos.
             </p>
             <div className="services-page-actions">
               <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
                 Cotizar proyecto
               </a>
               <a className="button secondary" href={SERVICES_PATH}>
-                Ver combos
+                Explorar combos
               </a>
             </div>
           </div>
@@ -3021,8 +2976,8 @@ function PortfolioPage() {
               <div className="services-page-highlight-overlay" />
               <div className="services-page-highlight-copy">
                 <span>PORTAFOLIO</span>
-                <strong>Proyectos con atmósfera y precisión.</strong>
-                <p>Una lectura rápida del lenguaje visual que buscamos en cada montaje.</p>
+                <strong>Atmósfera y precisión.</strong>
+                <p>Una mirada a nuestros proyectos.</p>
               </div>
             </div>
           </div>
@@ -3048,14 +3003,15 @@ function PortfolioPage() {
         </section>
 
         <InlineCtaSection
-          eyebrow="COTIZACIÓN"
-          title="¿Quieres llevar esta idea a tu proyecto?"
-          copy="Cuéntanos la locación y el tipo de montaje para armar una propuesta de iluminación clara, visual y funcional."
-          highlights={["Propuesta visual y técnica", "Según locación y montaje", "Eventos, foto y video"]}
+          eyebrow="COTIZA TU PRODUCCIÓN"
+          title="La luz correcta para tu proyecto."
+          copy="Cuéntanos la fecha, la locación y el resultado que buscas. Diseñamos la iluminación para fotografía, video, eventos y contenido en Bogotá."
+          highlights={["Dirección de iluminación", "Equipos según el montaje", "Producciones en Bogotá"]}
           primaryHref={WHATSAPP_URL}
-          primaryLabel="Cotizar proyecto"
+          primaryLabel="Cotizar por WhatsApp"
           secondaryHref={SERVICES_PATH}
-          secondaryLabel="Ver combos"
+          secondaryLabel="Explorar combos"
+          variant="portfolio"
         />
 
       </main>
@@ -3064,6 +3020,30 @@ function PortfolioPage() {
       <CookieBanner />
       <FloatingActions />
     </div>
+  );
+}
+
+function ContactFaqSection() {
+  return (
+    <section className="contact-faq-section" aria-labelledby="contact-faq-title">
+      <div className="contact-faq-intro">
+        <p className="eyebrow">FAQ</p>
+        <h2 id="contact-faq-title">Antes de cotizar.</h2>
+      </div>
+
+      <div className="contact-faq-list">
+        {contactFaq.map((item, index) => (
+          <details className="contact-faq-item" key={item.question}>
+            <summary>
+              <span className="contact-faq-number" aria-hidden="true">0{index + 1}</span>
+              <h3>{item.question}</h3>
+              <span className="contact-faq-toggle" aria-hidden="true">+</span>
+            </summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -3120,14 +3100,14 @@ function ContactPage() {
           <div className="contact-copy">
             <p className="eyebrow">CONTACTO</p>
             <h1>
-              Cuéntanos qué vas a <span>montar.</span>
+              Hablemos de tu <span>proyecto.</span>
             </h1>
             <p className="services-page-lead">
-              Revisamos el tipo de proyecto, locación, fecha, escala y resultado visual para proponer un setup de luz claro, funcional y listo para producción.
+              Cuéntanos la fecha, locación y tipo de producción. Te proponemos el setup adecuado.
             </p>
             <div className="services-page-actions">
               <a className="button secondary contact-whatsapp-button" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Contactarnos por WhatsApp
+                Hablar por WhatsApp ↗
               </a>
             </div>
           </div>
@@ -3171,10 +3151,12 @@ function ContactPage() {
               {contactSubmissionState.message}
             </p>
             <button className="button primary contact-submit" type="submit" disabled={contactSubmissionState.status === "loading"}>
-              {contactSubmissionState.status === "loading" ? "Enviando..." : "Enviar información"}
+              {contactSubmissionState.status === "loading" ? "Enviando..." : "Enviar proyecto ↗"}
             </button>
           </form>
         </section>
+
+        <ContactFaqSection />
 
       </main>
 
@@ -3214,9 +3196,12 @@ function LegalPage({ eyebrow, title, lead, sections, titleClassName = "" }) {
         </section>
 
         <section className="legal-content">
-          {sections.map((section) => (
+          {sections.map((section, index) => (
             <article className="legal-card" key={section.title}>
-              <h2>{section.title}</h2>
+              <span className="legal-section-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h2>{section.title.replace(/^\d+\.\s*/, "")}</h2>
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
@@ -3431,6 +3416,7 @@ function RotatingPortfolioBackground({ images }) {
 export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const [catalogMosaicOffset, setCatalogMosaicOffset] = useState(0);
+  const [studioVideoMuted, setStudioVideoMuted] = useState(false);
   const studioVideoRef = useRef(null);
   const currentPath =
     typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") || "/" : "/";
@@ -3443,7 +3429,8 @@ export default function App() {
   const isServicesPage = currentPath === SERVICES_PATH;
   const isEquipmentPage = currentPath === CATALOG_PATH;
   const isPortfolioPage = currentPath === PORTFOLIO_PATH;
-  const isContactPage = currentPath === CONTACT_PATH || currentPath === CART_PATH;
+  const isContactPage = currentPath === CONTACT_PATH;
+  const isCartPage = currentPath === CART_PATH;
   const isDataPolicyPage = currentPath === DATA_POLICY_PATH;
   const isTermsPage = currentPath === TERMS_PATH;
   const visibleCatalogMosaic = Array.from({ length: Math.min(5, catalogMosaicPool.length) }, (_, index) => {
@@ -3454,41 +3441,52 @@ export default function App() {
     };
   });
 
+  const enableStudioSound = () => {
+    const video = studioVideoRef.current;
+    if (!video) return;
+
+    video.muted = false;
+    video.volume = 0.55;
+    video.play()
+      .then(() => setStudioVideoMuted(false))
+      .catch(() => undefined);
+  };
+
   useEffect(() => {
     if (currentPath !== "/") return undefined;
 
     const video = studioVideoRef.current;
     if (!video) return undefined;
 
-    const startVideo = () => {
+    let isMounted = true;
+
+    const startVideo = async () => {
       if (video.readyState === 0) video.load();
-      video.play().catch(() => undefined);
+      video.muted = false;
+      video.volume = 0.55;
+
+      try {
+        await video.play();
+        if (!isMounted) return;
+        setStudioVideoMuted(false);
+      } catch {
+        video.muted = true;
+        if (!isMounted) return;
+        setStudioVideoMuted(true);
+        video.play().catch(() => undefined);
+      }
     };
 
-    if (!("IntersectionObserver" in window)) {
-      startVideo();
-      return () => video.pause();
-    }
+    const unlockAudio = () => enableStudioSound();
 
-    const isMobileViewport = window.matchMedia("(max-width: 640px)").matches;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          startVideo();
-        } else {
-          video.pause();
-        }
-      },
-      {
-        rootMargin: isMobileViewport ? "0px" : "200px 0px",
-        threshold: 0.01,
-      },
-    );
-
-    observer.observe(video);
+    startVideo();
+    document.addEventListener("pointerdown", unlockAudio, { once: true, capture: true });
+    document.addEventListener("keydown", unlockAudio, { once: true, capture: true });
 
     return () => {
-      observer.disconnect();
+      isMounted = false;
+      document.removeEventListener("pointerdown", unlockAudio, { capture: true });
+      document.removeEventListener("keydown", unlockAudio, { capture: true });
       video.pause();
     };
   }, [currentPath]);
@@ -3631,18 +3629,53 @@ export default function App() {
             }
           : isContactPage
             ? {
-                title: "Contacto para Cotizar Iluminación | Ceniza",
+                title: "Cotiza Iluminación y Alquiler de Luces en Bogotá | Ceniza",
                 description:
-                  "Contacta a Ceniza para cotizar iluminación, renta de luces, dirección visual y montaje técnico para eventos y producciones.",
+                  "Cotiza alquiler de luces, dirección de iluminación y montaje técnico para fotografía, video, streaming y eventos en Bogotá con Ceniza.",
                 schema: {
                   "@context": "https://schema.org",
-                  "@type": "ContactPage",
-                  name: "Contacto Ceniza",
-                  url: canonicalHref,
-                  description:
-                    "Formulario y canales de contacto para cotizar proyectos de iluminación, eventos y producción audiovisual.",
+                  "@graph": [
+                    {
+                      "@type": "ContactPage",
+                      name: "Contacto y cotización Ceniza",
+                      url: canonicalHref,
+                      description:
+                        "Formulario y canales de contacto para cotizar alquiler de luces, dirección de iluminación y producción audiovisual en Bogotá.",
+                      about: {
+                        "@type": "ProfessionalService",
+                        name: "Ceniza",
+                        areaServed: ["Bogotá", "Colombia"],
+                        telephone: "+57 320 362 4348",
+                      },
+                    },
+                    {
+                      "@type": "FAQPage",
+                      mainEntity: contactFaq.map((item) => ({
+                        "@type": "Question",
+                        name: item.question,
+                        acceptedAnswer: {
+                          "@type": "Answer",
+                          text: item.answer,
+                        },
+                      })),
+                    },
+                  ],
                 },
               }
+              : isCartPage
+                ? {
+                    title: "Solicitud de Cotización | Ceniza",
+                    description:
+                      "Revisa los equipos y combos seleccionados para solicitar una cotización de iluminación con Ceniza.",
+                    schema: {
+                      "@context": "https://schema.org",
+                      "@type": "WebPage",
+                      name: "Solicitud de cotización Ceniza",
+                      url: canonicalHref,
+                      description:
+                        "Página para revisar equipos y solicitar una cotización de iluminación Ceniza.",
+                    },
+                  }
               : isDataPolicyPage
                 ? {
                     title: "Tratamiento de Datos | Ceniza",
@@ -3731,7 +3764,7 @@ export default function App() {
     }
 
     schemaScript.textContent = JSON.stringify(seoConfig.schema);
-  }, [activeProduct, currentPath, currentUrl, isContactPage, isDataPolicyPage, isEquipmentPage, isPortfolioPage, isServicesPage, isTermsPage]);
+  }, [activeProduct, currentPath, currentUrl, isCartPage, isContactPage, isDataPolicyPage, isEquipmentPage, isPortfolioPage, isServicesPage, isTermsPage]);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -3800,6 +3833,10 @@ export default function App() {
     return <PortfolioPage />;
   }
 
+  if (isCartPage) {
+    return <CartPage />;
+  }
+
   if (isContactPage) {
     return <ContactPage />;
   }
@@ -3813,7 +3850,7 @@ export default function App() {
   }
 
   return (
-    <div className="page-shell">
+    <div className="page-shell home-page-shell">
       <SiteHeader
         isSubPage={false}
         searchValue={searchValue}
@@ -3822,181 +3859,148 @@ export default function App() {
       />
 
       <main>
-        <section className="hero" id="inicio">
-          <div className="hero-card">
-            <div className="hero-copy">
+        <section className="hero hero-campaign" id="inicio">
+          <div className="hero-campaign-frame">
+            <img
+              className="hero-campaign-image hero-campaign-image-off"
+              src={heroSoftboxOff}
+              alt="Modificador parabólico Godox QR-P70 en una composición de estudio Ceniza"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <span className="hero-light-trigger" aria-hidden="true" />
+            <img
+              className="hero-campaign-image hero-campaign-image-on"
+              src={heroSoftboxOn}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <div className="hero-campaign-shade" aria-hidden="true" />
+
+            <div className="hero-campaign-copy">
               <h1>
-                <span className="hero-title-light hero-title-solo">Estudio de iluminación</span>
+                <span>La luz</span>
+                <strong>cambia todo.</strong>
               </h1>
-              <div className="hero-divider" aria-hidden="true" />
-              <p className="lead">
-                Creamos iluminación profesional para podcasts, fotografía de marca,
-                contenido para redes sociales y producciones audiovisuales. No diseñamos
-                sets, creamos atmósferas.
+              <p className="hero-campaign-lead">
+                Atmósferas para fotografía, video y marcas.
               </p>
-              <div className="hero-actions">
-                <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                  Cotizar proyecto
-                </a>
-                <a className="button secondary" href={CATALOG_PATH}>
-                  Ver catálogo
+              <div className="hero-campaign-actions">
+                <a className="hero-campaign-link" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+                  Crear una atmósfera <span aria-hidden="true">↗</span>
                 </a>
               </div>
-            </div>
-            <div className="hero-art">
-              <img className="hero-combined-image" src={heroChairBlack} alt="" fetchPriority="high" decoding="async" />
             </div>
           </div>
         </section>
 
-        <section className="trust-bar">
-          <p>
-            <span>TRUSTED BY MORE THAN</span>
-            <strong className="trust-number">+1,000</strong>
-            <span className="trust-clients">CLIENTS</span>
-          </p>
-        </section>
-
-        <section className="about-grid" id="about">
-          <article className="about-panel about-unified-panel">
-            <div className="about-unified-frame">
-              <div className="about-unified-media">
-                <video
-                  ref={studioVideoRef}
-                  className="about-video-media"
-                  loop
-                  muted
-                  controls
-                  playsInline
-                  preload="none"
-                  poster={studioVideoPoster}
-                >
-                  <source src={studioVideo} type="video/mp4" />
-                </video>
+        <section className="home-editorial" id="about" aria-labelledby="home-editorial-title">
+          <div className="home-editorial-grid">
+            <article className="home-story-card home-story-feature" aria-label="Ceniza en acción">
+              <div className="home-story-feature-copy">
+                <p>ESTUDIO · EQUIPO · PRODUCCIÓN</p>
+                <h2 id="home-editorial-title">
+                  Todo para crear.<br />
+                  <span>Sin ruido.</span>
+                </h2>
+                <small>Un estudio, equipos y dirección de iluminación reunidos en una experiencia simple.</small>
               </div>
-              <div className="about-unified-copy">
-                <img className="intro-star" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-                <h2>La luz cuenta historias</h2>
-                <p className="section-subtitle about-subtitle">
-                  En Ceniza entendemos la iluminación como una herramienta creativa:
-                  define el tono, dirige la mirada y convierte un espacio en una
-                  experiencia. Combinamos criterio visual, técnica y equipos
-                  profesionales para construir atmósferas con intención.
-                </p>
-                <h3>Nuestro enfoque</h3>
-                <ul>
-                  <li>Iluminación creativa para podcast, video y fotografía</li>
-                  <li>Dirección visual para marcas, contenidos y eventos</li>
-                  <li>Alquiler de luces y equipos profesionales</li>
-                </ul>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section className="catalog-preview" id="catalogo">
-          <div className="catalog-preview-shell">
-            <div className="catalog-preview-head">
-              <a className="catalog-preview-chip" href={CATALOG_PATH}>
-                <p className="eyebrow center">CATÁLOGO</p>
-              </a>
-              <h2>Equipos de iluminación</h2>
-              <p className="section-subtitle catalog-preview-lead">
-                Una muestra de equipos disponibles para renta. Cada referencia puede integrarse en
-                combo o cotizarse según tu montaje.
-              </p>
-            </div>
-            <div className="catalog-preview-grid">
-              {visibleCatalogMosaic.map((item, index) => (
-                <a
-                  className={`catalog-mosaic-card ${index === 0 ? "is-featured" : ""} catalog-card-${index + 1}`}
-                  href={item.href}
-                  key={item.alt}
-                >
-                  <div className="catalog-mosaic-visual">
-                    <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
-                  </div>
-                  <div className="catalog-mosaic-overlay" />
-                  <div className="catalog-mosaic-copy">
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <span className="catalog-mosaic-cta">{item.cta}</span>
-                  </div>
-                </a>
-              ))}
-            </div>
-            <div className="catalog-preview-actions">
-              <a className="catalog-preview-button" href={CATALOG_PATH}>
-                Ver catálogo completo
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="services" id="servicios">
-          <img className="services-accent services-accent-top" src={aboutLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-          <img className="services-accent services-accent-bottom" src={aboutLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-          <a className="section-chip-link" href={SERVICES_PATH}>
-            <p className="eyebrow center">COMBOS</p>
-          </a>
-          <div className="services-heading">
-            <h2>Combos para contenido, fotografía y producción</h2>
-          </div>
-          <p className="section-subtitle services-subtitle">
-            Seis setups listos para resolver producciones de distinta escala con una lectura clara y profesional.
-          </p>
-          <div className="services-centered-grid">
-            {homeServiceCards.map((service, index) => (
-              <a
-                className={`services-centered-card service-card-${index + 1} ${service.image ? "" : "is-placeholder"}`}
-                href={`${SERVICES_PATH}#${service.slug}`}
-                key={`${service.title}-${index}`}
+              <img
+                className="home-story-video-backdrop"
+                src={studioVideoPoster}
+                alt=""
+                aria-hidden="true"
+              />
+              <video
+                ref={studioVideoRef}
+                autoPlay
+                loop
+                muted={studioVideoMuted}
+                controls
+                playsInline
+                preload="auto"
+                poster={studioVideoPoster}
+                onVolumeChange={(event) => setStudioVideoMuted(event.currentTarget.muted)}
               >
-                <div className="services-centered-visual">
-                  {service.image ? (
-                    <img src={service.image} alt={`Combo ${service.title} de Ceniza`} loading="lazy" decoding="async" />
-                  ) : null}
-                </div>
-                <div className="services-centered-overlay" />
-                <div className="services-centered-copy">
-                  <h3>{service.title}</h3>
-                  <p>{service.summary}</p>
-                  <span className="services-centered-cta">VER {service.eyebrow}</span>
-                </div>
-              </a>
-            ))}
+                <source src={studioVideo} type="video/mp4" />
+              </video>
+            </article>
+
+            <a
+              className="home-story-card home-story-destination home-story-catalog"
+              id="catalogo"
+              href={CATALOG_PATH}
+              aria-label="Abrir el catálogo de equipos"
+            >
+              <img src={catalogOneImage} alt="Equipo profesional de iluminación disponible en Ceniza" loading="lazy" decoding="async" />
+              <span className="home-story-overlay" aria-hidden="true" />
+              <span className="home-story-index">01 / CATÁLOGO</span>
+              <span className="home-story-copy">
+                <strong>El equipo correcto.</strong>
+                <small>Ver catálogo ↗</small>
+              </span>
+            </a>
+
+            <a
+              className="home-story-card home-story-destination home-story-combos home-story-warm"
+              id="servicios"
+              href={SERVICES_PATH}
+              aria-label="Explorar los combos de producción"
+            >
+              <img src={comboOneHomeImage} alt="Combo de producción de Ceniza" loading="lazy" decoding="async" />
+              <span className="home-story-overlay" aria-hidden="true" />
+              <span className="home-story-index">02 / COMBOS</span>
+              <span className="home-story-copy">
+                <strong>Setups sin complicaciones.</strong>
+                <small>Explorar combos ↗</small>
+              </span>
+            </a>
+
+            <a
+              className="home-story-card home-story-destination home-story-portfolio"
+              id="portafolio"
+              href={PORTFOLIO_PATH}
+              aria-label="Ver el portafolio de Ceniza"
+            >
+              <img src={portfolioCardImage} alt="Luz compacta Zhiyun Molus X60 presentada como producto" loading="lazy" decoding="async" />
+              <span className="home-story-overlay" aria-hidden="true" />
+              <span className="home-story-index">03 / PORTAFOLIO</span>
+              <span className="home-story-copy">
+                <strong>La atmósfera primero.</strong>
+                <small>Ver proyectos ↗</small>
+              </span>
+            </a>
+
+            <a
+              className="home-story-card home-story-destination home-story-process"
+              href={CONTACT_PATH}
+              aria-label="Conocer el proceso y contactar a Ceniza"
+            >
+              <img src={processCardImage} alt="Equipo audiovisual preparado para iniciar una producción" loading="lazy" decoding="async" />
+              <span className="home-story-overlay" aria-hidden="true" />
+              <span className="home-story-index">04 / PROCESO</span>
+              <div className="home-process-copy">
+                <strong>De la idea al rodaje.</strong>
+                <ol>
+                  <li><span>01</span> Cuéntanos la idea</li>
+                  <li><span>02</span> Diseñamos el setup</li>
+                  <li><span>03</span> Encendemos la escena</li>
+                </ol>
+                <small>Iniciar un proyecto ↗</small>
+              </div>
+            </a>
           </div>
         </section>
 
-        <section className="home-impact-statement" aria-label="Mensaje destacado Ceniza">
-          <div className="home-impact-shell">
-            <p className="home-impact-text">
-              LIGHTING THAT <span>SHAPES</span> EVERY SCENE
-            </p>
-          </div>
-        </section>
-
-        <section className="portfolio portfolio-rotating" id="portafolio">
-          <RotatingPortfolioBackground images={portfolioSlides} />
-          <a className="section-chip-link" href={PORTFOLIO_PATH}>
-            <p className="eyebrow center">PORTFOLIO</p>
+        <section className="home-contact-minimal" aria-labelledby="home-contact-title">
+          <p>¿TIENES UNA IDEA?</p>
+          <h2 id="home-contact-title">Hagamos que se vea.</h2>
+          <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+            Escribir por WhatsApp <span aria-hidden="true">↗</span>
           </a>
-          <div className="portfolio-heading">
-            <h2>Visión, craft y dirección técnica</h2>
-          </div>
-          <p className="section-subtitle portfolio-subtitle">
-            Una muestra del criterio visual, la precisión técnica y la atmósfera que construimos en cada montaje.
-          </p>
-          <a className="portfolio-rotating-cta" href={PORTFOLIO_PATH}>
-            Explorar proyectos completos
-          </a>
         </section>
-
-        <FaqAccordionSection
-          items={homeFaq.slice(0, 6)}
-          title="Dudas antes de cotizar."
-          subtitle="Lo esencial para entender cómo trabajamos, cómo se cotiza y cómo elegir el setup correcto."
-        />
 
       </main>
 
