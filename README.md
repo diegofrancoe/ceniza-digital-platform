@@ -100,6 +100,10 @@ La versión actual prioriza una buena experiencia en computadores, tablets y cel
 
 Antes de publicar se debe ejecutar `npm run build` y comprobar las rutas `/`, `/catalogo`, `/servicios`, `/portafolio` y `/contacto` en anchos móvil, tablet y escritorio.
 
+## Trazabilidad del rediseño
+
+El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) registra los cambios de diseño, las verificaciones y los pendientes para continuar en la rama `codex/redesign-integral-ceniza-2026-09-01`.
+
 ## Estado actual
 
 La interfaz, navegación, catálogo, carrito, formularios e integración configurable con n8n están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché y archivos básicos de descubrimiento. Para operar todos los formularios en un entorno real se deben mantener configurados y protegidos los endpoints externos, validar el flujo de pago y aplicar la política de tratamiento de datos personales.

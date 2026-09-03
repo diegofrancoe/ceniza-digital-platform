@@ -54,6 +54,24 @@ const TERMS_PATH = "/terminos-y-condiciones";
 const WHATSAPP_URL = "https://wa.me/573203624348";
 const CONTACT_EMAIL = "gerencia@cenizaproducciones.com";
 const INSTAGRAM_URL = "https://www.instagram.com/cenizaproducciones?igsh=NDdxam85cHV6cDRm";
+const CATALOG_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
+  [
+    "Hola, quiero cotizar equipos de iluminación para una producción.",
+    "",
+    "Tipo de producción:",
+    "Fecha:",
+    "Equipos o referencias:",
+    "Locación:",
+    "",
+    "¿Me ayudan a elegir la opción adecuada?",
+  ].join("\n"),
+)}`;
+const COMBO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
+  "Hola, quiero cotizar un combo de iluminación para mi producción. ¿Me ayudan a elegir la opción adecuada?",
+)}`;
+const PORTFOLIO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
+  "Hola, vi el portafolio de Ceniza y quiero contarles sobre un proyecto que necesita dirección de iluminación. ¿Podemos hablar?",
+)}`;
 const CART_STORAGE_KEY = "ceniza-cart-draft";
 const CART_UPDATED_EVENT = "ceniza-cart-updated";
 const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
@@ -61,6 +79,13 @@ const CART_WEBHOOK_URL = import.meta.env.VITE_N8N_CART_WEBHOOK_URL ?? "";
 const CONTACT_WEBHOOK_URL = import.meta.env.VITE_N8N_CONTACT_WEBHOOK_URL ?? "";
 const CART_PAYMENT_URL = import.meta.env.VITE_CENIZA_PAYMENT_URL ?? "";
 const GOOGLE_ANALYTICS_ID = "G-HDX27BVTHQ";
+
+function formatCatalogTechnicalText(value) {
+  return String(value).replace(
+    /(\d[\d.,]*)\s+(K|W|V|Hz|cm|mm|kg|COP)\b/g,
+    "$1\u00A0$2",
+  );
+}
 
 function loadAnalytics() {
   if (typeof window === "undefined" || document.getElementById("ceniza-google-analytics")) return;
@@ -1437,12 +1462,15 @@ const catalogBrowserItems = Array.from(
         .sort((a, b) => a.order - b.order),
     ]
     : Array.from(galleryByOrder.values()).sort((a, b) => a.order - b.order);
+  const finalGalleryImages = item.slug === "ulanzi-ua12-air-tube"
+    ? mergedGalleryImages.filter((image) => image.order === 8).slice(0, 1)
+    : mergedGalleryImages;
 
   return {
     ...item,
-    galleryImages: mergedGalleryImages,
-    src: mergedGalleryImages[0]?.src ?? item.src,
-    alt: mergedGalleryImages[0]?.alt ?? item.alt,
+    galleryImages: finalGalleryImages,
+    src: finalGalleryImages[0]?.src ?? item.src,
+    alt: finalGalleryImages[0]?.alt ?? item.alt,
     href: `${PRODUCTS_PATH}/${item.slug}`,
   };
 }).filter((item) => !productsWithdrawnForSale.has(item.slug));
@@ -1486,44 +1514,6 @@ const portfolioCards = [
 ];
 
 const portfolioSlides = [...portfolioCards];
-
-const homeFaq = [
-  {
-    question: "¿Ceniza alquila luces para video, fotografía y creación de contenido?",
-    answer:
-      "Sí. Puedes alquilar un combo listo para producción o cotizar luces y accesorios individuales según el formato, la locación y el resultado visual que necesitas.",
-  },
-  {
-    question: "¿Qué tipo de proyectos atiende Ceniza?",
-    answer:
-      "Trabajamos en podcast, streaming, fotografía profesional, videos, reels, entrevistas y contenido para redes sociales con soporte visual y técnico.",
-  },
-  {
-    question: "¿Me ayudan a elegir las luces adecuadas para mi producción?",
-    answer:
-      "Sí. Definimos una propuesta funcional según el número de personas, el encuadre, el estilo visual, el espacio disponible y el presupuesto.",
-  },
-  {
-    question: "¿Puedo alquilar equipos para grabar reels o contenido de redes sociales?",
-    answer:
-      "Sí. Tenemos soluciones compactas para reels, contenido de marca, tutoriales, entrevistas y grabaciones verticales u horizontales.",
-  },
-  {
-    question: "¿Puedo alquilar solo por un día o por pocas horas?",
-    answer:
-      "Sí. Podemos cotizar por jornada o según el tiempo real de grabación y montaje que necesite tu producción audiovisual.",
-  },
-  {
-    question: "¿Cómo es la entrega y recogida de los equipos?",
-    answer:
-      "La entrega y recogida puede asumirla el cliente o incluirse en la cotización. El transporte depende de la ubicación, los horarios y el volumen del equipo solicitado.",
-  },
-  {
-    question: "¿Ceniza también apoya la instalación para fotografía, video o podcast?",
-    answer:
-      "Sí. Además del alquiler, podemos acompañar la instalación y orientación técnica para que el setup de iluminación quede correctamente preparado.",
-  },
-];
 
 const contactFaq = [
   {
@@ -1626,7 +1616,7 @@ function SiteFooter() {
           <img className="footer-brand-image" src={cenizaLogo} alt="Ceniza" width="880" height="141" loading="lazy" decoding="async" />
           <img className="footer-brand-image footer-brand-image-accent" src={cenizaLogo} alt="" width="880" height="141" loading="lazy" decoding="async" aria-hidden="true" />
         </a>
-        <p>Dirección de iluminación, equipos y producción audiovisual.</p>
+        <p>Estudio de iluminación para fotografía, video y eventos.</p>
         <a
           className="footer-minimal-contact"
           href={WHATSAPP_URL}
@@ -1634,14 +1624,15 @@ function SiteFooter() {
           rel="noreferrer"
           aria-label="Hablar con Ceniza por WhatsApp"
         >
-          Hablar por WhatsApp ↗
+          WhatsApp ↗
         </a>
       </div>
 
       <div className="footer-minimal-meta">
         <p>© 2026 CENIZA · BOGOTÁ, COLOMBIA</p>
-        <div className="footer-minimal-socials" aria-label="Redes sociales">
+        <div className="footer-minimal-socials" aria-label="Redes sociales y correo">
           <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Instagram ↗</a>
+          <a href={`mailto:${CONTACT_EMAIL}`}>Correo ↗</a>
         </div>
         <div className="footer-minimal-legal">
           <a href={DATA_POLICY_PATH}>Privacidad</a>
@@ -2380,9 +2371,11 @@ function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], prima
           <a className="button primary" href={primaryHref} target="_blank" rel="noreferrer">
             {primaryLabel}
           </a>
-          <a className="button secondary" href={secondaryHref}>
-            {secondaryLabel}
-          </a>
+          {secondaryHref && secondaryLabel ? (
+            <a className="button secondary" href={secondaryHref}>
+              {secondaryLabel}
+            </a>
+          ) : null}
         </div>
       </div>
     </section>
@@ -2390,6 +2383,20 @@ function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], prima
 }
 
 function ServicesPage() {
+  const [activeComboIndex, setActiveComboIndex] = useState(0);
+  const activeCombo = servicesPageCards[activeComboIndex];
+  const combosLayoutOption = "selector"; // Cambiar a "editorial" restaura la opción A.
+  const activeComboWhatsAppUrl = `${WHATSAPP_URL}?text=${encodeURIComponent(
+    [
+      `Hola, quiero cotizar el ${activeCombo.eyebrow} ${activeCombo.title}.`,
+      "",
+      "El combo incluye:",
+      ...activeCombo.includes.map((item) => `- ${item}`),
+      "",
+      "¿Me comparten una cotización y los detalles para reservar?",
+    ].join("\n"),
+  )}`;
+
   useEffect(() => {
     if (!window.location.hash) return;
 
@@ -2407,110 +2414,155 @@ function ServicesPage() {
     <div className="page-shell services-page-shell combos-page-shell">
       <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
 
-      <main className="services-page-main">
-        <section className="services-page-hero">
-          <div className="services-page-hero-copy mobile-hide-page-intro">
-            <p className="eyebrow">COMBOS</p>
-            <h1>Combos listos para producir.</h1>
-            <p className="services-page-lead">
-              Setups de iluminación para fotografía, contenido y producción audiovisual.
+      <main className={`services-page-main ${combosLayoutOption === "editorial" ? "combos-editorial-main" : "combos-selector-main"}`}>
+        {combosLayoutOption === "editorial" ? (
+          <>
+        <section className="combos-editorial-hero" aria-labelledby="combos-page-title">
+          <div className="combos-editorial-hero-copy">
+            <p className="eyebrow">COMBOS DE ILUMINACIÓN</p>
+            <h1 id="combos-page-title">Combos para cada producción.</h1>
+            <p>
+              Setups completos para contenido, podcast, fotografía y producción audiovisual en Bogotá.
             </p>
-            <div className="services-page-actions">
-              <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Cotizar combo ↗
-              </a>
-              <a className="button secondary" href={CATALOG_PATH}>
-                Ver equipos →
-              </a>
+            <div className="combos-editorial-links" aria-label="Acciones principales">
+              <a href="#combos">Explorar montajes</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Ayúdame a elegir</a>
             </div>
           </div>
-          <div className="services-page-highlight">
-            <div className="services-page-highlight-card">
-              <img className="services-page-highlight-image" src={serviceOneImage} alt="" fetchPriority="high" decoding="async" aria-hidden="true" />
-              <div className="services-page-highlight-overlay" />
-              <div className="services-page-highlight-copy">
-                <span>Rider flexible</span>
-                <strong>El setup correcto.</strong>
-                <p>Escalable según locación, equipo y resultado visual.</p>
-              </div>
+
+          <figure className="combos-editorial-hero-visual">
+            <img
+              src={serviceOneImage}
+              alt="Set de iluminación profesional preparado para una producción audiovisual"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <figcaption>
+              <span>Rider flexible</span>
+              <strong>El montaje correcto, listo para producir.</strong>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section className="combos-editorial-catalog" id="combos" aria-labelledby="combos-catalog-title">
+          <header className="combos-editorial-heading">
+            <div>
+              <p className="eyebrow">SEIS FORMAS DE EMPEZAR</p>
+              <h2 id="combos-catalog-title">Elige según lo que vas a crear.</h2>
             </div>
+            <p>Cada combo puede ajustarse a la locación, la duración y el resultado visual que necesitas.</p>
+          </header>
+
+          <div className="combos-editorial-grid">
+            {servicesPageCards.map((service, index) => {
+              const isWideCard = index === 0 || index === servicesPageCards.length - 1;
+              const cardImage = isWideCard && service.homeImage ? service.homeImage : service.image;
+
+              return (
+                <article
+                  className={`combos-editorial-card ${isWideCard ? "is-wide" : ""}`}
+                  id={service.slug}
+                  key={service.title}
+                >
+                  <a href={`${SERVICES_PATH}/${service.slug}`} aria-label={`Ver ${service.title}`}>
+                    <img src={cardImage} alt={`Montaje ${service.title} de Ceniza`} loading="lazy" decoding="async" />
+                    <span className="combos-editorial-card-shade" aria-hidden="true" />
+                    <span className="combos-editorial-card-index">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="combos-editorial-card-copy">
+                      <span className="combos-editorial-card-type">{service.eyebrow}</span>
+                      <strong>{service.title}</strong>
+                      <span className="combos-editorial-card-summary">{service.summary}</span>
+                      <span className="combos-editorial-card-meta">
+                        <span className="combos-editorial-card-link">Ver combo</span>
+                      </span>
+                    </span>
+                  </a>
+                </article>
+              );
+            })}
           </div>
         </section>
 
-        <section className="services-page-list">
-          {servicesPageCards.map((service, index) => (
-            <article
-              className={`service-detail-card ${service.slug} ${index % 2 === 1 ? "is-reverse" : ""}`}
-              id={service.slug}
-              key={service.title}
-            >
-              <div className={`service-detail-visual ${service.image ? "" : "is-placeholder"}`}>
-                {service.image ? (
-                  <img src={service.image} alt={service.title} loading="lazy" decoding="async" />
-                ) : (
-                  <div className="service-detail-placeholder">
-                    <span className="service-detail-placeholder-chip">{service.eyebrow}</span>
-                    <strong>{service.title}</strong>
-                    <p>Imagen pendiente por cargar para la página de servicios.</p>
-                  </div>
-                )}
-              </div>
-              <div className="service-detail-copy">
-                <p className="service-detail-eyebrow">{service.eyebrow}</p>
-                <h2>
-                  {service.slug === "combo-produccion-audiovisual-media" ? (
-                    <>
-                      Producción
-                      <br />
-                      Audiovisual Media
-                    </>
-                  ) : service.slug === "combo-produccion-audiovisual-completa" ? (
-                    <>
-                      Producción
-                      <br />
-                      Audiovisual Completa
-                    </>
-                  ) : (
-                    service.title
-                  )}
-                </h2>
-                <p className="service-detail-description">{service.summary}</p>
-                <p className="service-detail-ideal">{service.idealFor}</p>
-                <details className="service-detail-includes">
-                  <summary>Qué incluye <span aria-hidden="true">↘</span></summary>
-                  <ul className="service-detail-list">
-                    {service.includes.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </details>
-                {service.price ? (
-                  <div className="service-detail-price-actions">
-                    <div className="service-detail-price-stack">
-                      <p className="service-detail-price">
-                        <span className="service-detail-price-label">Precio base:</span>{" "}
-                        <span className="service-detail-price-value">
-                          {service.price.replace("Precio base: ", "")}
-                        </span>
-                      </p>
-                      <a
-                        className="service-detail-rent"
-                        href={`${WHATSAPP_URL}?text=${encodeURIComponent(
-                          `Hola, quiero rentar el ${service.eyebrow} ${service.title}, con precio base de ${service.price.replace("Precio base: ", "")}. ¿Me confirman disponibilidad?`,
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Cotizar este combo ↗
-                      </a>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </article>
-          ))}
+        <section className="combos-editorial-cta" aria-labelledby="combos-cta-title">
+          <p className="eyebrow">MONTAJE A MEDIDA</p>
+          <h2 id="combos-cta-title">¿No sabes qué combo elegir?</h2>
+          <p>Cuéntanos tu proyecto y diseñamos una propuesta según tu espacio, fecha y producción.</p>
+          <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Hablar por WhatsApp</a>
         </section>
+          </>
+        ) : (
+          <>
+            <section className="combos-selector-showcase" aria-labelledby="combos-selector-title">
+              <div className="combos-selector-stage">
+                <figure className="combos-selector-visual" key={`visual-${activeCombo.slug}`}>
+                  <img
+                    src={activeCombo.image}
+                    alt={`Montaje ${activeCombo.title} de Ceniza`}
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                  <span className="combos-selector-visual-shade" aria-hidden="true" />
+                  <figcaption>
+                    <span>COMBO {String(activeComboIndex + 1).padStart(2, "0")}</span>
+                    <strong>Equipos incluidos en este combo.</strong>
+                  </figcaption>
+                </figure>
 
+                <article className="combos-selector-copy" key={`copy-${activeCombo.slug}`}>
+                  <p className="eyebrow">{activeCombo.eyebrow} · ILUMINACIÓN</p>
+                  <h1 id="combos-selector-title">{activeCombo.title}</h1>
+                  <p className="combos-selector-summary">{activeCombo.summary}</p>
+                  <p className="combos-selector-ideal">{activeCombo.idealFor}</p>
+                  <div className="combos-selector-includes">
+                    <p>Qué incluye</p>
+                    <ul>
+                      {activeCombo.includes.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="combos-selector-actions">
+                    <a href={activeComboWhatsAppUrl} target="_blank" rel="noreferrer">Cotizar combo</a>
+                  </div>
+                </article>
+              </div>
+
+              <div className="combos-selector-tray" aria-label="Seleccionar otro combo">
+                <div className="combos-selector-tray-heading">
+                  <p>Selecciona tu producción</p>
+                  <span>{String(activeComboIndex + 1).padStart(2, "0")} / {String(servicesPageCards.length).padStart(2, "0")}</span>
+                </div>
+                <div className="combos-selector-options">
+                  {servicesPageCards.map((service, index) => (
+                    <button
+                      className={`combos-selector-option ${service.title.length > 24 ? "has-long-title" : ""} ${index === activeComboIndex ? "is-active" : ""}`}
+                      type="button"
+                      aria-pressed={index === activeComboIndex}
+                      onClick={() => setActiveComboIndex(index)}
+                      key={service.slug}
+                    >
+                      <span className="combos-selector-option-image">
+                        <img src={service.image} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                      </span>
+                      <span className="combos-selector-option-copy">
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <strong>{service.title}</strong>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="combos-selector-cta" aria-labelledby="combos-selector-cta-title">
+              <div>
+                <h2 id="combos-selector-cta-title">¿No sabes cuál elegir?</h2>
+              </div>
+              <p>Cuéntanos tu producción y te recomendamos el combo de iluminación adecuado.</p>
+              <a href={COMBO_QUOTE_WHATSAPP_URL} target="_blank" rel="noreferrer">Te ayudamos por WhatsApp ↗</a>
+            </section>
+          </>
+        )}
       </main>
 
       <SiteFooter />
@@ -2520,11 +2572,14 @@ function ServicesPage() {
   );
 }
 
-function EquipmentPage() {
+function EquipmentPage({ initialProduct = null }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos los productos");
   const [hoveredCatalogCardSlug, setHoveredCatalogCardSlug] = useState("");
   const [catalogCardImageIndexes, setCatalogCardImageIndexes] = useState({});
+  const [selectedCatalogProduct, setSelectedCatalogProduct] = useState(initialProduct);
+  const [selectedCatalogImageIndex, setSelectedCatalogImageIndex] = useState(0);
+  const catalogSheetCloseRef = useRef(null);
   const [openSections, setOpenSections] = useState(() =>
     Object.fromEntries(catalogSidebarSections.map((section) => [section.title, true])),
   );
@@ -2567,6 +2622,69 @@ function EquipmentPage() {
     }
   }, [hoveredCatalogCardSlug]);
 
+  useEffect(() => {
+    if (!initialProduct) return;
+    setSelectedCatalogProduct(initialProduct);
+    setSelectedCatalogImageIndex(0);
+  }, [initialProduct]);
+
+  useEffect(() => {
+    if (!selectedCatalogProduct) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setSelectedCatalogProduct(null);
+        if (window.location.pathname.startsWith(`${PRODUCTS_PATH}/`)) {
+          window.history.replaceState({}, "", CATALOG_PATH);
+        }
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    window.requestAnimationFrame(() => catalogSheetCloseRef.current?.focus());
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [selectedCatalogProduct]);
+
+  const openCatalogSheet = (product) => {
+    setHoveredCatalogCardSlug("");
+    setSelectedCatalogImageIndex(0);
+    setSelectedCatalogProduct(product);
+  };
+
+  const closeCatalogSheet = () => {
+    setSelectedCatalogProduct(null);
+    setSelectedCatalogImageIndex(0);
+
+    if (window.location.pathname.startsWith(`${PRODUCTS_PATH}/`)) {
+      window.history.replaceState({}, "", CATALOG_PATH);
+    }
+  };
+
+  const selectedCatalogGallery = selectedCatalogProduct?.galleryImages?.length
+    ? selectedCatalogProduct.galleryImages
+    : selectedCatalogProduct
+      ? [{ src: selectedCatalogProduct.src, alt: selectedCatalogProduct.alt }]
+      : [];
+  const selectedCatalogImage = selectedCatalogGallery[selectedCatalogImageIndex] ?? selectedCatalogGallery[0];
+  const selectedCatalogContentWeight = selectedCatalogProduct
+    ? Math.ceil(selectedCatalogProduct.label.length / 28)
+      + Math.ceil(selectedCatalogProduct.description.length / 96)
+      + selectedCatalogProduct.specs.reduce((total, item) => total + Math.max(1, Math.ceil(item.length / 46)), 0)
+      + selectedCatalogProduct.includes.reduce((total, item) => total + Math.max(1, Math.ceil(item.length / 46)), 0)
+      + selectedCatalogProduct.pricing.reduce((total, price) => total + Math.max(1, Math.ceil(price.label.length / 38)), 0)
+    : 0;
+  const selectedCatalogDensityClass = selectedCatalogContentWeight > 18
+    ? "is-dense"
+    : selectedCatalogContentWeight <= 12
+      ? "is-roomy"
+      : "is-balanced";
+
   return (
     <div className="page-shell services-page-shell catalog-page-shell">
       <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
@@ -2580,8 +2698,8 @@ function EquipmentPage() {
               Luces y accesorios profesionales para fotografía, video, streaming y eventos.
             </p>
             <div className="services-page-actions">
-              <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Cotizar equipo
+              <a className="button primary" href="#catalogo-disponible">
+                Ver catálogo
               </a>
               <a className="button secondary" href={SERVICES_PATH}>
                 Explorar combos
@@ -2589,19 +2707,19 @@ function EquipmentPage() {
             </div>
           </div>
           <div className="services-page-highlight">
-            <div className="services-page-highlight-card">
-              <img className="services-page-highlight-image" src={catalogOneImage} alt="" fetchPriority="high" decoding="async" aria-hidden="true" />
-              <div className="services-page-highlight-overlay" />
-              <div className="services-page-highlight-copy">
-                <span>CATÁLOGO</span>
-                <strong>Listos para combinar.</strong>
-                <p>Renta por unidad o dentro de un combo.</p>
-              </div>
+            <div className="services-page-highlight-card catalog-hero-image-only">
+              <img
+                className="services-page-highlight-image"
+                src={catalogOneImage}
+                alt="Equipo profesional de iluminación disponible en el catálogo de Ceniza"
+                fetchPriority="high"
+                decoding="async"
+              />
             </div>
           </div>
         </section>
 
-        <section className="services-equipment-section services-equipment-page-section">
+        <section className="services-equipment-section services-equipment-page-section" id="catalogo-disponible">
           <div className="services-equipment-header">
             <p className="eyebrow">CATÁLOGO</p>
             <h2>Catálogo disponible.</h2>
@@ -2690,10 +2808,11 @@ function EquipmentPage() {
                 const cardImageAlt = activeCardImage?.alt ?? image.alt;
 
                 return (
-                <a
-                  className={`catalog-browser-card ${index === 0 ? "catalog-browser-card-featured" : ""}`}
-                  href={image.href}
+                <button
+                  className={`catalog-browser-card catalog-browser-card-trigger ${index === 0 ? "catalog-browser-card-featured" : ""}`}
+                  type="button"
                   key={image.slug}
+                  onClick={() => openCatalogSheet(image)}
                   onMouseEnter={() => {
                     if ((image.galleryImages?.length ?? 0) > 1) {
                       setHoveredCatalogCardSlug(image.slug);
@@ -2709,9 +2828,9 @@ function EquipmentPage() {
                   <div className="catalog-browser-card-copy">
                     <strong>{image.label}</strong>
                     <p>{image.category}</p>
-                    <span>Ver ficha</span>
+                    <span>Ver información</span>
                   </div>
-                </a>
+                </button>
               )})}
               {visibleCatalogItems.length === 0 ? (
                 <div className="catalog-browser-empty">
@@ -2724,18 +2843,152 @@ function EquipmentPage() {
         </section>
 
         <InlineCtaSection
-          eyebrow="COTIZACIÓN DE EQUIPOS"
-          title="Equipo listo para tu montaje."
-          copy="Dinos qué vas a producir, la fecha y las referencias que necesitas. Te ayudamos a cotizar equipos de iluminación en Bogotá con una selección clara para tu montaje."
-          highlights={["Alquiler por unidad", "Recomendación técnica", "Disponibilidad por fecha"]}
-          primaryHref={WHATSAPP_URL}
+          eyebrow="ALQUILER DE EQUIPOS DE ILUMINACIÓN"
+          title="La luz correcta para tu producción."
+          copy="Cuéntanos qué vas a producir, cuándo lo necesitas y qué resultado visual buscas. Te recomendamos luces y accesorios para fotografía, video, contenido o eventos y preparamos una cotización clara."
+          highlights={[
+            "Alquila solo los equipos que necesitas",
+            "Recibe una recomendación para tu tipo de producción",
+            "Confirma disponibilidad para la fecha de tu proyecto",
+          ]}
+          primaryHref={CATALOG_QUOTE_WHATSAPP_URL}
           primaryLabel="Cotizar equipos"
-          secondaryHref={SERVICES_PATH}
-          secondaryLabel="Explorar combos"
           variant="catalog"
         />
 
       </main>
+
+      {selectedCatalogProduct ? (
+        <div
+          className="catalog-sheet-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeCatalogSheet();
+          }}
+        >
+          <section
+            className={`catalog-sheet ${selectedCatalogDensityClass} product-${selectedCatalogProduct.slug}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="catalog-sheet-title"
+          >
+            <header className="catalog-sheet-header">
+              <p>FICHA DE EQUIPO</p>
+              <button ref={catalogSheetCloseRef} type="button" onClick={closeCatalogSheet}>
+                Cerrar
+              </button>
+            </header>
+
+            <div className="catalog-sheet-layout">
+              <div className="catalog-sheet-visual">
+                <div className="catalog-sheet-image-frame">
+                  {selectedCatalogGallery.length > 1 ? (
+                    <button
+                      className="catalog-sheet-image-arrow is-previous"
+                      type="button"
+                      onClick={() => {
+                        setSelectedCatalogImageIndex((current) =>
+                          (current - 1 + selectedCatalogGallery.length) % selectedCatalogGallery.length,
+                        );
+                      }}
+                      aria-label={`Ver imagen anterior de ${selectedCatalogProduct.label}`}
+                    >
+                      <span aria-hidden="true">‹</span>
+                    </button>
+                  ) : null}
+                  <img
+                    src={selectedCatalogImage?.src ?? selectedCatalogProduct.src}
+                    alt={selectedCatalogImage?.alt ?? selectedCatalogProduct.label}
+                    decoding="async"
+                  />
+                  {selectedCatalogGallery.length > 1 ? (
+                    <button
+                      className="catalog-sheet-image-arrow is-next"
+                      type="button"
+                      onClick={() => {
+                        setSelectedCatalogImageIndex((current) =>
+                          (current + 1) % selectedCatalogGallery.length,
+                        );
+                      }}
+                      aria-label={`Ver imagen siguiente de ${selectedCatalogProduct.label}`}
+                    >
+                      <span aria-hidden="true">›</span>
+                    </button>
+                  ) : null}
+                </div>
+
+                {selectedCatalogGallery.length > 1 ? (
+                  <div className="catalog-sheet-gallery" aria-label={`Imágenes de ${selectedCatalogProduct.label}`}>
+                    {selectedCatalogGallery.map((image, index) => (
+                      <button
+                        className={index === selectedCatalogImageIndex ? "is-active" : ""}
+                        type="button"
+                        key={`${selectedCatalogProduct.slug}-sheet-${image.src}`}
+                        onClick={() => setSelectedCatalogImageIndex(index)}
+                        aria-label={`Ver imagen ${index + 1} de ${selectedCatalogProduct.label}`}
+                      >
+                        <img src={image.src} alt="" loading="lazy" decoding="async" />
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="catalog-sheet-copy">
+                <div className="catalog-sheet-intro">
+                  <p className="catalog-sheet-eyebrow">PRODUCTO · {selectedCatalogProduct.category}</p>
+                  <h2 id="catalog-sheet-title">
+                    {selectedCatalogProduct.slug === "reflector-5-en-1-110-cm" ? (
+                      <>
+                        Reflector 5 en 1
+                        <span className="catalog-sheet-title-measure">110 cm</span>
+                      </>
+                    ) : selectedCatalogProduct.label}
+                  </h2>
+                  <p className="catalog-sheet-description">{selectedCatalogProduct.description}</p>
+                </div>
+
+                <div className="catalog-sheet-details">
+                  <div>
+                    <h3>Especificaciones</h3>
+                    <ul>
+                      {selectedCatalogProduct.specs.map((item) => (
+                        <li key={item}>{formatCatalogTechnicalText(item)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3>Incluye</h3>
+                    <ul>
+                      {selectedCatalogProduct.includes.map((item) => (
+                        <li key={item}>{formatCatalogTechnicalText(item)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="catalog-sheet-pricing" aria-label={`Opciones de renta de ${selectedCatalogProduct.label}`}>
+                  {selectedCatalogProduct.pricing.map((price) => (
+                    <div className="catalog-sheet-price-row" key={`${selectedCatalogProduct.slug}-sheet-${price.label}`}>
+                      <span>{formatCatalogTechnicalText(price.label)}</span>
+                      <strong>{formatCatalogTechnicalText(price.value)}</strong>
+                      <a
+                        href={`${WHATSAPP_URL}?text=${encodeURIComponent(
+                          `Hola, quiero cotizar ${selectedCatalogProduct.label} en la opción "${price.label}" por ${price.value}. ¿Me confirman disponibilidad?`,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Cotizar
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <SiteFooter />
       <CookieBanner />
@@ -2962,7 +3215,7 @@ function PortfolioPage() {
               Dirección de iluminación para producciones, espacios y eventos.
             </p>
             <div className="services-page-actions">
-              <a className="button primary" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+              <a className="button primary" href={PORTFOLIO_QUOTE_WHATSAPP_URL} target="_blank" rel="noreferrer">
                 Cotizar proyecto
               </a>
               <a className="button secondary" href={SERVICES_PATH}>
@@ -2974,11 +3227,6 @@ function PortfolioPage() {
             <div className="services-page-highlight-card portfolio-page-highlight-card">
               <img src={portfolioCasesImage} alt="Cases de producción Ceniza" fetchPriority="high" decoding="async" />
               <div className="services-page-highlight-overlay" />
-              <div className="services-page-highlight-copy">
-                <span>PORTAFOLIO</span>
-                <strong>Atmósfera y precisión.</strong>
-                <p>Una mirada a nuestros proyectos.</p>
-              </div>
             </div>
           </div>
         </section>
@@ -3003,14 +3251,11 @@ function PortfolioPage() {
         </section>
 
         <InlineCtaSection
-          eyebrow="COTIZA TU PRODUCCIÓN"
-          title="La luz correcta para tu proyecto."
-          copy="Cuéntanos la fecha, la locación y el resultado que buscas. Diseñamos la iluminación para fotografía, video, eventos y contenido en Bogotá."
-          highlights={["Dirección de iluminación", "Equipos según el montaje", "Producciones en Bogotá"]}
-          primaryHref={WHATSAPP_URL}
-          primaryLabel="Cotizar por WhatsApp"
-          secondaryHref={SERVICES_PATH}
-          secondaryLabel="Explorar combos"
+          eyebrow="DIRECCIÓN DE ILUMINACIÓN"
+          title="Hagamos visible tu idea."
+          copy="Diseñamos iluminación para fotografía, video, contenido y eventos. Definimos contigo la atmósfera y el montaje adecuados para cada producción."
+          primaryHref={PORTFOLIO_QUOTE_WHATSAPP_URL}
+          primaryLabel="Cuéntanos tu proyecto ↗"
           variant="portfolio"
         />
 
@@ -3416,7 +3661,6 @@ function RotatingPortfolioBackground({ images }) {
 export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const [catalogMosaicOffset, setCatalogMosaicOffset] = useState(0);
-  const [studioVideoMuted, setStudioVideoMuted] = useState(false);
   const studioVideoRef = useRef(null);
   const currentPath =
     typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") || "/" : "/";
@@ -3441,52 +3685,19 @@ export default function App() {
     };
   });
 
-  const enableStudioSound = () => {
-    const video = studioVideoRef.current;
-    if (!video) return;
-
-    video.muted = false;
-    video.volume = 0.55;
-    video.play()
-      .then(() => setStudioVideoMuted(false))
-      .catch(() => undefined);
-  };
-
   useEffect(() => {
     if (currentPath !== "/") return undefined;
 
     const video = studioVideoRef.current;
     if (!video) return undefined;
 
-    let isMounted = true;
-
-    const startVideo = async () => {
-      if (video.readyState === 0) video.load();
-      video.muted = false;
-      video.volume = 0.55;
-
-      try {
-        await video.play();
-        if (!isMounted) return;
-        setStudioVideoMuted(false);
-      } catch {
-        video.muted = true;
-        if (!isMounted) return;
-        setStudioVideoMuted(true);
-        video.play().catch(() => undefined);
-      }
-    };
-
-    const unlockAudio = () => enableStudioSound();
-
-    startVideo();
-    document.addEventListener("pointerdown", unlockAudio, { once: true, capture: true });
-    document.addEventListener("keydown", unlockAudio, { once: true, capture: true });
+    video.defaultMuted = true;
+    video.muted = true;
+    video.volume = 0.55;
+    if (video.readyState === 0) video.load();
+    video.play().catch(() => undefined);
 
     return () => {
-      isMounted = false;
-      document.removeEventListener("pointerdown", unlockAudio, { capture: true });
-      document.removeEventListener("keydown", unlockAudio, { capture: true });
       video.pause();
     };
   }, [currentPath]);
@@ -3707,7 +3918,7 @@ export default function App() {
           : {
             title: "Ceniza | Estudio de Iluminación en Bogotá",
             description:
-              "Renta de luces, combos y dirección visual para eventos, fotografía, streaming y producción audiovisual en Bogotá y Colombia.",
+              "Iluminación profesional, alquiler de luces y combos para podcasts, fotografía, video, contenido de marca y producción audiovisual en Bogotá.",
             schema: {
               "@context": "https://schema.org",
               "@graph": [
@@ -3716,8 +3927,14 @@ export default function App() {
                   name: "Ceniza",
                   url: canonicalHref,
                   description:
-                    "Estudio de iluminación especializado en renta de luces, dirección visual y montajes para eventos y producciones.",
-                  areaServed: "Colombia",
+                    "Estudio de iluminación en Bogotá especializado en dirección visual, alquiler de luces, combos y montajes para contenido y producción audiovisual.",
+                  serviceType: [
+                    "Dirección de iluminación",
+                    "Alquiler de luces y equipos",
+                    "Combos de iluminación",
+                    "Iluminación para fotografía, video, podcast y contenido de marca",
+                  ],
+                  areaServed: ["Bogotá", "Colombia"],
                   address: {
                     "@type": "PostalAddress",
                     addressLocality: "Bogotá",
@@ -3731,17 +3948,6 @@ export default function App() {
                     areaServed: "CO",
                     availableLanguage: ["es"],
                   },
-                },
-                {
-                  "@type": "FAQPage",
-                  mainEntity: homeFaq.slice(0, 5).map((item) => ({
-                    "@type": "Question",
-                    name: item.question,
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: item.answer,
-                    },
-                  })),
                 },
               ],
             },
@@ -3826,7 +4032,7 @@ export default function App() {
   }
 
   if (activeProduct) {
-    return <ProductDetailPage product={activeProduct} />;
+    return <EquipmentPage initialProduct={activeProduct} />;
   }
 
   if (isPortfolioPage) {
@@ -3888,7 +4094,7 @@ export default function App() {
                 Atmósferas para fotografía, video y marcas.
               </p>
               <div className="hero-campaign-actions">
-                <a className="hero-campaign-link" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+                <a className="hero-campaign-link" href={CATALOG_PATH}>
                   Crear una atmósfera <span aria-hidden="true">↗</span>
                 </a>
               </div>
@@ -3902,10 +4108,14 @@ export default function App() {
               <div className="home-story-feature-copy">
                 <p>ESTUDIO · EQUIPO · PRODUCCIÓN</p>
                 <h2 id="home-editorial-title">
-                  Todo para crear.<br />
-                  <span>Sin ruido.</span>
+                  La luz cuenta<br />
+                  <span>historias.</span>
                 </h2>
-                <small>Un estudio, equipos y dirección de iluminación reunidos en una experiencia simple.</small>
+                <small>
+                  Diseñamos iluminación profesional para podcasts, fotografía de marca, contenido para redes y
+                  producciones audiovisuales. Combinamos dirección visual, técnica y equipos para crear atmósferas
+                  con intención.
+                </small>
               </div>
               <img
                 className="home-story-video-backdrop"
@@ -3917,12 +4127,11 @@ export default function App() {
                 ref={studioVideoRef}
                 autoPlay
                 loop
-                muted={studioVideoMuted}
+                muted
                 controls
                 playsInline
                 preload="auto"
                 poster={studioVideoPoster}
-                onVolumeChange={(event) => setStudioVideoMuted(event.currentTarget.muted)}
               >
                 <source src={studioVideo} type="video/mp4" />
               </video>
@@ -3938,7 +4147,7 @@ export default function App() {
               <span className="home-story-overlay" aria-hidden="true" />
               <span className="home-story-index">01 / CATÁLOGO</span>
               <span className="home-story-copy">
-                <strong>El equipo correcto.</strong>
+                <strong>La luz correcta para cada escena.</strong>
                 <small>Ver catálogo ↗</small>
               </span>
             </a>
@@ -3953,8 +4162,8 @@ export default function App() {
               <span className="home-story-overlay" aria-hidden="true" />
               <span className="home-story-index">02 / COMBOS</span>
               <span className="home-story-copy">
-                <strong>Setups sin complicaciones.</strong>
-                <small>Explorar combos ↗</small>
+                <strong>Setups listos para producir.</strong>
+                <small>Elegir combo ↗</small>
               </span>
             </a>
 
@@ -3968,8 +4177,8 @@ export default function App() {
               <span className="home-story-overlay" aria-hidden="true" />
               <span className="home-story-index">03 / PORTAFOLIO</span>
               <span className="home-story-copy">
-                <strong>La atmósfera primero.</strong>
-                <small>Ver proyectos ↗</small>
+                <strong>Atmósferas con intención.</strong>
+                <small>Explorar proyectos ↗</small>
               </span>
             </a>
 
@@ -3982,23 +4191,23 @@ export default function App() {
               <span className="home-story-overlay" aria-hidden="true" />
               <span className="home-story-index">04 / PROCESO</span>
               <div className="home-process-copy">
-                <strong>De la idea al rodaje.</strong>
+                <strong>De la idea a una escena resuelta.</strong>
                 <ol>
-                  <li><span>01</span> Cuéntanos la idea</li>
-                  <li><span>02</span> Diseñamos el setup</li>
-                  <li><span>03</span> Encendemos la escena</li>
+                  <li><span>01</span> Cuéntanos el formato y la fecha</li>
+                  <li><span>02</span> Diseñamos la luz y el equipo</li>
+                  <li><span>03</span> Montamos la atmósfera</li>
                 </ol>
-                <small>Iniciar un proyecto ↗</small>
+                <small>Cotizar proyecto ↗</small>
               </div>
             </a>
           </div>
         </section>
 
         <section className="home-contact-minimal" aria-labelledby="home-contact-title">
-          <p>¿TIENES UNA IDEA?</p>
-          <h2 id="home-contact-title">Hagamos que se vea.</h2>
+          <p>ILUMINACIÓN PARA TU PRÓXIMA PRODUCCIÓN</p>
+          <h2 id="home-contact-title">Cuéntanos qué vas a crear.</h2>
           <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-            Escribir por WhatsApp <span aria-hidden="true">↗</span>
+            Hablemos por WhatsApp <span aria-hidden="true">↗</span>
           </a>
         </section>
 
