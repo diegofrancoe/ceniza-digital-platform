@@ -75,8 +75,8 @@ const PORTFOLIO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
 const CART_STORAGE_KEY = "ceniza-cart-draft";
 const CART_UPDATED_EVENT = "ceniza-cart-updated";
 const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
-const CART_WEBHOOK_URL = import.meta.env.VITE_N8N_CART_WEBHOOK_URL ?? "";
-const CONTACT_WEBHOOK_URL = import.meta.env.VITE_N8N_CONTACT_WEBHOOK_URL ?? "";
+const CART_WEBHOOK_URL = import.meta.env.VITE_MAKE_CART_WEBHOOK_URL ?? "";
+const CONTACT_WEBHOOK_URL = import.meta.env.VITE_MAKE_CONTACT_WEBHOOK_URL ?? "";
 const CART_PAYMENT_URL = import.meta.env.VITE_CENIZA_PAYMENT_URL ?? "";
 const GOOGLE_ANALYTICS_ID = "G-HDX27BVTHQ";
 
@@ -116,7 +116,7 @@ async function postWebhookSubmission(url, payload) {
   const normalizedUrl = normalizeWebhookUrl(url);
 
   if (!normalizedUrl) {
-    throw new Error("Configura el webhook de n8n en las variables de entorno.");
+    throw new Error("El formulario aún no está conectado. Inténtalo por WhatsApp.");
   }
 
   const response = await fetch(normalizedUrl, {
@@ -3304,16 +3304,15 @@ function ContactPage() {
     const form = event.currentTarget;
     const formValues = formDataToObject(new FormData(form));
     const payload = {
-      source: "contact-form",
+      source: "ceniza-contact-form",
       submittedAt: new Date().toISOString(),
-      contact: {
-        firstName: formValues.nombre ?? "",
-        lastName: formValues.apellido ?? "",
-        email: formValues.correo ?? "",
-        phone: formValues.telefono ?? "",
-        address: formValues.direccion ?? "",
-        projectDetails: formValues.proyecto ?? "",
-      },
+      firstName: formValues.nombre ?? "",
+      lastName: formValues.apellido ?? "",
+      email: formValues.correo ?? "",
+      phone: formValues.telefono ?? "",
+      address: formValues.direccion ?? "",
+      projectDetails: formValues.proyecto ?? "",
+      pageUrl: window.location.href,
     };
 
     setContactSubmissionState({
@@ -3325,7 +3324,7 @@ function ContactPage() {
       await postWebhookSubmission(CONTACT_WEBHOOK_URL, payload);
       setContactSubmissionState({
         status: "success",
-        message: "Proyecto enviado. Espere repuesta lo mas pronto posible.",
+        message: "Proyecto enviado. Te responderemos lo antes posible.",
       });
       form.reset();
     } catch (error) {
