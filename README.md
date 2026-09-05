@@ -12,13 +12,14 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Catálogo navegable de equipos con categorías, búsqueda, precios de referencia y páginas de detalle.
 - Catálogo de combos de iluminación y páginas individuales por servicio.
 - Carrito guardado localmente en el navegador para preparar una solicitud de renta o cotización.
-- Formulario de carrito que envía la solicitud a un webhook de n8n configurado externamente.
-- Formulario de contacto conectado a un segundo webhook de n8n.
+- Formulario de carrito preparado para enviar solicitudes a un webhook de Make configurado externamente.
+- Formulario de contacto conectado a Make para registrar la solicitud en Google Sheets y enviar los correos de seguimiento.
 - Apertura opcional de un enlace externo de pago después de registrar una solicitud de renta.
 - Portafolio con imágenes y videos.
-- Páginas de tratamiento de datos y términos y condiciones.
-- Aviso de cookies, enlaces de contacto y metadatos SEO.
-- Medición web cargada únicamente después de que el visitante acepta el aviso de cookies.
+- Política de tratamiento de datos y términos y condiciones.
+- Autorización obligatoria y sin selección previa en el formulario de contacto, con versión de política incluida en el envío.
+- Aviso de cookies con opciones para aceptar, rechazar o configurar preferencias.
+- Medición web cargada únicamente después de que el visitante autoriza las cookies de analítica.
 - Imágenes optimizadas en WebP y carga diferida de contenido fuera de pantalla.
 - Reproducción de videos del portafolio limitada al contenido visible, con portadas livianas para evitar cuadros vacíos durante la carga.
 - Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
@@ -32,7 +33,7 @@ El proyecto no procesa pagos directamente: solo puede abrir una URL externa conf
 - Vite 7
 - JavaScript y JSX
 - CSS
-- Webhooks HTTP de n8n configurados mediante variables de entorno
+- Webhooks HTTP de Make configurados mediante variables de entorno
 - Configuración de rutas SPA compatible con Vercel
 
 ## Arquitectura
@@ -67,8 +68,8 @@ La dirección local se mostrará en la salida de Vite.
 
 | Variable | Uso | Obligatoria |
 | --- | --- | --- |
-| `VITE_N8N_CART_WEBHOOK_URL` | Recibe solicitudes del carrito y datos de cotización o renta. | Para enviar el carrito |
-| `VITE_N8N_CONTACT_WEBHOOK_URL` | Recibe los formularios de contacto. | Para enviar contactos |
+| `VITE_MAKE_CART_WEBHOOK_URL` | Recibe solicitudes del carrito y datos de cotización o renta. | Para enviar el carrito |
+| `VITE_MAKE_CONTACT_WEBHOOK_URL` | Recibe los formularios de contacto y activa el flujo de seguimiento. | Para enviar contactos |
 | `VITE_CENIZA_PAYMENT_URL` | Enlace externo que se abre al continuar con una renta inmediata. | Solo para esa opción |
 
 Todas las variables con prefijo `VITE_` se incorporan al código del navegador y son públicas. No deben contener tokens privados, secretos ni credenciales con privilegios. Si un webhook necesita autenticación secreta, debe protegerse mediante un backend o proxy seguro que no está implementado en este proyecto.
@@ -106,6 +107,6 @@ El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) 
 
 ## Estado actual
 
-La interfaz, navegación, catálogo, carrito, formularios e integración configurable con n8n están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché y archivos básicos de descubrimiento. Para operar todos los formularios en un entorno real se deben mantener configurados y protegidos los endpoints externos, validar el flujo de pago y aplicar la política de tratamiento de datos personales.
+La interfaz, navegación, catálogo, carrito, formularios e integración configurable con Make están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos básicos de descubrimiento, controles de cookies y autorización para el tratamiento de datos en el formulario de contacto. Para operar todos los formularios en un entorno real se deben mantener configurados y protegidos los endpoints externos, conservar la prueba de la autorización y validar el flujo de pago.
 
 No se incluye CRM. Cualquier automatización de CRM, panel administrativo, autenticación, base de datos o gestión interna debe tratarse como una extensión demo o trabajo futuro hasta que exista código verificable para esas capacidades.

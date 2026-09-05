@@ -75,6 +75,9 @@ const PORTFOLIO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
 const CART_STORAGE_KEY = "ceniza-cart-draft";
 const CART_UPDATED_EVENT = "ceniza-cart-updated";
 const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
+const COOKIE_CONSENT_VERSION = "2026-09-04-v3";
+const COOKIE_SETTINGS_EVENT = "ceniza-open-cookie-settings";
+const DATA_POLICY_VERSION = "2026-09-04";
 const CART_WEBHOOK_URL = import.meta.env.VITE_MAKE_CART_WEBHOOK_URL ?? "";
 const CONTACT_WEBHOOK_URL = import.meta.env.VITE_MAKE_CONTACT_WEBHOOK_URL ?? "";
 const CART_PAYMENT_URL = import.meta.env.VITE_CENIZA_PAYMENT_URL ?? "";
@@ -88,12 +91,17 @@ function formatCatalogTechnicalText(value) {
 }
 
 function loadAnalytics() {
-  if (typeof window === "undefined" || document.getElementById("ceniza-google-analytics")) return;
+  if (typeof window === "undefined") return;
 
+  window[`ga-disable-${GOOGLE_ANALYTICS_ID}`] = false;
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function gtag() {
     window.dataLayer.push(arguments);
   };
+  window.gtag("consent", "update", { analytics_storage: "granted" });
+
+  if (document.getElementById("ceniza-google-analytics")) return;
+
   window.gtag("js", new Date());
   window.gtag("config", GOOGLE_ANALYTICS_ID);
 
@@ -102,6 +110,49 @@ function loadAnalytics() {
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`;
   document.head.appendChild(script);
+}
+
+function disableAnalytics() {
+  if (typeof window === "undefined") return;
+
+  window[`ga-disable-${GOOGLE_ANALYTICS_ID}`] = true;
+  if (typeof window.gtag === "function") {
+    window.gtag("consent", "update", { analytics_storage: "denied" });
+  }
+}
+
+function getCookiePreferences() {
+  if (typeof window === "undefined") return null;
+
+  const storedValue = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+  if (!storedValue) return null;
+
+  if (storedValue === "accepted" || storedValue === "rejected") return null;
+
+  try {
+    const preferences = JSON.parse(storedValue);
+    if (
+      typeof preferences?.analytics !== "boolean"
+      || preferences.version !== COOKIE_CONSENT_VERSION
+    ) return null;
+    return preferences;
+  } catch {
+    return null;
+  }
+}
+
+function saveCookiePreferences(analytics) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem(
+    COOKIE_CONSENT_KEY,
+    JSON.stringify({
+      essential: true,
+      analytics,
+      version: COOKIE_CONSENT_VERSION,
+      updatedAt: new Date().toISOString(),
+    }),
+  );
 }
 
 function formDataToObject(formData) {
@@ -1543,6 +1594,8 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth <= 720 : false,
   );
+  const mobileMenuButtonRef = useRef(null);
+  const mobileNavPanelRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -1561,10 +1614,37 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+
+    const closeMenuFromOutside = (event) => {
+      if (
+        !mobileMenuButtonRef.current?.contains(event.target)
+        && !mobileNavPanelRef.current?.contains(event.target)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    const closeMenuFromKeyboard = (event) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+        mobileMenuButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeMenuFromOutside);
+    document.addEventListener("keydown", closeMenuFromKeyboard);
+    return () => {
+      document.removeEventListener("pointerdown", closeMenuFromOutside);
+      document.removeEventListener("keydown", closeMenuFromKeyboard);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header className={`topbar ${isSubPage ? "topbar-subpage" : "topbar-home"}`}>
       {isMobileLayout && (
         <button
+          ref={mobileMenuButtonRef}
           className={`mobile-menu-button ${isMobileMenuOpen ? "is-open" : ""}`}
           type="button"
           aria-label={isMobileMenuOpen ? "Cerrar menu" : "Abrir menu"}
@@ -1592,6 +1672,7 @@ function SiteHeader({ isSubPage, searchValue, setSearchValue, handleSearch }) {
       )}
       {isMobileLayout && (
         <div
+          ref={mobileNavPanelRef}
           className={`mobile-nav-panel ${isMobileMenuOpen ? "is-open" : ""}`}
           id="mobile-nav-panel"
         >
@@ -1614,7 +1695,11 @@ function SiteFooter() {
       <div className="footer-minimal-lead">
         <a className="footer-brand" href="/">
           <img className="footer-brand-image" src={cenizaLogo} alt="Ceniza" width="880" height="141" loading="lazy" decoding="async" />
-          <img className="footer-brand-image footer-brand-image-accent" src={cenizaLogo} alt="" width="880" height="141" loading="lazy" decoding="async" aria-hidden="true" />
+          <span className="footer-brand-e" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </a>
         <p>Estudio de iluminación para fotografía, video y eventos.</p>
         <a
@@ -1645,51 +1730,113 @@ function SiteFooter() {
 
 function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isConfiguring, setIsConfiguring] = useState(false);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted") {
-      const loadId = "requestIdleCallback" in window
+    const preferences = getCookiePreferences();
+    let loadId;
+    let timerId;
+
+    if (preferences?.analytics) {
+      setAnalyticsEnabled(true);
+      loadId = "requestIdleCallback" in window
         ? window.requestIdleCallback(loadAnalytics, { timeout: 2500 })
         : window.setTimeout(loadAnalytics, 1500);
+    } else if (preferences) {
+      disableAnalytics();
+    } else {
+      timerId = window.setTimeout(() => setIsVisible(true), 500);
+    }
 
-      return () => {
+    const handleOpenSettings = () => {
+      const currentPreferences = getCookiePreferences();
+      setAnalyticsEnabled(Boolean(currentPreferences?.analytics));
+      setIsConfiguring(true);
+      setIsVisible(true);
+    };
+
+    window.addEventListener(COOKIE_SETTINGS_EVENT, handleOpenSettings);
+
+    return () => {
+      if (timerId) window.clearTimeout(timerId);
+      if (loadId) {
         if ("cancelIdleCallback" in window) {
           window.cancelIdleCallback(loadId);
         } else {
           window.clearTimeout(loadId);
         }
-      };
-    }
-
-    const timerId = window.setTimeout(() => setIsVisible(true), 500);
-    return () => window.clearTimeout(timerId);
+      }
+      window.removeEventListener(COOKIE_SETTINGS_EVENT, handleOpenSettings);
+    };
   }, []);
 
-  const handleAccept = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+  const applyPreferences = (analytics) => {
+    saveCookiePreferences(analytics);
+    setAnalyticsEnabled(analytics);
+
+    if (analytics) {
       loadAnalytics();
+    } else {
+      disableAnalytics();
     }
+
+    setIsConfiguring(false);
     setIsVisible(false);
   };
 
   if (!isVisible) return null;
 
   return (
-    <aside className="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies">
+    <aside
+      className={`cookie-banner${isConfiguring ? " is-configuring" : ""}`}
+      role="dialog"
+      aria-live="polite"
+      aria-label="Preferencias de cookies"
+    >
       <div className="cookie-banner-copy">
-        <span>COOKIES</span>
-        <strong>Preferencias de navegación</strong>
+        <strong>Cookies</strong>
         <p>
-          Usamos cookies para recordar tus preferencias y mejorar el sitio.
+          Usamos cookies necesarias para que la página funcione. Las de analítica son opcionales y nos ayudan a mejorarla. <a href={DATA_POLICY_PATH}>Ver política</a>.
         </p>
       </div>
+      {isConfiguring ? (
+        <div className="cookie-preferences">
+          <div className="cookie-preference-row">
+            <div>
+              <strong>Esenciales</strong>
+              <p>Necesarias para que la página funcione.</p>
+            </div>
+            <span>Siempre activas</span>
+          </div>
+          <label className="cookie-preference-row">
+            <div>
+              <strong>Analítica</strong>
+              <p>Nos ayuda a entender el uso del sitio y mejorarlo.</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={analyticsEnabled}
+              onChange={(event) => setAnalyticsEnabled(event.target.checked)}
+            />
+          </label>
+        </div>
+      ) : null}
       <div className="cookie-banner-actions">
-        <a className="cookie-button cookie-button-secondary" href={DATA_POLICY_PATH}>
-          Ver política
-        </a>
-        <button className="cookie-button cookie-button-primary" type="button" onClick={handleAccept}>
+        <button className="cookie-button cookie-button-secondary" type="button" onClick={() => applyPreferences(false)}>
+          Rechazar
+        </button>
+        {isConfiguring ? (
+          <button className="cookie-button cookie-button-secondary" type="button" onClick={() => applyPreferences(analyticsEnabled)}>
+            Guardar
+          </button>
+        ) : (
+          <button className="cookie-button cookie-button-secondary" type="button" onClick={() => setIsConfiguring(true)}>
+            Configurar
+          </button>
+        )}
+        <button className="cookie-button cookie-button-primary" type="button" onClick={() => applyPreferences(true)}>
           Aceptar
         </button>
       </div>
@@ -2384,6 +2531,7 @@ function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], prima
 
 function ServicesPage() {
   const [activeComboIndex, setActiveComboIndex] = useState(0);
+  const comboOptionsRef = useRef(null);
   const activeCombo = servicesPageCards[activeComboIndex];
   const combosLayoutOption = "selector"; // Cambiar a "editorial" restaura la opción A.
   const activeComboWhatsAppUrl = `${WHATSAPP_URL}?text=${encodeURIComponent(
@@ -2409,6 +2557,21 @@ function ServicesPage() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    const tray = comboOptionsRef.current;
+    const activeOption = tray?.querySelector(`[data-combo-index="${activeComboIndex}"]`);
+    if (!tray || !activeOption) return;
+
+    const left = activeOption.offsetLeft - ((tray.clientWidth - activeOption.clientWidth) / 2);
+    tray.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [activeComboIndex]);
+
+  const showAdjacentCombo = (direction) => {
+    setActiveComboIndex((current) => (
+      (current + direction + servicesPageCards.length) % servicesPageCards.length
+    ));
+  };
 
   return (
     <div className="page-shell services-page-shell combos-page-shell">
@@ -2532,24 +2695,43 @@ function ServicesPage() {
                   <p>Selecciona tu producción</p>
                   <span>{String(activeComboIndex + 1).padStart(2, "0")} / {String(servicesPageCards.length).padStart(2, "0")}</span>
                 </div>
-                <div className="combos-selector-options">
-                  {servicesPageCards.map((service, index) => (
-                    <button
-                      className={`combos-selector-option ${service.title.length > 24 ? "has-long-title" : ""} ${index === activeComboIndex ? "is-active" : ""}`}
-                      type="button"
-                      aria-pressed={index === activeComboIndex}
-                      onClick={() => setActiveComboIndex(index)}
-                      key={service.slug}
-                    >
-                      <span className="combos-selector-option-image">
-                        <img src={service.image} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-                      </span>
-                      <span className="combos-selector-option-copy">
-                        <span>{String(index + 1).padStart(2, "0")}</span>
-                        <strong>{service.title}</strong>
-                      </span>
-                    </button>
-                  ))}
+                <div className="combos-selector-carousel">
+                  <button
+                    className="combos-selector-side-arrow is-previous"
+                    type="button"
+                    onClick={() => showAdjacentCombo(-1)}
+                    aria-label="Seleccionar combo anterior"
+                  >
+                    <span className="combos-selector-chevron" aria-hidden="true" />
+                  </button>
+                  <div className="combos-selector-options" ref={comboOptionsRef}>
+                    {servicesPageCards.map((service, index) => (
+                      <button
+                        className={`combos-selector-option ${service.title.length > 24 ? "has-long-title" : ""} ${index === activeComboIndex ? "is-active" : ""}`}
+                        type="button"
+                        data-combo-index={index}
+                        aria-pressed={index === activeComboIndex}
+                        onClick={() => setActiveComboIndex(index)}
+                        key={service.slug}
+                      >
+                        <span className="combos-selector-option-image">
+                          <img src={service.image} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                        </span>
+                        <span className="combos-selector-option-copy">
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <strong>{service.title}</strong>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="combos-selector-side-arrow is-next"
+                    type="button"
+                    onClick={() => showAdjacentCombo(1)}
+                    aria-label="Seleccionar combo siguiente"
+                  >
+                    <span className="combos-selector-chevron" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
             </section>
@@ -2575,11 +2757,13 @@ function ServicesPage() {
 function EquipmentPage({ initialProduct = null }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos los productos");
+  const [isMobileCategoryMenuOpen, setIsMobileCategoryMenuOpen] = useState(false);
   const [hoveredCatalogCardSlug, setHoveredCatalogCardSlug] = useState("");
   const [catalogCardImageIndexes, setCatalogCardImageIndexes] = useState({});
   const [selectedCatalogProduct, setSelectedCatalogProduct] = useState(initialProduct);
   const [selectedCatalogImageIndex, setSelectedCatalogImageIndex] = useState(0);
   const catalogSheetCloseRef = useRef(null);
+  const catalogMobileFilterRef = useRef(null);
   const [openSections, setOpenSections] = useState(() =>
     Object.fromEntries(catalogSidebarSections.map((section) => [section.title, true])),
   );
@@ -2627,6 +2811,33 @@ function EquipmentPage({ initialProduct = null }) {
     setSelectedCatalogProduct(initialProduct);
     setSelectedCatalogImageIndex(0);
   }, [initialProduct]);
+
+  useEffect(() => {
+    if (!isMobileCategoryMenuOpen) return undefined;
+
+    const closeCategoryMenu = (event) => {
+      if (event.key === "Escape") {
+        setIsMobileCategoryMenuOpen(false);
+        return;
+      }
+
+      if (
+        event.type === "pointerdown"
+        && catalogMobileFilterRef.current
+        && !catalogMobileFilterRef.current.contains(event.target)
+      ) {
+        setIsMobileCategoryMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeCategoryMenu);
+    window.addEventListener("keydown", closeCategoryMenu);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeCategoryMenu);
+      window.removeEventListener("keydown", closeCategoryMenu);
+    };
+  }, [isMobileCategoryMenuOpen]);
 
   useEffect(() => {
     if (!selectedCatalogProduct) return undefined;
@@ -2741,6 +2952,56 @@ function EquipmentPage({ initialProduct = null }) {
                   aria-label="Buscar equipo"
                 />
               </label>
+              <div className="catalog-mobile-filter" ref={catalogMobileFilterRef}>
+                <span className="catalog-mobile-filter-label">Filtrar por categoría</span>
+                <button
+                  className={`catalog-mobile-filter-trigger ${isMobileCategoryMenuOpen ? "is-open" : ""}`}
+                  type="button"
+                  aria-label="Filtrar equipos por categoría"
+                  aria-haspopup="listbox"
+                  aria-expanded={isMobileCategoryMenuOpen}
+                  onClick={() => setIsMobileCategoryMenuOpen((current) => !current)}
+                >
+                  <span>{activeCategory}</span>
+                  <span className="catalog-mobile-filter-chevron" aria-hidden="true" />
+                </button>
+                {isMobileCategoryMenuOpen ? (
+                  <div className="catalog-mobile-filter-menu" role="listbox" aria-label="Categorías del catálogo">
+                    <button
+                      className={activeCategory === "Todos los productos" ? "is-active" : ""}
+                      type="button"
+                      role="option"
+                      aria-selected={activeCategory === "Todos los productos"}
+                      onClick={() => {
+                        setActiveCategory("Todos los productos");
+                        setIsMobileCategoryMenuOpen(false);
+                      }}
+                    >
+                      <span>Todos los productos</span>
+                    </button>
+                    {catalogSidebarSections.map((section) => (
+                      <div className="catalog-mobile-filter-group" key={section.title}>
+                        <p>{section.title}</p>
+                        {section.items.map((item) => (
+                          <button
+                            className={activeCategory === item ? "is-active" : ""}
+                            type="button"
+                            role="option"
+                            aria-selected={activeCategory === item}
+                            onClick={() => {
+                              setActiveCategory(item);
+                              setIsMobileCategoryMenuOpen(false);
+                            }}
+                            key={item}
+                          >
+                            <span>{item}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
               <div className="catalog-browser-nav">
                 <div className="catalog-browser-group">
                   <button
@@ -2882,14 +3143,12 @@ function EquipmentPage({ initialProduct = null }) {
             <div className="catalog-sheet-layout">
               <div className="catalog-sheet-visual">
                 <div className="catalog-sheet-image-frame">
-                  {selectedCatalogGallery.length > 1 ? (
+                  {selectedCatalogImageIndex > 0 ? (
                     <button
                       className="catalog-sheet-image-arrow is-previous"
                       type="button"
                       onClick={() => {
-                        setSelectedCatalogImageIndex((current) =>
-                          (current - 1 + selectedCatalogGallery.length) % selectedCatalogGallery.length,
-                        );
+                        setSelectedCatalogImageIndex((current) => Math.max(0, current - 1));
                       }}
                       aria-label={`Ver imagen anterior de ${selectedCatalogProduct.label}`}
                     >
@@ -2901,13 +3160,13 @@ function EquipmentPage({ initialProduct = null }) {
                     alt={selectedCatalogImage?.alt ?? selectedCatalogProduct.label}
                     decoding="async"
                   />
-                  {selectedCatalogGallery.length > 1 ? (
+                  {selectedCatalogImageIndex < selectedCatalogGallery.length - 1 ? (
                     <button
                       className="catalog-sheet-image-arrow is-next"
                       type="button"
                       onClick={() => {
                         setSelectedCatalogImageIndex((current) =>
-                          (current + 1) % selectedCatalogGallery.length,
+                          Math.min(selectedCatalogGallery.length - 1, current + 1),
                         );
                       }}
                       aria-label={`Ver imagen siguiente de ${selectedCatalogProduct.label}`}
@@ -3303,6 +3562,16 @@ function ContactPage() {
 
     const form = event.currentTarget;
     const formValues = formDataToObject(new FormData(form));
+    const dataConsentGranted = formValues.dataConsent === "on";
+
+    if (!dataConsentGranted) {
+      setContactSubmissionState({
+        status: "error",
+        message: "Debes autorizar el tratamiento de tus datos para enviar la solicitud.",
+      });
+      return;
+    }
+
     const payload = {
       source: "ceniza-contact-form",
       submittedAt: new Date().toISOString(),
@@ -3313,6 +3582,8 @@ function ContactPage() {
       address: formValues.direccion ?? "",
       projectDetails: formValues.proyecto ?? "",
       pageUrl: window.location.href,
+      dataConsentGranted,
+      dataPolicyVersion: DATA_POLICY_VERSION,
     };
 
     setContactSubmissionState({
@@ -3391,6 +3662,12 @@ function ContactPage() {
                 />
               </label>
             </div>
+            <label className="contact-data-consent">
+              <input name="dataConsent" type="checkbox" required />
+              <span>
+                Autorizo a Ceniza Producciones para tratar mis datos con el fin de atender esta solicitud, de acuerdo con la <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">Política de Tratamiento de Datos</a>.
+              </span>
+            </label>
             <p className={`form-status-message is-${contactSubmissionState.status}`} aria-live="polite">
               {contactSubmissionState.message}
             </p>
@@ -3456,6 +3733,15 @@ function LegalPage({ eyebrow, title, lead, sections, titleClassName = "" }) {
                   ))}
                 </ul>
               ) : null}
+              {section.cookieSettings ? (
+                <button
+                  className="legal-cookie-settings"
+                  type="button"
+                  onClick={() => window.dispatchEvent(new Event(COOKIE_SETTINGS_EVENT))}
+                >
+                  Cambiar preferencias de cookies
+                </button>
+              ) : null}
             </article>
           ))}
         </section>
@@ -3482,8 +3768,8 @@ function DataPolicyPage() {
         {
           title: "1. Responsable del tratamiento",
           paragraphs: [
-            "Ceniza es responsable del tratamiento de los datos personales recolectados a través de formularios, WhatsApp, correo electrónico y navegación dentro del sitio web.",
-            "La información de contacto principal para solicitudes relacionadas con datos personales es gerencia@cenizaproducciones.com.",
+            "Ceniza Producciones, con domicilio en Bogotá, Colombia, es responsable del tratamiento de los datos personales recolectados a través de este sitio web, sus formularios, WhatsApp y correo electrónico.",
+            "Canales de atención para asuntos de datos personales: gerencia@cenizaproducciones.com y WhatsApp +57 320 362 4348.",
           ],
         },
         {
@@ -3491,9 +3777,9 @@ function DataPolicyPage() {
           paragraphs: ["Podemos recopilar información necesaria para atender solicitudes comerciales, técnicas y logísticas."],
           items: [
             "Nombre, apellido y datos de contacto.",
-            "Empresa, marca o productora.",
-            "Ciudad, dirección, fecha de montaje y detalles del proyecto.",
-            "Información relacionada con preferencias de navegación y solicitudes de contacto.",
+            "Empresa, marca o productora, cuando se proporciona.",
+            "Ciudad, dirección, fecha, tipo de producción y detalles de la solicitud.",
+            "Información técnica de navegación y preferencias de cookies, según la autorización otorgada.",
           ],
         },
         {
@@ -3501,30 +3787,53 @@ function DataPolicyPage() {
           paragraphs: ["La información se utiliza únicamente para fines coherentes con la operación comercial y técnica de Ceniza."],
           items: [
             "Responder solicitudes de contacto, cotización o soporte.",
-            "Preparar propuestas comerciales, riders y montajes.",
-            "Hacer seguimiento a proyectos, disponibilidad y logística.",
-            "Mejorar la experiencia de navegación y recordar preferencias dentro del sitio.",
+            "Preparar cotizaciones de alquiler, propuestas de iluminación y recomendaciones técnicas.",
+            "Coordinar disponibilidad, fechas, entregas, montajes y demás aspectos logísticos.",
+            "Mantener la seguridad y el funcionamiento del sitio.",
+            "Medir el uso del sitio y mejorar su contenido únicamente cuando la persona autorice las cookies de analítica.",
           ],
         },
         {
-          title: "4. Almacenamiento y protección",
+          title: "4. Autorización y circulación de la información",
           paragraphs: [
-            "Ceniza adopta medidas razonables para proteger la información personal frente a pérdida, acceso no autorizado, uso indebido o divulgación no autorizada.",
-            "Solo se conserva la información durante el tiempo necesario para atender la solicitud, mantener la relación comercial o cumplir obligaciones legales aplicables.",
+            "Antes de enviar un formulario, la persona debe autorizar de forma previa, expresa e informada el tratamiento de sus datos. La casilla de autorización no está marcada previamente.",
+            "Para operar el formulario, Ceniza puede usar proveedores tecnológicos como Make, Google Workspace y el servicio de alojamiento del sitio. Estos proveedores actúan como encargados o prestadores tecnológicos y solo reciben la información necesaria para cumplir su función. Ceniza no vende datos personales.",
           ],
         },
         {
-          title: "5. Derechos del titular",
+          title: "5. Almacenamiento, seguridad y vigencia",
           paragraphs: [
-            "La persona titular de los datos puede solicitar actualización, corrección o supresión de su información, así como revocar autorizaciones cuando sea aplicable.",
-            "Para ello puede escribir a gerencia@cenizaproducciones.com indicando su solicitud y un medio de contacto para respuesta.",
+            "Ceniza adopta medidas razonables para proteger la información frente a pérdida, acceso no autorizado, uso indebido o divulgación no autorizada.",
+            "Los datos se conservan durante el tiempo necesario para atender la solicitud, gestionar la relación comercial y cumplir obligaciones legales o contractuales. Después se eliminan o anonimizan cuando resulte procedente.",
           ],
         },
         {
-          title: "6. Cookies y navegación",
+          title: "6. Derechos de la persona titular",
           paragraphs: [
-            "Este sitio puede usar cookies o almacenamiento local para recordar preferencias, mejorar la navegación y medir el funcionamiento básico de la experiencia digital.",
-            "Al continuar navegando o aceptar el banner de cookies, el usuario autoriza este uso funcional dentro del sitio.",
+            "La persona titular puede conocer, actualizar y rectificar sus datos; solicitar prueba de la autorización; conocer el uso dado a la información; presentar quejas ante la Superintendencia de Industria y Comercio; revocar la autorización o solicitar la supresión cuando sea procedente; y acceder gratuitamente a sus datos.",
+            "La revocatoria o supresión puede no proceder cuando exista un deber legal o contractual que obligue a conservar la información.",
+          ],
+        },
+        {
+          title: "7. Consultas y reclamos",
+          paragraphs: [
+            "Las consultas, correcciones, solicitudes de supresión o reclamos pueden enviarse a gerencia@cenizaproducciones.com con el asunto “Datos personales”. La solicitud debe incluir nombre, datos de contacto, una descripción clara de lo solicitado y los documentos de soporte, si aplican.",
+            "Las consultas se atienden en un máximo de diez días hábiles, prorrogables por cinco días hábiles cuando sea necesario. Los reclamos se atienden en un máximo de quince días hábiles, prorrogables por ocho días hábiles, de acuerdo con la Ley 1581 de 2012.",
+          ],
+        },
+        {
+          title: "8. Cookies y preferencias",
+          paragraphs: [
+            "El sitio usa almacenamiento esencial para recordar la elección de cookies y permitir funciones básicas. Las cookies de analítica solo se activan cuando la persona las acepta expresamente.",
+            "Aceptar, rechazar o configurar son opciones equivalentes y visibles en el aviso. La elección puede modificarse en cualquier momento desde esta política.",
+          ],
+          cookieSettings: true,
+        },
+        {
+          title: "9. Vigencia y actualizaciones",
+          paragraphs: [
+            "Esta política rige desde el 4 de septiembre de 2026 y permanece vigente hasta que sea sustituida. Ceniza puede actualizarla cuando cambien las finalidades, los procesos o las obligaciones aplicables.",
+            "Las modificaciones relevantes se publicarán en esta misma página antes de entrar en vigor cuando requieran una nueva autorización.",
           ],
         },
       ]}
