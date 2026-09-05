@@ -11,10 +11,8 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Página principal con presentación de marca, servicios, catálogo y portafolio.
 - Catálogo navegable de equipos con categorías, búsqueda, precios de referencia y páginas de detalle.
 - Catálogo de combos de iluminación y páginas individuales por servicio.
-- Carrito guardado localmente en el navegador para preparar una solicitud de renta o cotización.
-- Formulario de carrito preparado para enviar solicitudes a un webhook de Make configurado externamente.
 - Formulario de contacto conectado a Make para registrar la solicitud en Google Sheets y enviar los correos de seguimiento.
-- Apertura opcional de un enlace externo de pago después de registrar una solicitud de renta.
+- Solicitudes de renta y cotización dirigidas a WhatsApp o al formulario de contacto.
 - Portafolio con imágenes y videos.
 - Política de tratamiento de datos y términos y condiciones.
 - Autorización obligatoria y sin selección previa en el formulario de contacto, con versión de política incluida en el envío.
@@ -24,7 +22,7 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Reproducción de videos del portafolio limitada al contenido visible, con portadas livianas para evitar cuadros vacíos durante la carga.
 - Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
 
-El proyecto no procesa pagos directamente: solo puede abrir una URL externa configurada. Tampoco contiene un CRM. La conexión con un CRM, automatizaciones adicionales o persistencia de clientes debe considerarse una extensión demo o trabajo futuro.
+El proyecto no procesa pagos directamente ni contiene un CRM. La conexión con un CRM, automatizaciones adicionales o persistencia de clientes debe considerarse una extensión demo o trabajo futuro.
 
 ## Stack
 
@@ -41,13 +39,13 @@ El proyecto no procesa pagos directamente: solo puede abrir una URL externa conf
 La aplicación es una SPA ejecutada completamente en el navegador:
 
 - `src/main.jsx` monta la aplicación React.
-- `src/App.jsx` contiene las vistas, navegación, catálogo, carrito y formularios.
+- `src/App.jsx` contiene las vistas, navegación, catálogo y formularios.
 - `src/styles.css` contiene los estilos globales y responsivos.
 - `src/assets/` contiene únicamente las imágenes y videos utilizados por la aplicación.
 - `public/` contiene el icono y los archivos públicos de descubrimiento para buscadores.
-- `vercel.json` define el fallback de rutas hacia `index.html` y la caché de recursos versionados.
+- `vercel.json` configura las rutas públicas y la caché de recursos versionados.
 
-El carrito usa `localStorage`. Las solicitudes se envían directamente desde el navegador a endpoints externos; este repositorio no incluye base de datos, API propia ni almacenamiento persistente de clientes.
+Las solicitudes del formulario se envían directamente desde el navegador a un endpoint externo; este repositorio no incluye base de datos, API propia ni almacenamiento persistente de clientes.
 
 ## Requisitos
 
@@ -68,9 +66,7 @@ La dirección local se mostrará en la salida de Vite.
 
 | Variable | Uso | Obligatoria |
 | --- | --- | --- |
-| `VITE_MAKE_CART_WEBHOOK_URL` | Recibe solicitudes del carrito y datos de cotización o renta. | Para enviar el carrito |
 | `VITE_MAKE_CONTACT_WEBHOOK_URL` | Recibe los formularios de contacto y activa el flujo de seguimiento. | Para enviar contactos |
-| `VITE_CENIZA_PAYMENT_URL` | Enlace externo que se abre al continuar con una renta inmediata. | Solo para esa opción |
 
 Todas las variables con prefijo `VITE_` se incorporan al código del navegador y son públicas. No deben contener tokens privados, secretos ni credenciales con privilegios. Si un webhook necesita autenticación secreta, debe protegerse mediante un backend o proxy seguro que no está implementado en este proyecto.
 
@@ -107,6 +103,6 @@ El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) 
 
 ## Estado actual
 
-La interfaz, navegación, catálogo, carrito, formularios e integración configurable con Make están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos básicos de descubrimiento, controles de cookies y autorización para el tratamiento de datos en el formulario de contacto. Para operar todos los formularios en un entorno real se deben mantener configurados y protegidos los endpoints externos, conservar la prueba de la autorización y validar el flujo de pago.
+La interfaz, navegación, catálogo, formularios e integración configurable con Make están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos básicos de descubrimiento, controles de cookies y autorización para el tratamiento de datos en el formulario de contacto. Para operar el formulario en un entorno real se debe mantener configurado y protegido el endpoint externo y conservar la prueba de la autorización.
 
 No se incluye CRM. Cualquier automatización de CRM, panel administrativo, autenticación, base de datos o gestión interna debe tratarse como una extensión demo o trabajo futuro hasta que exista código verificable para esas capacidades.

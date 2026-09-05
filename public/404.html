@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,follow" />
+    <link rel="icon" type="image/svg+xml" href="/ceniza-icon.svg?v=3" />
+    <title>Página no encontrada | Ceniza</title>
+    <style>
+      :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #050505; color: #f7f4ed; }
+      main { min-height: 100svh; display: grid; grid-template-rows: auto 1fr; }
+      header { display: flex; align-items: center; min-height: 92px; padding: 24px clamp(24px, 5vw, 76px); border-bottom: 1px solid rgba(247,244,237,.13); }
+      .brand { display: inline-flex; align-items: center; gap: .22em; color: #f7f4ed; text-decoration: none; font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 300; letter-spacing: .3em; }
+      .brand-e { display: inline-grid; gap: 4px; width: .7em; }
+      .brand-e i { display: block; height: 2px; background: #e7ad00; }
+      .content { display: grid; align-content: center; width: min(1180px, calc(100% - 48px)); margin: auto; padding: 72px 0; }
+      .index { margin: 0; color: #e7ad00; font-size: .72rem; font-weight: 700; letter-spacing: .28em; }
+      h1 { max-width: 9ch; margin: 24px 0 0; font-size: clamp(4.6rem, 13vw, 10rem); font-weight: 200; letter-spacing: -.07em; line-height: .84; }
+      p { max-width: 44ch; margin: 34px 0 0; color: rgba(247,244,237,.6); font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.65; }
+      nav { display: flex; flex-wrap: wrap; gap: 18px 34px; margin-top: 42px; }
+      nav a { padding: 10px 0 8px; border-bottom: 1px solid currentColor; color: #f7f4ed; text-decoration: none; font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+      nav a:first-child { color: #e7ad00; }
+      @media (max-width: 560px) {
+        header { min-height: 76px; padding: 18px 22px; }
+        .content { width: calc(100% - 44px); padding: 56px 0 72px; }
+        h1 { font-size: clamp(4.2rem, 25vw, 7rem); }
+        nav { display: grid; justify-items: start; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="/" aria-label="Volver al inicio de Ceniza">
+          C<span class="brand-e" aria-hidden="true"><i></i><i></i><i></i></span>NIZA
+        </a>
+      </header>
+      <section class="content">
+        <span class="index">ERROR 404</span>
+        <h1>Esta escena no existe.</h1>
+        <p>La dirección que buscas cambió o ya no está disponible. Puedes volver al inicio o continuar explorando nuestros equipos de iluminación.</p>
+        <nav aria-label="Opciones para continuar">
+          <a href="/">Volver al inicio</a>
+          <a href="/catalogo">Explorar catálogo</a>
+          <a href="/contacto">Contactar a Ceniza</a>
+        </nav>
+      </section>
+    </main>
+  </body>
+</html>

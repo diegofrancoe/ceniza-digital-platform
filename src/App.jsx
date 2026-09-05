@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import heroSoftboxOff from "./assets/ceniza-godox-qrp70-left-off-grid.png";
-import heroSoftboxOn from "./assets/ceniza-godox-qrp70-left-on-cases-grid.png";
-import portfolioCardImage from "./assets/ceniza-card-portafolio-molus-x60-v3.png";
-import processCardImage from "./assets/ceniza-card-proceso-v2.png";
+import heroSoftboxOff from "./assets/ceniza-godox-qrp70-left-off-grid.jpg";
+import heroSoftboxOn from "./assets/ceniza-godox-qrp70-left-on-cases-grid.jpg";
+import portfolioCardImage from "./assets/ceniza-card-portafolio-molus-x60-v3.jpg";
+import processCardImage from "./assets/ceniza-card-proceso-v2.jpg";
 import cenizaLogo from "./assets/ceniza-logo-cropped.png";
-import aboutLight from "./assets/luz.png";
-import catalogAccentLight from "./assets/lumina2.webp";
-import portfolioLight from "./assets/lumina1.png";
 import studioVideo from "./assets/reel-juanita-detras-de-camara.mp4";
 import studioVideoPoster from "./assets/reel-juanita-poster.jpg";
 import portfolioVideo from "./assets/reel-editorial-semilla.mp4";
@@ -17,11 +14,6 @@ import portfolioSpaceVideo from "./assets/reel-diego-detras-de-camaras.mp4";
 import portfolioSpaceVideoPoster from "./assets/reel-diego-detras-de-camaras-poster.jpg";
 import characterVideo from "./assets/video-ambientes-con-caracter.mp4";
 import characterVideoPoster from "./assets/video-ambientes-con-caracter-poster.jpg";
-import eventTwoImage from "./assets/evento 2.webp";
-import eventThreeImage from "./assets/evento 3.webp";
-import eventFourImage from "./assets/evento 4.webp";
-import eventFiveImage from "./assets/evento 5 .webp";
-import eventSixImage from "./assets/evento 6.webp";
 import portfolioCasesImage from "./assets/portafolio-cases-ceniza.webp";
 import serviceOneImage from "./assets/servicios 1.webp";
 import catalogOneImage from "./assets/catalogo 1.webp";
@@ -48,7 +40,6 @@ const CATALOG_PATH = "/catalogo";
 const PRODUCTS_PATH = "/catalogo/productos";
 const PORTFOLIO_PATH = "/portafolio";
 const CONTACT_PATH = "/contacto";
-const CART_PATH = "/carrito";
 const DATA_POLICY_PATH = "/tratamiento-de-datos";
 const TERMS_PATH = "/terminos-y-condiciones";
 const WHATSAPP_URL = "https://wa.me/573203624348";
@@ -72,15 +63,11 @@ const COMBO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
 const PORTFOLIO_QUOTE_WHATSAPP_URL = `${WHATSAPP_URL}?text=${encodeURIComponent(
   "Hola, vi el portafolio de Ceniza y quiero contarles sobre un proyecto que necesita dirección de iluminación. ¿Podemos hablar?",
 )}`;
-const CART_STORAGE_KEY = "ceniza-cart-draft";
-const CART_UPDATED_EVENT = "ceniza-cart-updated";
 const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
 const COOKIE_CONSENT_VERSION = "2026-09-04-v3";
 const COOKIE_SETTINGS_EVENT = "ceniza-open-cookie-settings";
 const DATA_POLICY_VERSION = "2026-09-04";
-const CART_WEBHOOK_URL = import.meta.env.VITE_MAKE_CART_WEBHOOK_URL ?? "";
 const CONTACT_WEBHOOK_URL = import.meta.env.VITE_MAKE_CONTACT_WEBHOOK_URL ?? "";
-const CART_PAYMENT_URL = import.meta.env.VITE_CENIZA_PAYMENT_URL ?? "";
 const GOOGLE_ANALYTICS_ID = "G-HDX27BVTHQ";
 
 function formatCatalogTechnicalText(value) {
@@ -183,69 +170,6 @@ async function postWebhookSubmission(url, payload) {
   }
 
   return response;
-}
-
-function readStoredCartDraft(fallbackItems = []) {
-  if (typeof window === "undefined") return fallbackItems;
-
-  try {
-    const rawValue = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!rawValue) return fallbackItems;
-
-    const parsedValue = JSON.parse(rawValue);
-    return Array.isArray(parsedValue) ? parsedValue : fallbackItems;
-  } catch {
-    return fallbackItems;
-  }
-}
-
-function parseCopAmount(value) {
-  return Number(String(value ?? "").replace(/[^\d]/g, "")) || 0;
-}
-
-function addItemToStoredCart(item) {
-  if (typeof window === "undefined") return;
-
-  const currentItems = readStoredCartDraft([]);
-  const existingItem = currentItems.find((entry) => entry.id === item.id);
-  const nextItems = existingItem
-    ? currentItems.map((entry) =>
-        entry.id === item.id
-          ? { ...entry, quantity: (entry.quantity ?? 1) + (item.quantity ?? 1) }
-          : entry,
-      )
-    : [...currentItems, item];
-
-  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextItems));
-  window.dispatchEvent(new Event(CART_UPDATED_EVENT));
-}
-
-function createServiceCartItem(service) {
-  return {
-    id: `combo-${service.slug}`,
-    title: `Combo ${service.title}`,
-    note: service.summary,
-    unitPriceLabel: service.price.replace("Precio base: ", ""),
-    unitAmount: parseCopAmount(service.price),
-    quantity: 1,
-    units: service.eyebrow,
-    image: service.homeImage ?? service.serviceImage,
-    href: `${SERVICES_PATH}/${service.slug}`,
-  };
-}
-
-function createProductCartItem(product, priceOption) {
-  return {
-    id: `product-${product.slug}-${priceOption.label.toLowerCase().replace(/[^\w]+/g, "-")}`,
-    title: product.label,
-    note: product.shortDescription,
-    unitPriceLabel: priceOption.value,
-    unitAmount: parseCopAmount(priceOption.value),
-    quantity: 1,
-    units: priceOption.label,
-    image: product.src,
-    href: `${PRODUCTS_PATH}/${product.slug}`,
-  };
 }
 
 const catalogProductDetails = {
@@ -1194,11 +1118,6 @@ const serviceCatalog = [
   },
 ];
 
-const homeServiceCards = serviceCatalog.map((service) => ({
-  ...service,
-  image: service.homeImage,
-}));
-
 const servicesPageCards = serviceCatalog.map((service) => ({
   ...service,
   image: service.serviceImage,
@@ -1536,36 +1455,6 @@ const catalogMosaicPool = catalogBrowserItems.map((item) => ({
       .find(Boolean) ?? item.shortDescription,
 }));
 
-const portfolioCards = [
-  {
-    image: eventTwoImage,
-    className: "card-2",
-    alt: "Producción visual de evento Ceniza",
-  },
-  {
-    image: eventThreeImage,
-    className: "card-3",
-    alt: "Dirección técnica para montaje Ceniza",
-  },
-  {
-    image: eventFourImage,
-    className: "wide",
-    alt: "Montaje de iluminación para evento Ceniza",
-  },
-  {
-    image: eventFiveImage,
-    className: "tall",
-    alt: "Atmósfera de evento con iluminación Ceniza",
-  },
-  {
-    image: eventSixImage,
-    className: "small",
-    alt: "Detalle técnico de montaje de evento Ceniza",
-  },
-];
-
-const portfolioSlides = [...portfolioCards];
-
 const contactFaq = [
   {
     question: "¿Qué información necesito para cotizar un proyecto de iluminación?",
@@ -1848,658 +1737,6 @@ function FloatingActions() {
   return null;
 }
 
-function CartPage() {
-  const formatCop = (value) => `${new Intl.NumberFormat("es-CO").format(value)} COP`;
-
-  const initialCartDraft = [
-    {
-      id: "combo-podcast",
-      title: "Combo Podcast / Streaming",
-      note: "Setup para entrevistas, reels y contenido digital.",
-      unitPriceLabel: "700.000 COP",
-      unitAmount: 700000,
-      quantity: 1,
-      units: "8 piezas incluidas",
-      image: serviceCatalog[0].homeImage,
-      href: `${SERVICES_PATH}/${serviceCatalog[0].slug}`,
-    },
-    {
-      id: "combo-fotografia",
-      title: "Combo Fotografía Profesional",
-      note: "Luz controlada para producto, catálogo y campañas.",
-      unitPriceLabel: "580.000 COP",
-      unitAmount: 580000,
-      quantity: 1,
-      units: "7 piezas incluidas",
-      image: serviceCatalog[1].homeImage,
-      href: `${SERVICES_PATH}/${serviceCatalog[1].slug}`,
-    },
-    {
-      id: "ulanzi-vl120",
-      title: "Ulanzi VL120 RGB",
-      note: "Luz de apoyo portátil para planos cortos y contenido móvil.",
-      unitPriceLabel: "50.000 COP",
-      unitAmount: 50000,
-      quantity: 2,
-      units: "Unitario",
-      image: catalogBrowserItems.find((item) => item.order === 1)?.src,
-      href: catalogBrowserItems.find((item) => item.order === 1)?.href ?? PRODUCTS_PATH,
-    },
-  ];
-
-  const [cartDraft, setCartDraft] = useState(() => readStoredCartDraft(initialCartDraft));
-
-  const removeCartItem = (itemId) => {
-    setCartDraft((currentItems) => currentItems.filter((item) => item.id !== itemId));
-  };
-
-  const updateCartItemQuantity = (itemId, nextQuantity) => {
-    setCartDraft((currentItems) =>
-      currentItems.flatMap((item) => {
-        if (item.id !== itemId) return [item];
-        if (nextQuantity <= 0) return [];
-        return [{ ...item, quantity: nextQuantity }];
-      }),
-    );
-  };
-
-  const subtotalAmount = cartDraft.reduce((sum, item) => sum + item.unitAmount * item.quantity, 0);
-  const subtotalLabel = formatCop(subtotalAmount);
-
-  const comboRecommendationItems = serviceCatalog.slice(0, 3).map((service, index) => ({
-    id: `combo-${service.slug}`,
-    slug: `combo-${service.slug}`,
-    label: `Combo ${service.title}`,
-    src: service.homeImage,
-    href: `${SERVICES_PATH}/${service.slug}`,
-    shortDescription: service.summary,
-    accent:
-      index === 0
-        ? "Combo para contenido"
-        : index === 1
-          ? "Combo para producto"
-          : "Combo para rodajes",
-    priceLabel: service.price.replace("Precio base: ", ""),
-    note: service.summary,
-    units: "Combo",
-    unitAmount: Number(service.price.replace(/[^\d]/g, "")),
-  }));
-
-  const productRecommendationItems = [
-    catalogBrowserItems.find((item) => item.order === 2),
-    catalogBrowserItems.find((item) => item.order === 5),
-    catalogBrowserItems.find((item) => item.order === 22),
-  ]
-    .filter(Boolean)
-    .map((item, index) => ({
-      id: item.slug,
-      ...item,
-      accent:
-        index === 0
-          ? "Suma color al montaje"
-          : index === 1
-            ? "Ideal para producto"
-            : "Refuerzo para eventos",
-      priceLabel: item.pricing?.[0]?.value ?? "Cotizar",
-      note: item.shortDescription,
-      units: item.pricing?.[0]?.label ?? "Unitario",
-      unitAmount: Number((item.pricing?.[0]?.value ?? "0").replace(/[^\d]/g, "")),
-    }));
-
-  const recommendationItems = [
-    comboRecommendationItems[0],
-    productRecommendationItems[0],
-    comboRecommendationItems[1],
-    productRecommendationItems[1],
-    comboRecommendationItems[2],
-    productRecommendationItems[2],
-  ].filter(Boolean);
-
-  const [recommendationQuantities, setRecommendationQuantities] = useState(() =>
-    Object.fromEntries(recommendationItems.map((item) => [item.id, 1])),
-  );
-  const [serviceModality, setServiceModality] = useState("");
-  const [cartSubmissionState, setCartSubmissionState] = useState({
-    status: "idle",
-    message: "",
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartDraft));
-    window.dispatchEvent(new Event(CART_UPDATED_EVENT));
-  }, [cartDraft]);
-
-  const changeRecommendationQuantity = (itemId, delta) => {
-    setRecommendationQuantities((current) => ({
-      ...current,
-      [itemId]: Math.max(1, (current[itemId] ?? 1) + delta),
-    }));
-  };
-
-  const addRecommendationToCart = (item) => {
-    const quantityToAdd = recommendationQuantities[item.id] ?? 1;
-
-    setCartDraft((currentItems) => {
-      const existingItem = currentItems.find((cartItem) => cartItem.id === item.id);
-
-      if (existingItem) {
-        return currentItems.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + quantityToAdd }
-            : cartItem,
-        );
-      }
-
-      return [
-        ...currentItems,
-        {
-          id: item.id,
-          title: item.label,
-          note: item.note,
-          unitPriceLabel: item.priceLabel,
-          unitAmount: item.unitAmount,
-          quantity: quantityToAdd,
-          units: item.units,
-          image: item.src,
-          href: item.href,
-        },
-      ];
-    });
-  };
-
-  const handleCartSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!cartDraft.length) {
-      setCartSubmissionState({
-        status: "error",
-        message: "Agrega al menos un equipo o combo antes de enviar la solicitud.",
-      });
-      return;
-    }
-
-    const form = event.currentTarget;
-    const formValues = formDataToObject(new FormData(form));
-    const submitter = event.nativeEvent?.submitter;
-    const checkoutIntent = submitter?.value === "rent_now" ? "renta_inmediata" : "solicitud";
-
-    if (!serviceModality) {
-      setCartSubmissionState({
-        status: "error",
-        message: "Selecciona la modalidad del servicio antes de continuar.",
-      });
-      return;
-    }
-
-    if (checkoutIntent === "renta_inmediata" && !normalizeWebhookUrl(CART_PAYMENT_URL)) {
-      setCartSubmissionState({
-        status: "error",
-        message: "Configura el link de pago para activar la opción de rentar.",
-      });
-      return;
-    }
-
-    const payload = {
-      source: "cart-checkout",
-      checkoutIntent,
-      submittedAt: new Date().toISOString(),
-      currency: "COP",
-      subtotalAmount,
-      subtotalLabel,
-      summary: {
-        totalItems: cartDraft.reduce((accumulator, item) => accumulator + item.quantity, 0),
-        estimatedDelivery: "Según proyecto",
-        estimatedTotalAmount: subtotalAmount,
-        estimatedTotalLabel: subtotalLabel,
-      },
-      cartItems: cartDraft.map((item) => ({
-        id: item.id,
-        title: item.title,
-        note: item.note,
-        quantity: item.quantity,
-        units: item.units,
-        unitAmount: item.unitAmount,
-        unitPriceLabel: item.unitPriceLabel,
-        totalAmount: item.unitAmount * item.quantity,
-        href: item.href,
-      })),
-      customer: {
-        email: formValues.correo ?? "",
-        socials: formValues.redes_sociales ?? "",
-        authorizedDataTreatment: Boolean(formValues.autorizacion_correo),
-        acceptedTerms: Boolean(formValues.autorizacion_terminos),
-        firstName: formValues.nombre ?? "",
-        lastName: formValues.apellido ?? "",
-        company: formValues.empresa ?? "",
-        phone: formValues.telefono ?? "",
-      },
-      delivery: {
-        country: formValues.pais ?? "",
-        city: formValues.ciudad ?? "",
-        department: formValues.departamento ?? "",
-        address: formValues.direccion ?? "",
-        installationDate: formValues.fecha ?? "",
-        projectDetails: formValues.proyecto ?? "",
-        internalNote: formValues.nota_adicional ?? "",
-        modality: formValues.modalidad ?? serviceModality,
-      },
-    };
-
-    setCartSubmissionState({
-      status: "loading",
-      message: checkoutIntent === "renta_inmediata" ? "Preparando renta..." : "Enviando solicitud...",
-    });
-
-    try {
-      await postWebhookSubmission(CART_WEBHOOK_URL, payload);
-      setCartSubmissionState({
-        status: "success",
-        message:
-          checkoutIntent === "renta_inmediata"
-            ? "Solicitud registrada. Continúa con la renta y pronto te compartiremos el resumen de lo que compraste."
-            : "Solicitud enviada. Pronto te compartiremos el resumen de lo que solicitaste.",
-      });
-
-      if (checkoutIntent === "renta_inmediata") {
-        window.open(normalizeWebhookUrl(CART_PAYMENT_URL), "_blank", "noopener,noreferrer");
-      } else {
-        form.reset();
-        setServiceModality("");
-        setCartDraft([]);
-      }
-    } catch (error) {
-      setCartSubmissionState({
-        status: "error",
-        message: error.message || "No pudimos enviar la solicitud.",
-      });
-    }
-  };
-
-  return (
-    <div className="page-shell services-page-shell cart-page-shell">
-      <SiteHeader isSubPage hideCartBulb searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
-
-      <main className="cart-page-main">
-        <section className="cart-page-hero">
-          <div className="cart-page-hero-copy">
-            <p className="eyebrow">CARRITO</p>
-            <h1>
-              Tu selección de <span>equipos</span> y combos, lista para cotizar.
-            </h1>
-            <p className="cart-page-lead">
-              Organiza aquí los combos, equipos y datos del proyecto para convertir tu selección en una cotización clara, premium y lista para producción.
-            </p>
-          </div>
-          <div className="cart-page-hero-card">
-            <span>Checkout Ceniza</span>
-            <strong>Renta de luces con lectura <em>técnica</em> y visual.</strong>
-            <p>Este espacio reúne la información del montaje, la entrega y la selección para que el cliente envíe una solicitud completa y fácil de revisar.</p>
-          </div>
-        </section>
-
-        <form className="cart-page-grid" onSubmit={handleCartSubmit}>
-          <section className="cart-checkout-form">
-            <div className="cart-form-block">
-              <div className="cart-page-list-head">
-                <p className="eyebrow">ENTREGA</p>
-                <h2>Modalidad del <span>servicio</span></h2>
-                <p>Selecciona si necesitas solo envío o envío con montaje para orientar tiempos, logística y alcance del servicio.</p>
-              </div>
-              <input type="hidden" name="modalidad" value={serviceModality} />
-              <div className="cart-delivery-toggle" role="group" aria-label="Modalidad de entrega">
-                <button
-                  className={`cart-delivery-option ${serviceModality === "Envío" ? "is-active" : ""}`}
-                  type="button"
-                  onClick={() => setServiceModality("Envío")}
-                  aria-pressed={serviceModality === "Envío"}
-                >
-                  Envío
-                </button>
-                <button
-                  className={`cart-delivery-option ${serviceModality === "Envío y montaje" ? "is-active" : ""}`}
-                  type="button"
-                  onClick={() => setServiceModality("Envío y montaje")}
-                  aria-pressed={serviceModality === "Envío y montaje"}
-                >
-                  Envío y montaje
-                </button>
-              </div>
-            </div>
-
-            <div className="cart-form-block">
-              <div className="cart-page-list-head">
-                <p className="eyebrow">CONTACTO</p>
-                <h2>Información del <span>cliente</span></h2>
-                <p>Déjanos los datos base para preparar la propuesta, coordinar el montaje y responder la solicitud de forma clara y rápida.</p>
-              </div>
-              <div className="cart-form-grid">
-                <label className="cart-form-field cart-form-field-wide">
-                  País / Región
-                  <input type="text" name="pais" defaultValue="Colombia" required />
-                </label>
-                <label className="cart-form-field">
-                  Nombre
-                  <input type="text" name="nombre" autoComplete="given-name" placeholder="Nombre" required />
-                </label>
-                <label className="cart-form-field">
-                  Apellido
-                  <input type="text" name="apellido" autoComplete="family-name" placeholder="Apellido" required />
-                </label>
-                <label className="cart-form-field cart-form-field-wide">
-                  Empresa / marca
-                  <input type="text" name="empresa" placeholder="Marca, agencia o productora" required />
-                </label>
-                <label className="cart-form-field cart-form-field-wide">
-                  Dirección
-                  <input type="text" name="direccion" autoComplete="street-address" placeholder="Dirección del montaje o punto de entrega" required />
-                </label>
-                <label className="cart-form-field">
-                  Ciudad
-                  <input type="text" name="ciudad" defaultValue="Bogotá" required />
-                </label>
-                <label className="cart-form-field">
-                  Departamento
-                  <input type="text" name="departamento" defaultValue="Bogotá D.C." required />
-                </label>
-                <label className="cart-form-field">
-                  Teléfono
-                  <input type="tel" name="telefono" autoComplete="tel" placeholder="+57 320 362 4348" required />
-                </label>
-                <label className="cart-form-field">
-                  Correo electrónico
-                  <input type="email" name="correo" autoComplete="email" placeholder="correo@ejemplo.com" required />
-                </label>
-                <label className="cart-form-field">
-                  Redes sociales
-                  <input type="text" name="redes_sociales" placeholder="@instagram / web / portafolio" />
-                </label>
-                <label className="cart-form-field">
-                  Fecha del montaje
-                  <input type="text" name="fecha" placeholder="DD / MM / AAAA" required />
-                </label>
-                <label className="cart-form-field cart-form-field-wide">
-                  Detalles del proyecto
-                  <textarea
-                    name="proyecto"
-                    rows="5"
-                    placeholder="Tipo de evento o producción, locación, horario, número de personas, rider y referencias visuales."
-                    required
-                  />
-                </label>
-                <label className="cart-form-checkbox cart-form-field-wide">
-                  <input type="checkbox" name="autorizacion_correo" required />
-                  <span>
-                    Autorizo el{" "}
-                    <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">
-                      tratamiento de datos
-                    </a>{" "}
-                    para responder esta solicitud y enviar seguimiento comercial.
-                  </span>
-                </label>
-                <label className="cart-form-checkbox cart-form-field-wide">
-                  <input type="checkbox" name="autorizacion_terminos" required />
-                  <span>
-                    Autorizo y acepto los{" "}
-                    <a href={TERMS_PATH} target="_blank" rel="noreferrer">
-                      términos y condiciones
-                    </a>
-                    .
-                  </span>
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <aside className="cart-page-summary">
-            <div className="cart-summary-block">
-              <p className="eyebrow">SELECCIÓN</p>
-              <h2>Resumen de <span>renta</span></h2>
-              <p>Combos y equipos listos para cotizar, con lectura visual, cantidades y precio base estimado.</p>
-              <div className="cart-draft-list">
-                {cartDraft.map((item) => (
-                  <article className="cart-draft-card" key={item.id}>
-                    <button
-                      className="cart-draft-remove"
-                      type="button"
-                      aria-label={`Quitar ${item.title} del carrito`}
-                      onClick={() => removeCartItem(item.id)}
-                    >
-                      ×
-                    </button>
-                    <div className="cart-draft-card-media">
-                      <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
-                    </div>
-                    <div className="cart-draft-card-copy">
-                      <div className="cart-draft-card-top">
-                        <span className="cart-draft-qty">{item.quantity}</span>
-                        <span className="cart-draft-units">{item.units}</span>
-                      </div>
-                      <div>
-                        <strong>{item.title}</strong>
-                        <p>{item.note}</p>
-                      </div>
-                    </div>
-                    <div className="cart-draft-card-meta">
-                      <div className="cart-draft-price-stack">
-                        <span className="cart-draft-price">{formatCop(item.unitAmount * item.quantity)}</span>
-                        {item.quantity > 1 ? <small>{item.unitPriceLabel} c/u</small> : null}
-                      </div>
-                      <div className="cart-draft-meta-actions">
-                        <div className="cart-draft-stepper" aria-label={`Cantidad de ${item.title}`}>
-                          <button type="button" onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}>
-                            −
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button type="button" onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}>
-                            +
-                          </button>
-                        </div>
-                        <a href={item.href}>Ver detalle</a>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-
-            <div className="cart-summary-block cart-summary-totals">
-              <label className="cart-discount-field">
-                Código o nota adicional
-                <div className="cart-discount-row">
-                  <input type="text" name="nota_adicional" placeholder="Cupón, observación o referencia del rider" />
-                  <button type="button">Aplicar</button>
-                </div>
-              </label>
-              <div className="cart-total-row">
-                <span>Subtotal</span>
-                <strong>{subtotalLabel}</strong>
-              </div>
-              <div className="cart-total-row">
-                <span>Entrega y montaje</span>
-                <strong>Según proyecto</strong>
-              </div>
-              <div className="cart-total-row is-total">
-                <span>Total estimado</span>
-                <strong>{subtotalLabel}</strong>
-              </div>
-              <p className="cart-summary-note">El valor final puede ajustarse según locación, tiempos, operación y requerimientos técnicos.</p>
-              <p className={`form-status-message is-${cartSubmissionState.status}`} aria-live="polite">
-                {cartSubmissionState.message}
-              </p>
-              <div className="cart-summary-actions">
-                <button className="button primary" type="submit" value="quote" disabled={cartSubmissionState.status === "loading"}>
-                  {cartSubmissionState.status === "loading" ? "Enviando..." : "Enviar solicitud"}
-                </button>
-                <button className="button secondary cart-pay-now" type="submit" value="rent_now" disabled={cartSubmissionState.status === "loading"}>
-                  {cartSubmissionState.status === "loading" ? "Preparando..." : "Rentar"}
-                </button>
-                <a className="button tertiary" href={CATALOG_PATH}>
-                  Seguir explorando catálogo
-                </a>
-              </div>
-            </div>
-          </aside>
-        </form>
-
-        <section className="cart-upsell-section" aria-labelledby="cart-upsell-title">
-          <div className="cart-upsell-shell">
-            <div className="cart-upsell-head">
-              <p className="eyebrow">RECOMENDADOS</p>
-              <h2 id="cart-upsell-title">Añade más al <span>carrito</span></h2>
-              <p>Una selección de equipos unitarios y complementos que suelen acompañar este tipo de montaje.</p>
-            </div>
-
-            <div className="cart-upsell-marquee" aria-label="Productos recomendados">
-              <div className="cart-upsell-track">
-                {recommendationItems.map((item) => (
-                  <article className="cart-recommendation-card" key={item.slug}>
-                    <div className="cart-recommendation-media">
-                      <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
-                    </div>
-                    <div className="cart-recommendation-copy">
-                      <span>{item.accent}</span>
-                      <strong>{item.label}</strong>
-                      <p>{item.shortDescription}</p>
-                      <div className="cart-recommendation-footer">
-                        <div className="cart-recommendation-qty">
-                          <button type="button" onClick={() => changeRecommendationQuantity(item.id, -1)}>
-                            −
-                          </button>
-                          <span>{recommendationQuantities[item.id] ?? 1}</span>
-                          <button type="button" onClick={() => changeRecommendationQuantity(item.id, 1)}>
-                            +
-                          </button>
-                        </div>
-                        <div className="cart-recommendation-actions">
-                          <em>{item.priceLabel}</em>
-                          <button type="button" onClick={() => addRecommendationToCart(item)}>
-                            Agregar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-                {recommendationItems.map((item) => (
-                  <article className="cart-recommendation-card" key={`${item.slug}-loop`} aria-hidden="true">
-                    <div className="cart-recommendation-media">
-                      <img src={item.src} alt="" loading="lazy" decoding="async" />
-                    </div>
-                    <div className="cart-recommendation-copy">
-                      <span>{item.accent}</span>
-                      <strong>{item.label}</strong>
-                      <p>{item.shortDescription}</p>
-                      <div className="cart-recommendation-footer">
-                        <div className="cart-recommendation-qty" aria-hidden="true">
-                          <button type="button">−</button>
-                          <span>{recommendationQuantities[item.id] ?? 1}</span>
-                          <button type="button">+</button>
-                        </div>
-                        <div className="cart-recommendation-actions">
-                          <em>{item.priceLabel}</em>
-                          <button type="button">Agregar</button>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <SiteFooter />
-      <CookieBanner />
-      <FloatingActions />
-    </div>
-  );
-}
-
-function FaqAccordionSection({
-  items,
-  title = "Dudas antes de cotizar.",
-  titleLines,
-  subtitle,
-  showSideLights = false,
-  compactTitle = false,
-}) {
-  const [openFaqIndex, setOpenFaqIndex] = useState(0);
-
-  return (
-    <section
-      className={`faq-section ${showSideLights ? "faq-section-with-lights" : ""} ${compactTitle ? "faq-section-compact-title" : ""}`}
-      id="faq"
-      aria-labelledby="faq-title"
-    >
-      <img
-        className="faq-accent-light"
-        src={catalogAccentLight}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        aria-hidden="true"
-      />
-      <img
-        className="faq-accent-star"
-        src={aboutLight}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        aria-hidden="true"
-      />
-      <div className="faq-shell">
-        <div className="faq-head">
-          <a className="section-chip-link" href="#faq">
-            <p className="eyebrow center">FAQ</p>
-          </a>
-          <div className="faq-title-wrap">
-            {showSideLights ? (
-              <img className="faq-title-light faq-title-light-left" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-            ) : null}
-            <div className="faq-title-row">
-              <h2 id="faq-title">
-                {titleLines?.length
-                  ? titleLines.map((line) => (
-                      <span className="faq-title-line" key={line}>
-                        {line}
-                      </span>
-                    ))
-                  : title}
-              </h2>
-            </div>
-            {showSideLights ? (
-              <img className="faq-title-light faq-title-light-right" src={portfolioLight} alt="" loading="lazy" decoding="async" aria-hidden="true" />
-            ) : null}
-          </div>
-          <p className="section-subtitle faq-subtitle">{subtitle}</p>
-        </div>
-        <div className="faq-grid">
-          {items.map((item, index) => (
-            <article className={`faq-card ${openFaqIndex === index ? "is-open" : ""}`} key={item.question}>
-              <button
-                className="faq-trigger"
-                type="button"
-                aria-expanded={openFaqIndex === index}
-                aria-controls={`faq-panel-${index}`}
-                onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
-              >
-                <h3>{item.question}</h3>
-                <span className="faq-icon" aria-hidden="true">
-                  {openFaqIndex === index ? "−" : "+"}
-                </span>
-              </button>
-              <div className="faq-panel" id={`faq-panel-${index}`} hidden={openFaqIndex !== index}>
-                <p>{item.answer}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function InlineCtaSection({ eyebrow = "CTA", title, copy, highlights = [], primaryHref, primaryLabel, secondaryHref, secondaryLabel, variant = "default" }) {
   return (
     <section className={`contact-cta inline-cta-section inline-cta-${variant}`} aria-label={title}>
@@ -2685,7 +1922,8 @@ function ServicesPage() {
                     </ul>
                   </div>
                   <div className="combos-selector-actions">
-                    <a href={activeComboWhatsAppUrl} target="_blank" rel="noreferrer">Cotizar combo</a>
+                    <a href={activeComboWhatsAppUrl} target="_blank" rel="noreferrer">Cotizar por WhatsApp</a>
+                    <a href={CONTACT_PATH}>Usar formulario</a>
                   </div>
                 </article>
               </div>
@@ -3113,7 +2351,9 @@ function EquipmentPage({ initialProduct = null }) {
             "Confirma disponibilidad para la fecha de tu proyecto",
           ]}
           primaryHref={CATALOG_QUOTE_WHATSAPP_URL}
-          primaryLabel="Cotizar equipos"
+          primaryLabel="Cotizar por WhatsApp"
+          secondaryHref={CONTACT_PATH}
+          secondaryLabel="Usar formulario"
           variant="catalog"
         />
 
@@ -3248,114 +2488,6 @@ function EquipmentPage({ initialProduct = null }) {
           </section>
         </div>
       ) : null}
-
-      <SiteFooter />
-      <CookieBanner />
-      <FloatingActions />
-    </div>
-  );
-}
-
-function ProductDetailPage({ product }) {
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const galleryImages = product.galleryImages?.length ? product.galleryImages : [{ src: product.src, alt: product.alt }];
-  const activeGalleryImage = galleryImages[activeImageIndex] ?? galleryImages[0];
-
-  useEffect(() => {
-    setActiveImageIndex(0);
-  }, [product.slug]);
-
-  return (
-    <div className="page-shell services-page-shell product-page-shell">
-      <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
-
-      <main className="services-page-main product-page-main">
-        <section className="product-detail-card">
-          <div className="product-detail-copy">
-            <p className="service-detail-eyebrow">PRODUCTO</p>
-            <h1>{product.label}</h1>
-            <p className="product-detail-description">{product.description}</p>
-
-            <div className="product-detail-block">
-              <strong>Especificaciones técnicas</strong>
-              <ul className="product-detail-list">
-                {product.specs.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="product-detail-block">
-              <strong>Incluye</strong>
-              <ul className="product-detail-list">
-                {product.includes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="product-price-table" aria-label={`Precios de ${product.label}`}>
-              {product.pricing.map((price) => (
-                <div className="product-price-row" key={`${product.slug}-${price.label}`}>
-                  <span>{price.label}</span>
-                  <div className="product-price-actions">
-                    <strong>{price.value}</strong>
-                    <a
-                      className="product-price-rent"
-                      href={`${WHATSAPP_URL}?text=${encodeURIComponent(
-                        `Hola, quiero rentar ${product.label} en la opción "${price.label}" por ${price.value}. ¿Me confirman disponibilidad?`,
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Rentar
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </div>
-
-          <div className="product-detail-visual">
-            <div className="product-detail-visual-frame">
-              <img src={activeGalleryImage.src} alt={activeGalleryImage.alt ?? product.label} fetchPriority="high" decoding="async" />
-            </div>
-            {galleryImages.length > 1 ? (
-              <div className="product-detail-gallery" aria-label={`Galería de ${product.label}`}>
-                {galleryImages.map((image, index) => (
-                  <button
-                    className={`product-detail-thumb ${index === activeImageIndex ? "is-active" : ""}`}
-                    type="button"
-                    key={`${product.slug}-image-${image.src}`}
-                    onClick={() => setActiveImageIndex(index)}
-                    aria-label={`Ver imagen ${index + 1} de ${product.label}`}
-                  >
-                    <img src={image.src} alt="" loading="lazy" decoding="async" />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="equipment-banner equipment-banner-large product-equipment-banner" aria-label="Más productos Ceniza">
-          <div className="equipment-banner-marquee">
-            <div className="equipment-banner-track">
-              {[...catalogBrowserItems, ...catalogBrowserItems].map((item, index) => (
-                <a
-                  className="equipment-banner-item"
-                  href={item.href}
-                  key={`${item.slug}-product-${index}`}
-                  aria-label={`Ver ${item.label}`}
-                >
-                  <img src={item.src} alt={item.label} loading="lazy" decoding="async" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
 
       <SiteFooter />
       <CookieBanner />
@@ -3902,66 +3034,26 @@ function TermsPage() {
   );
 }
 
-function RotatingPortfolioBackground({ images }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const videoRefs = useRef([]);
-
-  useEffect(() => {
-    if (images[activeIndex]?.video) {
-      return undefined;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setActiveIndex((currentIndex) => (currentIndex + 1) % images.length);
-    }, 5000);
-
-    return () => window.clearTimeout(timeout);
-  }, [activeIndex, images]);
-
-  useEffect(() => {
-    videoRefs.current.forEach((video, index) => {
-      if (!video) return;
-
-      if (index === activeIndex) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-        video.currentTime = 0;
-      }
-    });
-  }, [activeIndex]);
-
+function NotFoundPage() {
   return (
-    <div className="portfolio-bg-slideshow" aria-hidden="true">
-      {images.map((image, index) => (
-        image.video ? (
-          <video
-            className={`portfolio-bg-slide ${index === activeIndex ? "is-active" : ""}`}
-            muted
-            playsInline
-            preload="auto"
-            ref={(node) => {
-              videoRefs.current[index] = node;
-            }}
-            onEnded={() => {
-              setActiveIndex((currentIndex) => (currentIndex === index ? (currentIndex + 1) % images.length : currentIndex));
-            }}
-            key={image.alt}
-          >
-            <source src={image.video} type="video/mp4" />
-          </video>
-        ) : (
-          <img
-            className={`portfolio-bg-slide ${index === activeIndex ? "is-active" : ""}`}
-            src={image.image}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            key={image.alt}
-          />
-        )
-      ))}
+    <div className="page-shell services-page-shell not-found-page-shell">
+      <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
+      <main className="not-found-main">
+        <p className="eyebrow">ERROR 404</p>
+        <h1>Esta escena no existe.</h1>
+        <p className="not-found-copy">
+          La dirección que buscas cambió o ya no está disponible. Puedes volver al inicio o continuar explorando
+          nuestros equipos de iluminación.
+        </p>
+        <div className="not-found-actions">
+          <a className="button primary" href="/">Volver al inicio</a>
+          <a className="button secondary" href={CATALOG_PATH}>Explorar catálogo</a>
+          <a className="not-found-contact" href={CONTACT_PATH}>Contactar a Ceniza ↗</a>
+        </div>
+      </main>
+      <SiteFooter />
+      <CookieBanner />
+      <FloatingActions />
     </div>
   );
 }
@@ -3982,9 +3074,17 @@ export default function App() {
   const isEquipmentPage = currentPath === CATALOG_PATH;
   const isPortfolioPage = currentPath === PORTFOLIO_PATH;
   const isContactPage = currentPath === CONTACT_PATH;
-  const isCartPage = currentPath === CART_PATH;
   const isDataPolicyPage = currentPath === DATA_POLICY_PATH;
   const isTermsPage = currentPath === TERMS_PATH;
+  const isNotFoundPage = ![
+    "/",
+    SERVICES_PATH,
+    CATALOG_PATH,
+    PORTFOLIO_PATH,
+    CONTACT_PATH,
+    DATA_POLICY_PATH,
+    TERMS_PATH,
+  ].includes(currentPath) && !activeProduct;
   const visibleCatalogMosaic = Array.from({ length: Math.min(5, catalogMosaicPool.length) }, (_, index) => {
     const item = catalogMosaicPool[(catalogMosaicOffset + index) % catalogMosaicPool.length];
     return {
@@ -4002,10 +3102,32 @@ export default function App() {
     video.defaultMuted = true;
     video.muted = true;
     video.volume = 0.55;
-    if (video.readyState === 0) video.load();
-    video.play().catch(() => undefined);
+
+    const playVideo = () => {
+      if (video.readyState === 0) video.load();
+      video.play().catch(() => undefined);
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      playVideo();
+      return () => video.pause();
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          playVideo();
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "200px 0px", threshold: 0.1 },
+    );
+
+    observer.observe(video);
 
     return () => {
+      observer.disconnect();
       video.pause();
     };
   }, [currentPath]);
@@ -4027,6 +3149,7 @@ export default function App() {
     const ogUrl = document.querySelector('meta[property="og:url"]');
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
     const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+    const robotsMeta = document.querySelector('meta[name="robots"]');
     const schemaId = "ceniza-dynamic-schema";
     const canonicalHref = currentUrl || window.location.origin + currentPath;
 
@@ -4181,20 +3304,6 @@ export default function App() {
                   ],
                 },
               }
-              : isCartPage
-                ? {
-                    title: "Solicitud de Cotización | Ceniza",
-                    description:
-                      "Revisa los equipos y combos seleccionados para solicitar una cotización de iluminación con Ceniza.",
-                    schema: {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      name: "Solicitud de cotización Ceniza",
-                      url: canonicalHref,
-                      description:
-                        "Página para revisar equipos y solicitar una cotización de iluminación Ceniza.",
-                    },
-                  }
               : isDataPolicyPage
                 ? {
                     title: "Tratamiento de Datos | Ceniza",
@@ -4221,6 +3330,18 @@ export default function App() {
                       url: canonicalHref,
                       description:
                         "Página legal con términos y condiciones generales del sitio web y servicios de Ceniza.",
+                    },
+                  }
+              : isNotFoundPage
+                ? {
+                    title: "Página no encontrada | Ceniza",
+                    description:
+                      "La dirección solicitada no está disponible. Vuelve al inicio o explora el catálogo de Ceniza.",
+                    schema: {
+                      "@context": "https://schema.org",
+                      "@type": "WebPage",
+                      name: "Página no encontrada",
+                      url: canonicalHref,
                     },
                   }
           : {
@@ -4268,6 +3389,7 @@ export default function App() {
     document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalHref);
     if (twitterTitle) twitterTitle.setAttribute("content", seoConfig.title);
     if (twitterDescription) twitterDescription.setAttribute("content", seoConfig.description);
+    if (robotsMeta) robotsMeta.setAttribute("content", isNotFoundPage ? "noindex,follow" : "index,follow");
 
     let schemaScript = document.getElementById(schemaId);
     if (!schemaScript) {
@@ -4278,7 +3400,7 @@ export default function App() {
     }
 
     schemaScript.textContent = JSON.stringify(seoConfig.schema);
-  }, [activeProduct, currentPath, currentUrl, isCartPage, isContactPage, isDataPolicyPage, isEquipmentPage, isPortfolioPage, isServicesPage, isTermsPage]);
+  }, [activeProduct, currentPath, currentUrl, isContactPage, isDataPolicyPage, isEquipmentPage, isNotFoundPage, isPortfolioPage, isServicesPage, isTermsPage]);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -4347,10 +3469,6 @@ export default function App() {
     return <PortfolioPage />;
   }
 
-  if (isCartPage) {
-    return <CartPage />;
-  }
-
   if (isContactPage) {
     return <ContactPage />;
   }
@@ -4361,6 +3479,10 @@ export default function App() {
 
   if (isTermsPage) {
     return <TermsPage />;
+  }
+
+  if (isNotFoundPage) {
+    return <NotFoundPage />;
   }
 
   return (
@@ -4433,12 +3555,11 @@ export default function App() {
               />
               <video
                 ref={studioVideoRef}
-                autoPlay
                 loop
                 muted
                 controls
                 playsInline
-                preload="auto"
+                preload="none"
                 poster={studioVideoPoster}
               >
                 <source src={studioVideo} type="video/mp4" />
