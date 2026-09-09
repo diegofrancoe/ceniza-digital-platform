@@ -2601,10 +2601,7 @@ function PortfolioPage() {
         <section className="services-page-hero portfolio-page-hero">
           <div className="services-page-hero-copy mobile-hide-page-intro">
             <p className="eyebrow">PORTAFOLIO</p>
-            <h1 className="portfolio-hero-title">
-              <span>Luz que transforma</span>
-              <span>cada escena</span>
-            </h1>
+            <h1>Luz que transforma cada escena</h1>
             <p className="services-page-lead">
               Dirección de iluminación para producciones, espacios y eventos.
             </p>
