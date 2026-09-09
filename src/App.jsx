@@ -3518,7 +3518,7 @@ export default function App() {
             <div className="hero-campaign-copy">
               <h1>
                 <span>La luz</span>
-                <strong>cambia todo.</strong>
+                <strong>cambia todo</strong>
               </h1>
               <p className="hero-campaign-lead">
                 Atmósferas para fotografía, video y marcas.
