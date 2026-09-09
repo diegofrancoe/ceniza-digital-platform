@@ -1820,7 +1820,7 @@ function ServicesPage() {
         <section className="combos-editorial-hero" aria-labelledby="combos-page-title">
           <div className="combos-editorial-hero-copy">
             <p className="eyebrow">COMBOS DE ILUMINACIÓN</p>
-            <h1 id="combos-page-title">Combos para cada producción.</h1>
+            <h1 id="combos-page-title">Combos para cada producción</h1>
             <p>
               Setups completos para contenido, podcast, fotografía y producción audiovisual en Bogotá.
             </p>
@@ -1848,7 +1848,7 @@ function ServicesPage() {
           <header className="combos-editorial-heading">
             <div>
               <p className="eyebrow">SEIS FORMAS DE EMPEZAR</p>
-              <h2 id="combos-catalog-title">Elige según lo que vas a crear.</h2>
+              <h2 id="combos-catalog-title">Elige según lo que vas a crear</h2>
             </div>
             <p>Cada combo puede ajustarse a la locación, la duración y el resultado visual que necesitas.</p>
           </header>
@@ -2142,7 +2142,7 @@ function EquipmentPage({ initialProduct = null }) {
         <section className="services-page-hero services-page-hero-inverse">
           <div className="services-page-hero-copy services-page-hero-copy-inverse mobile-hide-page-intro">
             <p className="eyebrow">CATÁLOGO</p>
-            <h1>Equipos para cada producción.</h1>
+            <h1>Equipos para cada producción</h1>
             <p className="services-page-lead">
               Luces y accesorios profesionales para fotografía, video, streaming y eventos.
             </p>
@@ -2171,7 +2171,7 @@ function EquipmentPage({ initialProduct = null }) {
         <section className="services-equipment-section services-equipment-page-section" id="catalogo-disponible">
           <div className="services-equipment-header">
             <p className="eyebrow">CATÁLOGO</p>
-            <h2>Catálogo disponible.</h2>
+            <h2>Catálogo disponible</h2>
             <p>
               Encuentra el equipo ideal o pídenos una recomendación.
             </p>
@@ -2343,7 +2343,7 @@ function EquipmentPage({ initialProduct = null }) {
 
         <InlineCtaSection
           eyebrow="ALQUILER DE EQUIPOS DE ILUMINACIÓN"
-          title="La luz correcta para tu producción."
+          title="La luz correcta para tu producción"
           copy="Cuéntanos qué vas a producir, cuándo lo necesitas y qué resultado visual buscas. Te recomendamos luces y accesorios para fotografía, video, contenido o eventos y preparamos una cotización clara."
           highlights={[
             "Alquila solo los equipos que necesitas",
@@ -2562,7 +2562,7 @@ function PortfolioPage() {
     {
       type: "video",
       eyebrow: "VISUAL REEL",
-      title: "Proyectos con atmósfera y precisión.",
+      title: "Proyectos con atmósfera y precisión",
       copy: "Lectura visual de montaje, escala y escena en formato corto.",
       src: portfolioVideo,
       poster: portfolioVideoPoster,
@@ -2570,7 +2570,7 @@ function PortfolioPage() {
     {
       type: "video",
       eyebrow: "STUDIO",
-      title: "Composición para espacios.",
+      title: "Composición para espacios",
       copy: "Referencias visuales para atmósfera, profundidad y look final.",
       src: portfolioSpaceVideo,
       poster: portfolioSpaceVideoPoster,
@@ -2578,7 +2578,7 @@ function PortfolioPage() {
     {
       type: "video",
       eyebrow: "ESCENA",
-      title: "Ritmo visual de producción.",
+      title: "Ritmo visual de producción",
       copy: "Piezas para leer luz, contraste y continuidad de montaje.",
       src: atmosphereVideo,
       poster: atmosphereVideoPoster,
@@ -2586,7 +2586,7 @@ function PortfolioPage() {
     {
       type: "video",
       eyebrow: "VIDEO",
-      title: "Ambiente con carácter.",
+      title: "Ambiente con carácter",
       copy: "Composición escénica y acentos de luz para propuestas de eventos.",
       src: characterVideo,
       poster: characterVideoPoster,
@@ -2601,7 +2601,10 @@ function PortfolioPage() {
         <section className="services-page-hero portfolio-page-hero">
           <div className="services-page-hero-copy mobile-hide-page-intro">
             <p className="eyebrow">PORTAFOLIO</p>
-            <h1>Luz que transforma cada escena.</h1>
+            <h1 className="portfolio-hero-title">
+              <span>Luz que transforma</span>
+              <span>cada escena</span>
+            </h1>
             <p className="services-page-lead">
               Dirección de iluminación para producciones, espacios y eventos.
             </p>
@@ -2643,7 +2646,7 @@ function PortfolioPage() {
 
         <InlineCtaSection
           eyebrow="DIRECCIÓN DE ILUMINACIÓN"
-          title="Hagamos visible tu idea."
+          title="Hagamos visible tu idea"
           copy="Diseñamos iluminación para fotografía, video, contenido y eventos. Definimos contigo la atmósfera y el montaje adecuados para cada producción."
           primaryHref={PORTFOLIO_QUOTE_WHATSAPP_URL}
           primaryLabel="Cuéntanos tu proyecto ↗"
@@ -2664,7 +2667,7 @@ function ContactFaqSection() {
     <section className="contact-faq-section" aria-labelledby="contact-faq-title">
       <div className="contact-faq-intro">
         <p className="eyebrow">FAQ</p>
-        <h2 id="contact-faq-title">Antes de cotizar.</h2>
+        <h2 id="contact-faq-title">Antes de cotizar</h2>
       </div>
 
       <div className="contact-faq-list">
@@ -2747,7 +2750,7 @@ function ContactPage() {
           <div className="contact-copy">
             <p className="eyebrow">CONTACTO</p>
             <h1>
-              Hablemos de tu <span>proyecto.</span>
+              Hablemos de tu <span>proyecto</span>
             </h1>
             <p className="services-page-lead">
               Cuéntanos la fecha, locación y tipo de producción. Te proponemos el setup adecuado.
@@ -3040,7 +3043,7 @@ function NotFoundPage() {
       <SiteHeader isSubPage searchValue="" setSearchValue={() => {}} handleSearch={() => {}} />
       <main className="not-found-main">
         <p className="eyebrow">ERROR 404</p>
-        <h1>Esta escena no existe.</h1>
+        <h1>Esta escena no existe</h1>
         <p className="not-found-copy">
           La dirección que buscas cambió o ya no está disponible. Puedes volver al inicio o continuar explorando
           nuestros equipos de iluminación.
@@ -3539,7 +3542,7 @@ export default function App() {
                 <p>ESTUDIO · EQUIPO · PRODUCCIÓN</p>
                 <h2 id="home-editorial-title">
                   La luz cuenta<br />
-                  <span>historias.</span>
+                  <span>historias</span>
                 </h2>
                 <small>
                   Diseñamos iluminación profesional para podcasts, fotografía de marca, contenido para redes y
@@ -3634,7 +3637,7 @@ export default function App() {
 
         <section className="home-contact-minimal" aria-labelledby="home-contact-title">
           <p>ILUMINACIÓN PARA TU PRÓXIMA PRODUCCIÓN</p>
-          <h2 id="home-contact-title">Cuéntanos qué vas a crear.</h2>
+          <h2 id="home-contact-title">Cuéntanos qué vas a crear</h2>
           <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
             Hablemos por WhatsApp <span aria-hidden="true">↗</span>
           </a>

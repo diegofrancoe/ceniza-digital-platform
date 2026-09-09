@@ -11982,7 +11982,8 @@ a {
   grid-template-columns: minmax(0, 0.9fr) minmax(300px, 0.72fr) auto;
   align-items: center;
   gap: clamp(28px, 4vw, 68px);
-  padding: clamp(42px, 4.5vw, 64px) clamp(24px, 6vw, 96px);
+  min-height: clamp(250px, 18vw, 320px);
+  padding: clamp(64px, 6.5vw, 96px) clamp(24px, 6vw, 96px);
   color: var(--commerce-ink);
   border-top: 1px solid var(--commerce-rule);
   background: #eee8e1;
@@ -13300,7 +13301,7 @@ a {
 }
 
 .portfolio-page-shell .portfolio-page-hero {
-  grid-template-columns: minmax(350px, 0.78fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(520px, 0.95fr) minmax(0, 1.05fr);
   min-height: clamp(660px, 76vh, 860px);
   border-bottom: 0;
   background: var(--portfolio-black);
@@ -13309,7 +13310,7 @@ a {
 .portfolio-page-shell .portfolio-page-hero .services-page-hero-copy {
   position: relative;
   justify-content: flex-end;
-  padding: clamp(72px, 8vw, 128px) clamp(38px, 6vw, 94px);
+  padding: clamp(72px, 8vw, 128px) clamp(38px, 4vw, 76px);
   color: #f7f5ee;
   background:
     radial-gradient(circle at 14% 12%, rgba(243, 179, 0, 0.08), transparent 30%),
@@ -13317,11 +13318,16 @@ a {
 }
 
 .portfolio-page-shell .portfolio-page-hero .services-page-hero-copy h1 {
-  max-width: 9ch;
+  max-width: none;
   color: #f7f5ee;
-  font-size: clamp(3.5rem, 5.6vw, 6.8rem);
+  font-size: clamp(3.5rem, 4.25vw, 5.5rem);
   font-weight: 220;
   line-height: 0.89;
+}
+
+.portfolio-page-shell .portfolio-hero-title > span {
+  display: block;
+  white-space: nowrap;
 }
 
 .portfolio-page-shell .portfolio-page-hero .services-page-lead {
@@ -13462,7 +13468,7 @@ a {
   margin-top: 4px;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 1100px) {
   .portfolio-page-shell .portfolio-page-hero,
   .portfolio-page-shell .inline-cta-section .inline-cta-shell {
     grid-template-columns: 1fr;
