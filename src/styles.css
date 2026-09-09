@@ -6196,18 +6196,13 @@ a {
   }
 
   .hero-campaign-image-on {
-    opacity: 0;
-    animation: hero-mobile-light-cycle 12s ease-in-out infinite;
+    opacity: 1;
+    animation: hero-mobile-light-cycle 8s ease-in-out infinite;
+    transition: none;
   }
 
-  .hero-light-trigger:hover ~ .hero-campaign-image-on,
-  .hero-light-trigger:active ~ .hero-campaign-image-on {
-    opacity: 1;
-  }
-
-  .hero-light-trigger:active ~ .hero-campaign-image-on {
-    opacity: 1;
-    animation-play-state: paused;
+  .hero-light-trigger {
+    pointer-events: none;
   }
 
   .footer.footer-minimal,
@@ -6291,12 +6286,12 @@ a {
 
 @keyframes hero-mobile-light-cycle {
   0%,
-  42% {
+  45% {
     opacity: 1;
   }
 
   50%,
-  92% {
+  95% {
     opacity: 0;
   }
 
@@ -9656,8 +9651,8 @@ a {
 .hero-campaign-shade {
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(5, 5, 4, 0.56) 0%, rgba(5, 5, 4, 0.16) 41%, transparent 67%),
-    linear-gradient(180deg, rgba(5, 5, 4, 0.42) 0%, transparent 22%, transparent 68%, rgba(5, 5, 4, 0.82) 100%);
+    linear-gradient(90deg, rgba(5, 5, 4, 0.48) 0%, rgba(5, 5, 4, 0.12) 41%, transparent 67%),
+    linear-gradient(180deg, rgba(5, 5, 4, 0.34) 0%, transparent 22%, transparent 68%, rgba(5, 5, 4, 0.68) 100%);
 }
 
 .hero-campaign-frame::before {
@@ -10016,8 +10011,8 @@ a {
 
   .hero-campaign-shade {
     background:
-      linear-gradient(180deg, rgba(5, 5, 4, 0.45) 0%, rgba(5, 5, 4, 0.16) 16%, rgba(5, 5, 4, 0.62) 58%, rgba(5, 5, 4, 0.9) 100%),
-      linear-gradient(90deg, rgba(5, 5, 4, 0.74) 0%, rgba(5, 5, 4, 0.22) 72%, transparent 100%);
+      linear-gradient(180deg, rgba(5, 5, 4, 0.34) 0%, rgba(5, 5, 4, 0.12) 16%, rgba(5, 5, 4, 0.48) 58%, rgba(5, 5, 4, 0.72) 100%),
+      linear-gradient(90deg, rgba(5, 5, 4, 0.58) 0%, rgba(5, 5, 4, 0.18) 72%, transparent 100%);
   }
 
   .hero-campaign-frame::after {
@@ -14714,13 +14709,13 @@ a {
   }
 
   .hero-campaign-image-on {
-    opacity: 0;
-    animation: none;
+    opacity: 1;
+    animation: hero-mobile-light-cycle 8s ease-in-out infinite;
+    transition: none;
   }
 
-  .hero-light-trigger:hover ~ .hero-campaign-image-on,
-  .hero-light-trigger:active ~ .hero-campaign-image-on {
-    opacity: 1;
+  .hero-light-trigger {
+    pointer-events: none;
   }
 
   .combos-selector-options {
@@ -14738,7 +14733,7 @@ a {
 
 @media (max-width: 720px) and (prefers-reduced-motion: reduce) {
   .hero-campaign-image-on {
-    opacity: 0;
+    opacity: 1;
     animation: none;
   }
 }
