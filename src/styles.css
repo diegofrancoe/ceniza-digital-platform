@@ -11442,10 +11442,6 @@ a {
   letter-spacing: 0.24em;
 }
 
-.catalog-page-shell .services-page-hero-copy::after {
-  content: "01 / EQUIPO";
-}
-
 .combos-page-shell .services-page-hero-copy::after {
   content: "02 / RIDERS";
 }
@@ -12882,11 +12878,6 @@ a {
   letter-spacing: 0.22em;
 }
 
-.contact-page-shell .contact-copy::after {
-  content: "01 / HABLEMOS";
-  color: rgba(247, 245, 238, 0.34);
-}
-
 .contact-page-shell .contact-copy h1 {
   max-width: 8ch;
   color: #f7f5ee;
@@ -13328,17 +13319,6 @@ a {
   background:
     radial-gradient(circle at 14% 12%, rgba(243, 179, 0, 0.08), transparent 30%),
     var(--portfolio-black);
-}
-
-.portfolio-page-shell .portfolio-page-hero .services-page-hero-copy::after {
-  content: "03 / PROYECTOS";
-  position: absolute;
-  top: clamp(38px, 5vw, 70px);
-  right: clamp(32px, 4vw, 60px);
-  color: rgba(247, 245, 238, 0.34);
-  font-size: 0.58rem;
-  font-weight: 550;
-  letter-spacing: 0.22em;
 }
 
 .portfolio-page-shell .portfolio-page-hero .services-page-hero-copy h1 {
