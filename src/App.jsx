@@ -29,7 +29,7 @@ import comboDetailSixImage from "./assets/combo-detail-6.webp";
 import landingCreatorProImage from "./assets/landing-creador-pro.webp";
 import landingProfessionalBrandImage from "./assets/landing-marca-profesional.webp";
 import landingPhotographyProfessionalImage from "./assets/landing-fotografia-profesional.webp";
-import kitKt272SoftboxesImage from "./assets/kit-kt272-softboxes-complete-v1.jpg";
+import kitKt272SoftboxesImage from "./assets/kit-kt272-softboxes-transparent-v2.png";
 
 const equipmentBannerModules = import.meta.glob("./assets/*equiposceniza.webp", {
   eager: true,
@@ -1435,7 +1435,7 @@ const catalogBrowserItems = Array.from(
     : Array.from(galleryByOrder.values()).sort((a, b) => a.order - b.order);
   const galleryWithSupplementalImages = item.aliases?.includes("kit-kt272-telones-y-luces-02")
     ? [
-      ...mergedGalleryImages,
+      ...mergedGalleryImages.filter((image) => image.order === 37),
       {
         src: kitKt272SoftboxesImage,
         alt: "KIT KT272 completo con telones, soporte y dos softbox de estudio",
