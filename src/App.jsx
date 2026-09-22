@@ -2126,7 +2126,10 @@ function EquipmentPage({ initialProduct = null }) {
       + Math.ceil(selectedCatalogProduct.description.length / 96)
       + selectedCatalogProduct.specs.reduce((total, item) => total + Math.max(1, Math.ceil(item.length / 46)), 0)
       + selectedCatalogProduct.includes.reduce((total, item) => total + Math.max(1, Math.ceil(item.length / 46)), 0)
-      + selectedCatalogProduct.pricing.reduce((total, price) => total + Math.max(1, Math.ceil(price.label.length / 38)), 0)
+      + selectedCatalogProduct.pricing.reduce(
+        (total, price) => total + (Math.max(1, Math.ceil(price.label.length / 38)) * 2),
+        0,
+      )
     : 0;
   const selectedCatalogDensityClass = selectedCatalogContentWeight > 18
     ? "is-dense"
