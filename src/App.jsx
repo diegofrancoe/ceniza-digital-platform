@@ -190,9 +190,9 @@ const catalogProductDetails = {
     ],
     includes: ["1 luz VL120 RGB Ulanzi", "1 difusor", "1 cable USB-C", "1 soporte", "1 clip para celular"],
     pricing: [
-      { label: "Unitario + reflector", value: "50.000 COP" },
-      { label: "Reflector + trípode", value: "95.000 COP" },
-      { label: "Reflector + trípode + softbox", value: "190.000 COP" },
+      { label: "Unitario con clip celular", value: "50.000 COP" },
+      { label: "Combo x2", value: "95.000 COP" },
+      { label: "Combo x4", value: "190.000 COP" },
     ],
   },
   2: {
@@ -378,9 +378,9 @@ const catalogProductDetails = {
     ],
     includes: ["1 luz VL120 RGB Ulanzi", "1 difusor", "1 cable USB-C", "1 soporte", "1 clip para celular"],
     pricing: [
-      { label: "Unitario + reflector", value: "50.000 COP" },
-      { label: "Reflector + trípode", value: "95.000 COP" },
-      { label: "Reflector + trípode + softbox", value: "190.000 COP" },
+      { label: "Unitario con clip celular", value: "50.000 COP" },
+      { label: "Combo x2", value: "95.000 COP" },
+      { label: "Combo x4", value: "190.000 COP" },
     ],
   },
   12: {
@@ -458,7 +458,7 @@ const catalogProductDetails = {
     ],
     includes: ["1 Ulanzi L024 40W RGB", "1 reflector", "1 softbox"],
     pricing: [
-      { label: "Unitario", value: "80.000 COP" },
+      { label: "Unitario", value: "100.000 COP" },
       { label: "Combo x2", value: "190.000 COP" },
       { label: "Unitario + trípode + softbox", value: "110.000 COP" },
       { label: "Combo x2 + trípode + softbox", value: "209.000 COP" },
@@ -538,7 +538,7 @@ const catalogProductDetails = {
     ],
     includes: ["1 Ulanzi L024 40W RGB", "1 reflector", "1 softbox"],
     pricing: [
-      { label: "Unitario", value: "80.000 COP" },
+      { label: "Unitario", value: "100.000 COP" },
       { label: "Combo x2", value: "190.000 COP" },
       { label: "Unitario + trípode + softbox", value: "110.000 COP" },
       { label: "Combo x2 + trípode + softbox", value: "209.000 COP" },
@@ -560,7 +560,7 @@ const catalogProductDetails = {
     ],
     includes: ["1 Ulanzi L024 40W RGB", "1 reflector", "1 softbox"],
     pricing: [
-      { label: "Unitario", value: "80.000 COP" },
+      { label: "Unitario", value: "100.000 COP" },
       { label: "Combo x2", value: "190.000 COP" },
       { label: "Unitario + trípode + softbox", value: "110.000 COP" },
       { label: "Combo x2 + trípode + softbox", value: "209.000 COP" },
@@ -584,7 +584,7 @@ const catalogProductDetails = {
     pricing: [
       { label: "Unitario", value: "80.000 COP" },
       { label: "Combo x2", value: "152.000 COP" },
-      { label: "Reflector + trípode + softbox", value: "304.000 COP" },
+      { label: "Combo x4", value: "304.000 COP" },
     ],
   },
   26: {
@@ -902,9 +902,9 @@ const catalogProductDetails = {
     ],
     includes: ["1 luz VL120 RGB Ulanzi", "1 difusor", "1 cable USB-C", "1 soporte", "1 clip para celular"],
     pricing: [
-      { label: "Unitario + reflector", value: "50.000 COP" },
-      { label: "Reflector + trípode", value: "95.000 COP" },
-      { label: "Reflector + trípode + softbox", value: "190.000 COP" },
+      { label: "Unitario con clip celular", value: "50.000 COP" },
+      { label: "Combo x2", value: "95.000 COP" },
+      { label: "Combo x4", value: "190.000 COP" },
     ],
   },
   43: {
@@ -962,7 +962,7 @@ const catalogProductDetails = {
     ],
     includes: ["1 Ulanzi L024 40W RGB", "1 reflector", "1 softbox"],
     pricing: [
-      { label: "Unitario", value: "80.000 COP" },
+      { label: "Unitario", value: "100.000 COP" },
       { label: "Combo x2", value: "190.000 COP" },
       { label: "Unitario + trípode + softbox", value: "110.000 COP" },
       { label: "Combo x2 + trípode + softbox", value: "209.000 COP" },
