@@ -1125,7 +1125,7 @@ const servicesPageCards = serviceCatalog.map((service) => ({
   image: service.serviceImage,
 }));
 
-const hiddenEquipmentOrders = new Set([9, 12, 13, 15, 22, 23, 27, 32, 33, 36]);
+const hiddenEquipmentOrders = new Set([9, 12, 13, 15, 22, 23, 27, 32, 33, 36, 40]);
 
 const allEquipmentImages = Object.entries(equipmentBannerModules)
   .map(([path, src]) => {
@@ -1150,6 +1150,7 @@ const catalogGalleryOrderOverrides = {
   "maquina-de-humo-f400": [12, 14],
   "maquina-de-humo-f400-02": [12, 14],
   "par-led-pro-dj-pl006": [31, 32],
+  "reflector-5-en-1-110-cm": [16, 41, 40],
   "softbox-godox-qr-p70": [20, 22, 44],
   "softbox-godox-qr-p70-03": [20, 22, 44],
   "softbox-cuadrado-estudio": [5, 9],
