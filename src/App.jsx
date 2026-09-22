@@ -29,6 +29,7 @@ import comboDetailSixImage from "./assets/combo-detail-6.webp";
 import landingCreatorProImage from "./assets/landing-creador-pro.webp";
 import landingProfessionalBrandImage from "./assets/landing-marca-profesional.webp";
 import landingPhotographyProfessionalImage from "./assets/landing-fotografia-profesional.webp";
+import kitKt272SoftboxImage from "./assets/5equiposceniza.webp";
 import kitKt272SoftboxesImage from "./assets/kit-kt272-softboxes-transparent-v2.png";
 
 const equipmentBannerModules = import.meta.glob("./assets/*equiposceniza.webp", {
@@ -1436,6 +1437,11 @@ const catalogBrowserItems = Array.from(
   const galleryWithSupplementalImages = item.aliases?.includes("kit-kt272-telones-y-luces-02")
     ? [
       ...mergedGalleryImages.filter((image) => image.order === 37),
+      {
+        src: kitKt272SoftboxImage,
+        alt: "Bombillo con softbox cuadrado incluido en el KIT KT272",
+        order: 38,
+      },
       {
         src: kitKt272SoftboxesImage,
         alt: "KIT KT272 completo con telones, soporte y dos softbox de estudio",
