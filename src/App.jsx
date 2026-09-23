@@ -1943,8 +1943,8 @@ function ServicesPage() {
                     </ul>
                   </div>
                   <div className="combos-selector-actions">
-                    <a href={activeComboWhatsAppUrl} target="_blank" rel="noreferrer">Cotizar por WhatsApp</a>
-                    <a href={CONTACT_PATH}>Usar formulario</a>
+                    <a href={activeComboWhatsAppUrl} target="_blank" rel="noreferrer">Cotizar ahora</a>
+                    <a href={CONTACT_PATH}>Completar formulario</a>
                   </div>
                 </article>
               </div>
@@ -2000,7 +2000,7 @@ function ServicesPage() {
                 <h2 id="combos-selector-cta-title">¿No sabes cuál elegir?</h2>
               </div>
               <p>Cuéntanos tu producción y te recomendamos el combo de iluminación adecuado.</p>
-              <a href={COMBO_QUOTE_WHATSAPP_URL} target="_blank" rel="noreferrer">Te ayudamos por WhatsApp ↗</a>
+              <a href={COMBO_QUOTE_WHATSAPP_URL} target="_blank" rel="noreferrer">Te ayudamos ↗</a>
             </section>
           </>
         )}
@@ -3655,7 +3655,7 @@ export default function App() {
           <p>ILUMINACIÓN PARA TU PRÓXIMA PRODUCCIÓN</p>
           <h2 id="home-contact-title">Cuéntanos qué vas a crear</h2>
           <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-            Hablemos por WhatsApp <span aria-hidden="true">↗</span>
+            Hablemos <span aria-hidden="true">↗</span>
           </a>
         </section>
 
