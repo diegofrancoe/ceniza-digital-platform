@@ -156,7 +156,7 @@ async function postWebhookSubmission(url, payload) {
   const normalizedUrl = normalizeWebhookUrl(url);
 
   if (!normalizedUrl) {
-    throw new Error("El formulario aún no está conectado. Inténtalo por WhatsApp.");
+    throw new Error("El formulario aún no está conectado. Inténtalo de nuevo en unos minutos.");
   }
 
   const response = await fetch(normalizedUrl, {
@@ -2776,11 +2776,6 @@ function ContactPage() {
             <p className="services-page-lead">
               Cuéntanos la fecha, locación y tipo de producción. Te proponemos el setup adecuado.
             </p>
-            <div className="services-page-actions">
-              <a className="button secondary contact-whatsapp-button" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                Hablar por WhatsApp ↗
-              </a>
-            </div>
           </div>
 
           <form
