@@ -1371,11 +1371,14 @@ const catalogBrowserRawItems = equipmentBannerImages.map((image, index, images) 
 });
 
 const productsWithdrawnForSale = new Set([
+  "consola-dmx-operator-384",
+]);
+
+const compactCatalogSheetSlugs = new Set([
   "barra-led-pl183-washer-pro-dj",
   "cabeza-movil-pl61-spot-pro-dj-lighting",
   "blinder-pl2200-pro-dj",
   "controlador-dmx-pro-dj-pc384",
-  "consola-dmx-operator-384",
   "laser-pl27-rgb",
 ]);
 
@@ -2329,7 +2332,7 @@ function EquipmentPage({ initialProduct = null }) {
 
                 return (
                 <button
-                  className={`catalog-browser-card catalog-browser-card-trigger ${index === 0 ? "catalog-browser-card-featured" : ""}`}
+                  className={`catalog-browser-card catalog-browser-card-trigger product-${image.slug} ${index === 0 ? "catalog-browser-card-featured" : ""}`}
                   type="button"
                   key={image.slug}
                   onClick={() => openCatalogSheet(image)}
@@ -2389,7 +2392,7 @@ function EquipmentPage({ initialProduct = null }) {
           }}
         >
           <section
-            className={`catalog-sheet ${selectedCatalogDensityClass} product-${selectedCatalogProduct.slug}`}
+            className={`catalog-sheet ${selectedCatalogDensityClass} product-${selectedCatalogProduct.slug} ${compactCatalogSheetSlugs.has(selectedCatalogProduct.slug) ? "is-compact-product" : ""}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="catalog-sheet-title"

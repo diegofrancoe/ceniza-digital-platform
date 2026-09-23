@@ -11623,6 +11623,38 @@ a {
   background: #ebe6df;
 }
 
+.catalog-page-shell .catalog-browser-card.product-cabeza-movil-pl61-spot-pro-dj-lighting .catalog-browser-card-media img {
+  transform: scale(1.24);
+}
+
+.catalog-page-shell .catalog-browser-card.product-blinder-pl2200-pro-dj .catalog-browser-card-media img {
+  transform: scale(1.36);
+}
+
+.catalog-page-shell .catalog-browser-card.product-controlador-dmx-pro-dj-pc384 .catalog-browser-card-media img {
+  transform: scale(1.12);
+}
+
+.catalog-page-shell .catalog-browser-card.product-laser-pl27-rgb .catalog-browser-card-media img {
+  transform: scale(1.78);
+}
+
+.catalog-page-shell .catalog-browser-card.product-cabeza-movil-pl61-spot-pro-dj-lighting:hover .catalog-browser-card-media img {
+  transform: scale(1.3);
+}
+
+.catalog-page-shell .catalog-browser-card.product-blinder-pl2200-pro-dj:hover .catalog-browser-card-media img {
+  transform: scale(1.43);
+}
+
+.catalog-page-shell .catalog-browser-card.product-controlador-dmx-pro-dj-pc384:hover .catalog-browser-card-media img {
+  transform: scale(1.18);
+}
+
+.catalog-page-shell .catalog-browser-card.product-laser-pl27-rgb:hover .catalog-browser-card-media img {
+  transform: scale(1.86);
+}
+
 .catalog-page-shell .catalog-browser-card-featured {
   grid-column: span 2;
   grid-template-columns: minmax(0, 1.45fr) minmax(190px, 0.55fr);
@@ -14166,6 +14198,22 @@ a {
   transform: scale(1.85);
 }
 
+.catalog-sheet.product-cabeza-movil-pl61-spot-pro-dj-lighting .catalog-sheet-image-frame > img {
+  transform: scale(1.35);
+}
+
+.catalog-sheet.product-blinder-pl2200-pro-dj .catalog-sheet-image-frame > img {
+  transform: scale(1.45);
+}
+
+.catalog-sheet.product-controlador-dmx-pro-dj-pc384 .catalog-sheet-image-frame > img {
+  transform: scale(1.15);
+}
+
+.catalog-sheet.product-laser-pl27-rgb .catalog-sheet-image-frame > img {
+  transform: scale(2);
+}
+
 .catalog-sheet-description {
   max-width: 52ch;
   margin: 16px 0 0;
@@ -14594,6 +14642,156 @@ a {
   .catalog-sheet-price-row a {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+
+  .catalog-sheet.is-compact-product {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-layout {
+    display: grid;
+    grid-template-rows: 168px minmax(0, 1fr);
+    height: calc(100dvh - 54px);
+    overflow: hidden;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-visual {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    align-content: center;
+    gap: 4px;
+    padding: 8px 14px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-image-frame {
+    aspect-ratio: auto;
+    height: 124px;
+    padding: 8px 30px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-image-frame img {
+    max-height: 116px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-gallery {
+    display: grid;
+    grid-template-columns: 48px;
+    gap: 2px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-gallery button {
+    width: 48px;
+    height: 42px;
+    padding: 4px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-copy,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-copy,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-copy,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-copy {
+    gap: 7px;
+    padding: 12px 18px 14px;
+    overflow: hidden;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-eyebrow,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-eyebrow {
+    font-size: 0.56rem;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-copy h2,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-copy h2,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-copy h2,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-copy h2 {
+    margin-top: 6px;
+    font-size: clamp(1.8rem, 8.8vw, 2.2rem);
+    line-height: 0.92;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-description,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-description,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-description,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-description {
+    margin-top: 7px;
+    font-size: 0.72rem;
+    line-height: 1.34;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-details,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-details,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-details,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-details {
+    grid-template-columns: minmax(0, 1.35fr) minmax(96px, 0.65fr);
+    gap: 10px;
+    padding-top: 7px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-details h3,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-details h3,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-details h3,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-details h3 {
+    margin-bottom: 4px;
+    font-size: 0.58rem;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-details ul,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-details ul,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-details ul,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-details ul {
+    gap: 2px;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-details li,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-details li,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-details li,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-details li {
+    font-size: 0.62rem;
+    line-height: 1.22;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-price-row,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-price-row,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-price-row,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-price-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    padding: 5px 0;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-price-row span,
+  .catalog-sheet.is-compact-product .catalog-sheet-price-row strong,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-price-row span,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-price-row strong,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-price-row span,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-price-row strong,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-price-row span,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-price-row strong {
+    font-size: 0.66rem;
+  }
+
+  .catalog-sheet.is-compact-product .catalog-sheet-price-row a,
+  .catalog-sheet.is-compact-product.is-roomy .catalog-sheet-price-row a,
+  .catalog-sheet.is-compact-product.is-balanced .catalog-sheet-price-row a,
+  .catalog-sheet.is-compact-product.is-dense .catalog-sheet-price-row a {
+    grid-column: auto;
+    font-size: 0.56rem;
+  }
+
+  .catalog-sheet.is-compact-product.product-cabeza-movil-pl61-spot-pro-dj-lighting .catalog-sheet-image-frame > img {
+    transform: scale(1.18);
+  }
+
+  .catalog-sheet.is-compact-product.product-blinder-pl2200-pro-dj .catalog-sheet-image-frame > img {
+    transform: scale(1.3);
+  }
+
+  .catalog-sheet.is-compact-product.product-controlador-dmx-pro-dj-pc384 .catalog-sheet-image-frame > img {
+    transform: scale(1.05);
+  }
+
+  .catalog-sheet.is-compact-product.product-laser-pl27-rgb .catalog-sheet-image-frame > img {
+    transform: scale(1.7);
   }
 }
 
