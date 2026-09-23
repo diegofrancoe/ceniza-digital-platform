@@ -2375,9 +2375,9 @@ function EquipmentPage({ initialProduct = null }) {
             "Confirma disponibilidad para la fecha de tu proyecto",
           ]}
           primaryHref={CATALOG_QUOTE_WHATSAPP_URL}
-          primaryLabel="Cotizar por WhatsApp"
+          primaryLabel="Cotizar ahora"
           secondaryHref={CONTACT_PATH}
-          secondaryLabel="Usar formulario"
+          secondaryLabel="Completar formulario"
           variant="catalog"
         />
 
