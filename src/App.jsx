@@ -986,7 +986,7 @@ const catalogProductDetails = {
       "Modos de operación: automático / activación por sonido / DMX / master / slave",
     ],
     includes: ["1 Láser PL27 RGB"],
-    pricing: [{ label: "Unitario", value: "40.000 COP" }],
+    pricing: [{ label: "Unitario", value: "90.000 COP" }],
   },
 };
 
