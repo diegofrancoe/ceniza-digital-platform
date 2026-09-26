@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "postbuild": "node scripts/generate-static-routes.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test"
   },
   "dependencies": {
     "react": "^19.2.0",

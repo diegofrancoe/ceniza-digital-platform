@@ -1,17 +1,21 @@
 # Ceniza Digital Platform
 
-Plataforma web de Ceniza para presentar servicios de iluminación, consultar el catálogo de equipos y combos, explorar trabajos visuales y enviar solicitudes de contacto.
+Plataforma web de Ceniza para presentar servicios de iluminación, consultar el catálogo de equipos y combos, explorar trabajos visuales y convertir solicitudes de contacto en un flujo comercial automatizado.
+
+[Sitio web](https://ceniza-web.vercel.app/) · [Caso de estudio](https://www.diegofrancoe.com/proyectos/ceniza)
 
 ## Objetivo
 
-Centralizar la presencia digital de Ceniza en una aplicación web orientada a clientes. La experiencia reúne información comercial, catálogo, portafolio y formularios de solicitud sin incluir un backend propio ni almacenar credenciales en el repositorio.
+Centralizar la presencia digital de Ceniza en una aplicación web orientada a clientes. La experiencia reúne información comercial, catálogo, portafolio y formularios de solicitud, con una función serverless mínima que protege la automatización y mantiene secretos fuera del navegador.
 
 ## Funcionalidades implementadas
 
 - Página principal con presentación de marca, servicios, catálogo y portafolio.
 - Catálogo navegable de equipos con categorías, búsqueda, precios de referencia y páginas de detalle.
 - Catálogo de combos de iluminación y páginas individuales por servicio.
-- Formulario de contacto conectado a Make para registrar la solicitud en Google Sheets y enviar los correos de seguimiento.
+- Formulario de contacto protegido con honeypot, tiempo mínimo, límites de tamaño, validación del servidor y Cloudflare Turnstile.
+- Función serverless que entrega a Make únicamente solicitudes validadas; el webhook y su token nunca llegan al navegador.
+- Automatización en Make para registrar la solicitud en Google Sheets y enviar los correos de seguimiento.
 - Solicitudes de renta y cotización dirigidas a WhatsApp o al formulario de contacto.
 - Portafolio con imágenes y videos.
 - Política de tratamiento de datos y términos y condiciones.
@@ -22,7 +26,7 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Reproducción de videos del portafolio limitada al contenido visible, con portadas livianas para evitar cuadros vacíos durante la carga.
 - Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
 
-El proyecto no procesa pagos directamente ni contiene un CRM. La conexión con un CRM, automatizaciones adicionales o persistencia de clientes debe considerarse una extensión demo o trabajo futuro.
+El proyecto no procesa pagos directamente ni incluye el CRM privado. Make coordina el correo y el registro operativo del lead; una futura conexión con el CRM debe conservar el mismo límite seguro y usar exclusivamente su interfaz de entrada autorizada.
 
 ## Stack
 
@@ -31,21 +35,26 @@ El proyecto no procesa pagos directamente ni contiene un CRM. La conexión con u
 - Vite 7
 - JavaScript y JSX
 - CSS
-- Webhooks HTTP de Make configurados mediante variables de entorno
+- Vercel Function como frontera segura del formulario
+- Cloudflare Turnstile
+- Make, Google Sheets y correo como servicios externos de automatización
 - Configuración de rutas SPA compatible con Vercel
 
 ## Arquitectura
 
-La aplicación es una SPA ejecutada completamente en el navegador:
+La interfaz es una SPA y el formulario cruza una frontera serverless:
 
 - `src/main.jsx` monta la aplicación React.
 - `src/App.jsx` contiene las vistas, navegación, catálogo y formularios.
 - `src/styles.css` contiene los estilos globales y responsivos.
+- `src/components/TurnstileWidget.jsx` integra la verificación anti-bot en el formulario.
+- `api/contact.js` valida, limita y normaliza cada solicitud antes de enviarla a Make.
+- `server/turnstile.js` verifica el token de Turnstile exclusivamente en el servidor.
 - `src/assets/` contiene únicamente las imágenes y videos utilizados por la aplicación.
 - `public/` contiene el icono y los archivos públicos de descubrimiento para buscadores.
 - `vercel.json` configura las rutas públicas y la caché de recursos versionados.
 
-Las solicitudes del formulario se envían directamente desde el navegador a un endpoint externo; este repositorio no incluye base de datos, API propia ni almacenamiento persistente de clientes.
+El navegador solo llama a `/api/contact`. La función verifica método, tipo y tamaño del cuerpo, honeypot, tiempo mínimo, token Turnstile, consentimiento, campos y longitudes antes de construir un payload nuevo. La URL y el token opcional de Make son variables exclusivas del servidor.
 
 ## Requisitos
 
@@ -64,17 +73,25 @@ La dirección local se mostrará en la salida de Vite.
 
 ## Variables de entorno
 
-| Variable | Uso | Obligatoria |
+| Variable | Entorno | Uso |
 | --- | --- | --- |
-| `VITE_MAKE_CONTACT_WEBHOOK_URL` | Recibe los formularios de contacto y activa el flujo de seguimiento. | Para enviar contactos |
+| `VITE_TURNSTILE_SITE_KEY` | Navegador | Clave pública del widget Cloudflare Turnstile. |
+| `TURNSTILE_SECRET_KEY` | Servidor | Verifica los tokens del formulario. |
+| `TURNSTILE_EXPECTED_ACTION` | Servidor | Debe permanecer como `contact_form`. |
+| `TURNSTILE_ALLOWED_HOSTNAMES` | Servidor | Lista de dominios autorizados por comas. |
+| `MAKE_CONTACT_WEBHOOK_URL` | Servidor | Webhook privado que recibe solicitudes validadas. |
+| `MAKE_CONTACT_WEBHOOK_TOKEN` | Servidor, opcional | Encabezado privado compartido con Make. |
 
-Todas las variables con prefijo `VITE_` se incorporan al código del navegador y son públicas. No deben contener tokens privados, secretos ni credenciales con privilegios. Si un webhook necesita autenticación secreta, debe protegerse mediante un backend o proxy seguro que no está implementado en este proyecto.
+Las variables `VITE_*` forman parte del bundle público. Las demás se configuran en Vercel y nunca deben copiarse al frontend ni versionarse con valores reales.
 
 ## Scripts
 
 - `npm run dev`: inicia el servidor local de desarrollo.
 - `npm run build`: genera la versión de producción en `dist/`.
 - `npm run preview`: sirve localmente el build generado.
+- `npm test`: valida los controles básicos de la función del formulario.
+
+`npm run dev` valida la interfaz. Para probar también `/api/contact`, usa un entorno local de Vercel con las variables privadas configuradas y evita conectar pruebas a destinatarios reales.
 
 ## Build de producción
 
@@ -103,6 +120,6 @@ El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) 
 
 ## Estado actual
 
-La interfaz, navegación, catálogo, formularios e integración configurable con Make están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos básicos de descubrimiento, controles de cookies y autorización para el tratamiento de datos en el formulario de contacto. Para operar el formulario en un entorno real se debe mantener configurado y protegido el endpoint externo y conservar la prueba de la autorización.
+La interfaz, navegación, catálogo, formulario y frontera segura para Make están implementados. La versión está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos de descubrimiento, controles de cookies, consentimiento y protección anti-bot.
 
-El CRM, su autenticación y la base de datos viven en el repositorio `ceniza.crm`. Para activar la conexión publicada todavía se deben desplegar la migración y la función `website-lead`, configurar `VITE_CRM_INTAKE_URL` y verificar un envío real de extremo a extremo.
+Antes de activar el formulario en producción se deben configurar las variables de Turnstile y Make, añadir un límite durable en la capa de plataforma, comprobar que Make registra el lead y verificar los dos correos con datos sintéticos. El CRM, su autenticación y la base de datos permanecen en un repositorio privado independiente.

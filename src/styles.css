@@ -13068,6 +13068,25 @@ a {
   color: #9b7200;
 }
 
+.contact-page-shell .turnstile-field {
+  min-width: 0;
+  margin-top: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.contact-page-shell .turnstile-field > span {
+  color: rgba(25, 23, 20, 0.62);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.contact-page-shell .turnstile-widget {
+  width: 100%;
+  min-height: 65px;
+}
+
 .cookie-banner-copy a {
   color: #181613;
   text-decoration-color: rgba(189, 139, 0, 0.65);

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import TurnstileWidget from "./components/TurnstileWidget.jsx";
 import heroSoftboxOff from "./assets/ceniza-godox-qrp70-left-off-grid.jpg";
 import heroSoftboxOn from "./assets/ceniza-godox-qrp70-left-on-cases-grid.jpg";
 import portfolioCardImage from "./assets/ceniza-card-portafolio-molus-x60-v3.jpg";
@@ -69,7 +70,6 @@ const COOKIE_CONSENT_KEY = "ceniza-cookie-consent";
 const COOKIE_CONSENT_VERSION = "2026-09-04-v3";
 const COOKIE_SETTINGS_EVENT = "ceniza-open-cookie-settings";
 const DATA_POLICY_VERSION = "2026-09-04";
-const CONTACT_WEBHOOK_URL = import.meta.env.VITE_MAKE_CONTACT_WEBHOOK_URL ?? "";
 const GOOGLE_ANALYTICS_ID = "G-HDX27BVTHQ";
 
 function formatCatalogTechnicalText(value) {
@@ -148,18 +148,8 @@ function formDataToObject(formData) {
   return Object.fromEntries(formData.entries());
 }
 
-function normalizeEndpointUrl(url) {
-  return String(url ?? "").trim();
-}
-
 async function submitPublicForm(payload) {
-  const normalizedUrl = normalizeEndpointUrl(CRM_INTAKE_URL);
-
-  if (!normalizedUrl) {
-    throw new Error("El formulario aún no está conectado. Inténtalo de nuevo en unos minutos.");
-  }
-
-  const response = await fetch(normalizedUrl, {
+  const response = await fetch("/api/contact", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -168,7 +158,8 @@ async function submitPublicForm(payload) {
   });
 
   if (!response.ok) {
-    throw new Error("No pudimos registrar la solicitud en el CRM.");
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || "No pudimos enviar la solicitud.");
   }
 
   return response;
@@ -2712,6 +2703,14 @@ function ContactPage() {
     status: "idle",
     message: "",
   });
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const formStartedAt = useRef(Date.now());
+
+  const handleTurnstileError = useCallback((message) => {
+    setTurnstileToken("");
+    setContactSubmissionState({ status: "error", message });
+  }, []);
 
   const handleContactSubmit = async (event) => {
     event.preventDefault();
@@ -2728,6 +2727,14 @@ function ContactPage() {
       return;
     }
 
+    if (!turnstileToken) {
+      setContactSubmissionState({
+        status: "error",
+        message: "Completa la verificación de seguridad antes de enviar.",
+      });
+      return;
+    }
+
     const payload = {
       source: "ceniza-contact-form",
       submittedAt: new Date().toISOString(),
@@ -2740,6 +2747,9 @@ function ContactPage() {
       pageUrl: window.location.href,
       dataConsentGranted,
       dataPolicyVersion: DATA_POLICY_VERSION,
+      website: formValues.website ?? "",
+      startedAt: formStartedAt.current,
+      turnstileToken,
     };
 
     setContactSubmissionState({
@@ -2760,6 +2770,10 @@ function ContactPage() {
         status: "error",
         message: error.message || "No pudimos enviar la información.",
       });
+    } finally {
+      setTurnstileToken("");
+      setTurnstileResetKey((current) => current + 1);
+      formStartedAt.current = Date.now();
     }
   };
 
@@ -2818,11 +2832,10 @@ function ContactPage() {
                 />
               </label>
               <label className="contact-consent contact-form-wide">
-                <input type="checkbox" name="autorizacion_datos" required />
+                <input type="checkbox" name="dataConsent" required />
                 <span>
-                  Autorizo el{" "}
-                  <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">tratamiento de mis datos</a>
-                  {" "}para recibir respuesta y seguimiento comercial.
+                  Autorizo a Ceniza Producciones para tratar mis datos con el fin de atender esta solicitud y realizar el seguimiento comercial, de acuerdo con la{" "}
+                  <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">Política de Tratamiento de Datos</a>.
                 </span>
               </label>
               <label className="contact-consent contact-form-wide">
@@ -2833,16 +2846,15 @@ function ContactPage() {
                 </span>
               </label>
             </div>
-            <label className="contact-data-consent">
-              <input name="dataConsent" type="checkbox" required />
-              <span>
-                Autorizo a Ceniza Producciones para tratar mis datos con el fin de atender esta solicitud, de acuerdo con la <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">Política de Tratamiento de Datos</a>.
-              </span>
-            </label>
+            <TurnstileWidget
+              onTokenChange={setTurnstileToken}
+              onError={handleTurnstileError}
+              resetKey={turnstileResetKey}
+            />
             <p className={`form-status-message is-${contactSubmissionState.status}`} aria-live="polite">
               {contactSubmissionState.message}
             </p>
-            <button className="button primary contact-submit" type="submit" disabled={contactSubmissionState.status === "loading"}>
+            <button className="button primary contact-submit" type="submit" disabled={contactSubmissionState.status === "loading" || !turnstileToken}>
               {contactSubmissionState.status === "loading" ? "Enviando..." : "Enviar proyecto ↗"}
             </button>
           </form>
