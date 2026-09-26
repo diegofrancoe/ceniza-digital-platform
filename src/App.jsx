@@ -148,12 +148,12 @@ function formDataToObject(formData) {
   return Object.fromEntries(formData.entries());
 }
 
-function normalizeWebhookUrl(url) {
+function normalizeEndpointUrl(url) {
   return String(url ?? "").trim();
 }
 
-async function postWebhookSubmission(url, payload) {
-  const normalizedUrl = normalizeWebhookUrl(url);
+async function submitPublicForm(payload) {
+  const normalizedUrl = normalizeEndpointUrl(CRM_INTAKE_URL);
 
   if (!normalizedUrl) {
     throw new Error("El formulario aún no está conectado. Inténtalo de nuevo en unos minutos.");
@@ -168,7 +168,7 @@ async function postWebhookSubmission(url, payload) {
   });
 
   if (!response.ok) {
-    throw new Error("No pudimos enviar la información al webhook.");
+    throw new Error("No pudimos registrar la solicitud en el CRM.");
   }
 
   return response;
@@ -2748,7 +2748,8 @@ function ContactPage() {
     });
 
     try {
-      await postWebhookSubmission(CONTACT_WEBHOOK_URL, payload);
+      await submitPublicForm(payload);
+      delete form.dataset.requestId;
       setContactSubmissionState({
         status: "success",
         message: "Proyecto enviado. Te responderemos lo antes posible.",
@@ -2782,6 +2783,10 @@ function ContactPage() {
             className="contact-form"
             onSubmit={handleContactSubmit}
           >
+            <label className="form-honeypot" aria-hidden="true">
+              Sitio web
+              <input name="website" type="text" tabIndex="-1" autoComplete="off" />
+            </label>
             <div className="contact-form-grid">
               <label>
                 Nombre
@@ -2811,6 +2816,21 @@ function ContactPage() {
                   placeholder="Tipo de evento o producción, ciudad, fecha, locación, número de personas y referencias visuales."
                   required
                 />
+              </label>
+              <label className="contact-consent contact-form-wide">
+                <input type="checkbox" name="autorizacion_datos" required />
+                <span>
+                  Autorizo el{" "}
+                  <a href={DATA_POLICY_PATH} target="_blank" rel="noreferrer">tratamiento de mis datos</a>
+                  {" "}para recibir respuesta y seguimiento comercial.
+                </span>
+              </label>
+              <label className="contact-consent contact-form-wide">
+                <input type="checkbox" name="autorizacion_terminos" required />
+                <span>
+                  Acepto los{" "}
+                  <a href={TERMS_PATH} target="_blank" rel="noreferrer">términos y condiciones</a>.
+                </span>
               </label>
             </div>
             <label className="contact-data-consent">

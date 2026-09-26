@@ -1,6 +1,6 @@
 # Ceniza Digital Platform
 
-Plataforma web de Ceniza para presentar servicios de iluminación, consultar el catálogo de equipos y combos, explorar trabajos visuales y enviar solicitudes de contacto o renta.
+Plataforma web de Ceniza para presentar servicios de iluminación, consultar el catálogo de equipos y combos, explorar trabajos visuales y enviar solicitudes de contacto.
 
 ## Objetivo
 
@@ -105,4 +105,4 @@ El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) 
 
 La interfaz, navegación, catálogo, formularios e integración configurable con Make están implementados. La versión publicada está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos básicos de descubrimiento, controles de cookies y autorización para el tratamiento de datos en el formulario de contacto. Para operar el formulario en un entorno real se debe mantener configurado y protegido el endpoint externo y conservar la prueba de la autorización.
 
-No se incluye CRM. Cualquier automatización de CRM, panel administrativo, autenticación, base de datos o gestión interna debe tratarse como una extensión demo o trabajo futuro hasta que exista código verificable para esas capacidades.
+El CRM, su autenticación y la base de datos viven en el repositorio `ceniza.crm`. Para activar la conexión publicada todavía se deben desplegar la migración y la función `website-lead`, configurar `VITE_CRM_INTAKE_URL` y verificar un envío real de extremo a extremo.
