@@ -1,26 +1,19 @@
-<p align="center"><img src="docs/ceniza-brand-header.svg" alt="CENIZA" width="100%"></p>
+<p align="center"><img src="docs/ceniza-brand-header.svg" alt="CENIZA" width="460"></p>
 
-# CENIZA — Digital Platform
+<h1 align="center">CENIZA — Lighting & Production Studio</h1>
+<p align="center"><strong>Visual portfolio · equipment rental · service discovery · secure lead capture</strong></p>
+<p align="center"><a href="https://www.cenizaproducciones.com/"><strong>Live website</strong></a> · <a href="https://www.diegofrancoe.com/proyectos/ceniza"><strong>Case study</strong></a></p>
 
-**Lighting studio · equipment rental · visual portfolio · commercial automation**
+CENIZA is a responsive digital platform for a lighting studio and equipment-rental business. It brings the brand, services, equipment catalog, lighting packages, visual portfolio and commercial lead capture into one customer-facing experience while keeping private CRM operations separate.
 
-[Live website](https://www.cenizaproducciones.com/) · [Case study](https://www.diegofrancoe.com/proyectos/ceniza)
+| Project showcase | Service catalog | Lead capture | Optimized experience |
+|---|---|---|---|
+| Photography + video | Equipment + lighting combos | Secure forms + WhatsApp | Responsive media + SEO |
 
-CENIZA is a responsive digital platform for a lighting studio and equipment-rental business. It brings the brand, services, equipment catalog, lighting packages, visual portfolio and commercial lead capture into one customer-facing experience, while keeping private CRM operations separate.
+### Tech stack
+![React](https://img.shields.io/badge/React-20232A?logo=react) ![Vite](https://img.shields.io/badge/Vite-20232A?logo=vite) ![Make](https://img.shields.io/badge/Make-20232A?logo=make) ![Cloudflare](https://img.shields.io/badge/Turnstile-20232A?logo=cloudflare) ![Vercel](https://img.shields.io/badge/Vercel-20232A?logo=vercel)
 
-## Highlights
-
-- Responsive website with strong visual direction and optimized media.
-- Equipment and lighting-combo catalog with detail views.
-- Portfolio built around photography and video.
-- Rental and quote journeys through WhatsApp and contact forms.
-- Secure contact intake with server validation and Cloudflare Turnstile.
-- Vercel Function boundary that keeps Make credentials outside the browser.
-- Make automation for lead registration and email follow-up.
-- SEO, sitemap, consent-aware analytics and production deployment.
-
-## Architecture
-
+### Architecture
 ~~~mermaid
 flowchart LR
  U[Visitor] --> W[React + Vite]
@@ -30,16 +23,11 @@ flowchart LR
  F --> API[Vercel Function]
  API --> T[Turnstile]
  T --> M[Make]
- M --> L[Lead registration]
- M --> E[Email follow-up]
- CRM[Private CENIZA CRM] -. separate system .-> W
+ M --> L[Lead + email follow-up]
+ CRM[Private CRM] -. separate .-> W
 ~~~
 
-## Stack
-
-React 19 · Vite 7 · JavaScript / JSX · CSS · Vercel Functions · Cloudflare Turnstile · Make · Google Sheets · Vercel
-
-## Run locally
+<details><summary><strong>Run locally & repository structure</strong></summary>
 
 ~~~bash
 npm install
@@ -47,18 +35,13 @@ cp .env.example .env.local
 npm run dev
 ~~~
 
-Server-only credentials are configured in the deployment environment and are not stored in the repository.
-
-## Project structure
-
 ~~~text
 src/        UI, catalog, services and portfolio
 api/        Secure contact endpoint
 server/     Turnstile verification
 public/     Public discovery assets
-docs/       Project notes and verification
+docs/       Project notes
 ~~~
+</details>
 
-**Production:** https://www.cenizaproducciones.com/
-
-Built by **Diego Franco**.
+<p align="center"><strong>Production:</strong> https://www.cenizaproducciones.com/</p>
