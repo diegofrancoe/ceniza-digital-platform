@@ -1,4 +1,4 @@
-<p align="center"><img src="src/assets/ceniza-logo-cropped.png" alt="Ceniza" width="200"></p>
+<p align="center"><img src="src/assets/ceniza-logo-cropped.png" alt="Ceniza" width="420"></p>
 
 # Ceniza Digital Platform
 
