@@ -1,8 +1,10 @@
+<p align="center"><img src="src/assets/ceniza-logo-cropped.png" alt="Ceniza" width="200"></p>
+
 # Ceniza Digital Platform
 
 Plataforma web de Ceniza para presentar servicios de iluminación, consultar el catálogo de equipos y combos, explorar trabajos visuales y convertir solicitudes de contacto en un flujo comercial automatizado.
 
-[Sitio web](https://ceniza-web.vercel.app/) · [Caso de estudio](https://www.diegofrancoe.com/proyectos/ceniza)
+[Sitio web](https://www.cenizaproducciones.com/) · [Caso de estudio](https://www.diegofrancoe.com/proyectos/ceniza)
 
 ## Objetivo
 
@@ -26,7 +28,7 @@ Centralizar la presencia digital de Ceniza en una aplicación web orientada a cl
 - Reproducción de videos del portafolio limitada al contenido visible, con portadas livianas para evitar cuadros vacíos durante la carga.
 - Archivos públicos para buscadores: `robots.txt`, `sitemap.xml` y `llms.txt`.
 
-El proyecto no procesa pagos directamente ni incluye el CRM privado. Make coordina el correo y el registro operativo del lead; una futura conexión con el CRM debe conservar el mismo límite seguro y usar exclusivamente su interfaz de entrada autorizada.
+El proyecto no procesa pagos directamente ni incluye el CRM privado. Make coordina el correo y el registro operativo del lead. El CRM de CENIZA existe como un sistema independiente y mantiene separados los datos y la lógica operacional de la experiencia web pública.
 
 ## Stack
 
@@ -117,6 +119,10 @@ Antes de publicar se debe ejecutar `npm run build` y comprobar las rutas `/`, `/
 ## Trazabilidad del rediseño
 
 El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) registra los cambios de diseño, las verificaciones y los pendientes para continuar en la rama `codex/redesign-integral-ceniza-2026-09-01`.
+
+## Producción
+
+**Sitio:** https://www.cenizaproducciones.com/
 
 ## Estado actual
 
