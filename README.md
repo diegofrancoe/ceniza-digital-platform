@@ -1,7 +1,5 @@
 <p align="center"><a href="https://www.cenizaproducciones.com/"><img src="docs/readme-hero.svg" alt="Project overview" width="100%"></a></p>
 
-<p align="center"><a href="https://www.cenizaproducciones.com/"><strong>Live website</strong></a> · <a href="https://www.diegofrancoe.com/proyectos/ceniza"><strong>Case study</strong></a></p>
-
 CENIZA combines a visual brand experience, equipment and lighting-service discovery, portfolio content and secure commercial intake. Contact and quote requests cross a protected server-side boundary before reaching automation, while the private CRM remains separated from the public website and its customer-facing data flows.
 
 ### Architecture
