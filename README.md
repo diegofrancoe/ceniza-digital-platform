@@ -4,6 +4,18 @@ CENIZA is a responsive digital platform for a lighting and production studio. Th
 
 The technical goal was to keep the public website visually rich while maintaining a clear security boundary between visitors and the company's private operational systems. Contact and quote requests therefore move through a protected server-side path before reaching automation, while the CRM remains a separate application.
 
+### Product Overview
+
+A responsive digital experience for a lighting studio, designed around project discovery, service exploration and quote requests.
+
+### Product Design & UX/UI
+
+Responsive visual hierarchy, project-led navigation and clear service-to-contact journeys put the visitor's experience first.
+
+### What I Built
+
+A React website with a visual portfolio and protected commercial intake. The private CRM remains a separate application.
+
 ### Core stack
 ![React](https://img.shields.io/badge/React-252824?style=flat-square&logo=react&logoColor=74CDA7) ![Vite](https://img.shields.io/badge/Vite-252824?style=flat-square&logo=vite&logoColor=74CDA7) ![Make](https://img.shields.io/badge/Make-252824?style=flat-square&logo=make&logoColor=74CDA7) ![Cloudflare Turnstile](https://img.shields.io/badge/Cloudflare%20Turnstile-252824?style=flat-square&logo=cloudflare&logoColor=74CDA7) ![Vercel](https://img.shields.io/badge/Vercel-252824?style=flat-square&logo=vercel&logoColor=74CDA7)
 
