@@ -2736,6 +2736,7 @@ function ContactPage() {
     }
 
     const payload = {
+      requestId: form.dataset.requestId || (form.dataset.requestId = crypto.randomUUID()),
       source: "ceniza-contact-form",
       submittedAt: new Date().toISOString(),
       firstName: formValues.nombre ?? "",

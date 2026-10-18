@@ -48,13 +48,13 @@ La interfaz es una SPA y el formulario cruza una frontera serverless:
 - `src/App.jsx` contiene las vistas, navegación, catálogo y formularios.
 - `src/styles.css` contiene los estilos globales y responsivos.
 - `src/components/TurnstileWidget.jsx` integra la verificación anti-bot en el formulario.
-- `api/contact.js` valida, limita y normaliza cada solicitud antes de enviarla a Make.
+- `api/contact.js` valida, limita y normaliza cada solicitud antes de enviarla a Make y al buzón seguro del CRM.
 - `server/turnstile.js` verifica el token de Turnstile exclusivamente en el servidor.
 - `src/assets/` contiene únicamente las imágenes y videos utilizados por la aplicación.
 - `public/` contiene el icono y los archivos públicos de descubrimiento para buscadores.
 - `vercel.json` configura las rutas públicas y la caché de recursos versionados.
 
-El navegador solo llama a `/api/contact`. La función verifica método, tipo y tamaño del cuerpo, honeypot, tiempo mínimo, token Turnstile, consentimiento, campos y longitudes antes de construir un payload nuevo. La URL y el token opcional de Make son variables exclusivas del servidor.
+El navegador solo llama a `/api/contact`. La función verifica método, tipo y tamaño del cuerpo, honeypot, tiempo mínimo, token Turnstile, consentimiento, campos y longitudes antes de construir payloads nuevos. La URL y el token obligatorio de Make, así como la credencial de ingreso al CRM, son variables exclusivas del servidor. El identificador de envío se conserva durante reintentos: el escenario de Make debe deduplicar por `submissionId`, usar `safe.html.*` dentro de HTML y `safe.sheet.*` al escribir hojas; nunca los campos originales en esos contextos.
 
 ## Requisitos
 
@@ -80,7 +80,9 @@ La dirección local se mostrará en la salida de Vite.
 | `TURNSTILE_EXPECTED_ACTION` | Servidor | Debe permanecer como `contact_form`. |
 | `TURNSTILE_ALLOWED_HOSTNAMES` | Servidor | Lista de dominios autorizados por comas. |
 | `MAKE_CONTACT_WEBHOOK_URL` | Servidor | Webhook privado que recibe solicitudes validadas. |
-| `MAKE_CONTACT_WEBHOOK_TOKEN` | Servidor, opcional | Encabezado privado compartido con Make. |
+| `MAKE_CONTACT_WEBHOOK_TOKEN` | Servidor | Encabezado privado obligatorio compartido con Make. |
+| `CRM_INTAKE_URL` | Servidor | URL de la función `website-lead`; nunca se expone al navegador. |
+| `CRM_INTAKE_TOKEN` | Servidor | Secreto aleatorio de al menos 32 caracteres, igual a `WEBSITE_LEAD_INGEST_TOKEN` en Supabase. |
 
 Las variables `VITE_*` forman parte del bundle público. Las demás se configuran en Vercel y nunca deben copiarse al frontend ni versionarse con valores reales.
 

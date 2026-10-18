@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { verifyTurnstile } from "../server/turnstile.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -6,6 +6,7 @@ const MAX_BODY_BYTES = 24 * 1024;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 6;
 const REQUEST_TIMEOUT_MS = 15000;
+const DATA_POLICY_VERSION = "2026-09-04";
 const MAX_LENGTHS = {
   firstName: 120,
   lastName: 120,
@@ -65,12 +66,6 @@ export default async function handler(request, response) {
     return response.status(413).json({ error: "La solicitud supera el tamaño permitido." });
   }
 
-  const clientIp = getClientIp(request);
-  if (isRateLimited(clientIp)) {
-    response.setHeader("Retry-After", "3600");
-    return response.status(429).json({ error: "Has realizado varios intentos. Espera antes de volver a enviar." });
-  }
-
   const body = request.body && typeof request.body === "object" ? request.body : {};
   const elapsed = Date.now() - Number(body.startedAt);
 
@@ -78,6 +73,7 @@ export default async function handler(request, response) {
     return response.status(200).json({ ok: true, message: "Solicitud recibida." });
   }
 
+  const clientIp = getClientIp(request);
   const turnstile = await verifyTurnstile({ token: body.turnstileToken, remoteIp: clientIp });
   if (!turnstile.success) {
     const statusCode = turnstile.code === "not-configured" ? 503 : 403;
@@ -86,6 +82,11 @@ export default async function handler(request, response) {
         ? "El formulario está temporalmente en configuración. Inténtalo más tarde."
         : "No pudimos validar la verificación de seguridad. Inténtalo de nuevo.",
     });
+  }
+
+  if (isRateLimited(clientIp)) {
+    response.setHeader("Retry-After", "3600");
+    return response.status(429).json({ error: "Has realizado varios intentos. Espera antes de volver a enviar." });
   }
 
   const firstName = cleanString(body.firstName);
@@ -118,17 +119,20 @@ export default async function handler(request, response) {
   }
 
   const webhookUrl = cleanString(process.env.MAKE_CONTACT_WEBHOOK_URL);
-  if (!webhookUrl) {
-    console.error("Falta MAKE_CONTACT_WEBHOOK_URL en el entorno.");
+  const webhookToken = cleanString(process.env.MAKE_CONTACT_WEBHOOK_TOKEN);
+  const crmIntakeUrl = cleanString(process.env.CRM_INTAKE_URL);
+  const crmIntakeToken = cleanString(process.env.CRM_INTAKE_TOKEN);
+  if (!webhookUrl || !webhookToken || !crmIntakeUrl || !crmIntakeToken) {
+    console.error("Falta una variable privada de la integración de contacto.");
     return response.status(503).json({ error: "El formulario no está disponible en este momento." });
   }
 
-  const webhookHeaders = { "Content-Type": "application/json" };
-  const webhookToken = cleanString(process.env.MAKE_CONTACT_WEBHOOK_TOKEN);
-  if (webhookToken) webhookHeaders["x-make-apikey"] = webhookToken;
-
+  const requestedId = cleanString(body.requestId);
+  const submissionId = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedId)
+    ? requestedId
+    : randomUUID();
   const payload = {
-    submissionId: randomUUID(),
+    submissionId,
     source: "ceniza-contact-form",
     submittedAt: new Date().toISOString(),
     firstName,
@@ -139,20 +143,57 @@ export default async function handler(request, response) {
     projectDetails,
     pageUrl,
     dataConsentGranted: true,
-    dataPolicyVersion: cleanString(body.dataPolicyVersion) || "unknown",
+    dataPolicyVersion: DATA_POLICY_VERSION,
+    safe: {
+      html: Object.fromEntries(Object.entries({ firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;")])),
+      sheet: Object.fromEntries(Object.entries({ firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, /^[\u0000-\u0020\u007f\u00a0\ufeff]*[=+\-@]/u.test(String(value)) || /^[\t\r\n]/u.test(String(value)) ? `'${value}` : value])),
+    },
+  };
+
+  const crmPayload = {
+    source: "contact-form",
+    requestId: submissionId,
+    contact: {
+      firstName,
+      lastName,
+      email,
+      phone,
+      company: "",
+      socials: "",
+      address,
+      projectDetails,
+      authorizedDataTreatment: true,
+      acceptedTerms: true,
+    },
   };
 
   try {
-    const webhookResponse = await fetch(webhookUrl, {
-      method: "POST",
-      headers: webhookHeaders,
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
+    const crmBody = JSON.stringify(crmPayload);
+    const [webhookResponse, crmResponse] = await Promise.all([
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-make-apikey": webhookToken },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      }),
+      fetch(crmIntakeUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-ceniza-ingest-token": crmIntakeToken,
+          "x-ceniza-client-fingerprint": createHmac("sha256", crmIntakeToken).update(clientIp).digest("hex"),
+        },
+        body: crmBody,
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      }),
+    ]);
 
-    if (!webhookResponse.ok) {
-      throw new Error(`Make returned ${webhookResponse.status}`);
-    }
+    if (!webhookResponse.ok || !crmResponse.ok) throw new Error(`Contact delivery failed: Make ${webhookResponse.status}; CRM ${crmResponse.status}`);
 
     return response.status(200).json({ ok: true, message: "Solicitud enviada correctamente." });
   } catch (error) {
