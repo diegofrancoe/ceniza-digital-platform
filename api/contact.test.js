@@ -123,7 +123,7 @@ test("normalizes and forwards only the approved payload", async () => {
   globalThis.fetch = async (url, options) => {
     calls.push({ url: String(url), options });
     if (calls.length === 1) return successfulTurnstileResponse();
-    return { ok: true, status: 200 };
+    return { ok: true, status: 202, async json(){return {accepted:true,requestId:"6f96bb91-e248-4b37-8e15-2a4c73b41111",receiptVersion:1};} };
   };
 
   try {
@@ -134,14 +134,12 @@ test("normalizes and forwards only the approved payload", async () => {
     }), response);
 
     assert.equal(response.statusCode, 200);
-    assert.equal(calls.length, 3);
-    assert.equal(calls[1].url, "https://hook.example.test/contact");
-    assert.equal(calls[1].options.headers["x-make-apikey"], "shared-test-token");
-    assert.equal(calls[2].url, "https://crm.example.test/website-lead");
-    assert.equal(calls[2].options.headers["x-ceniza-ingest-token"], "a-secure-test-token-that-is-at-least-32-chars");
-    assert.match(calls[2].options.headers["x-ceniza-client-fingerprint"], /^[a-f0-9]{64}$/);
+    assert.equal(calls.length, 2);
+        assert.equal(calls[1].url, "https://crm.example.test/website-lead");
+    assert.equal(calls[1].options.headers["x-ceniza-ingest-token"], "a-secure-test-token-that-is-at-least-32-chars");
+    assert.match(calls[1].options.headers["x-ceniza-client-fingerprint"], /^[a-f0-9]{64}$/);
 
-    const payload = JSON.parse(calls[1].options.body);
+    const payload = JSON.parse(calls[1].options.body).makePayload;
     assert.equal(payload.firstName, "Mariana");
     assert.equal(payload.lastName, "Ejemplo");
     assert.equal(payload.email, "mariana@example.com");
@@ -153,9 +151,9 @@ test("normalizes and forwards only the approved payload", async () => {
     assert.equal(payload.submissionId, "6f96bb91-e248-4b37-8e15-2a4c73b41111");
     assert.equal(payload.safe.html.projectDetails, payload.projectDetails);
     assert.equal(payload.safe.sheet.email, payload.email);
-    const crmPayload = JSON.parse(calls[2].options.body);
+    const crmPayload = JSON.parse(calls[1].options.body);
     assert.equal(crmPayload.requestId, payload.submissionId);
-    assert.deepEqual(Object.keys(crmPayload).sort(), ["contact", "requestId", "source"]);
+    assert.deepEqual(Object.keys(crmPayload).sort(), ["contact", "makePayload", "requestId", "source"]);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalWebhook === undefined) delete process.env.MAKE_CONTACT_WEBHOOK_URL;
@@ -183,7 +181,7 @@ test("escapes values for HTML and neutralizes spreadsheet formulas", async () =>
   globalThis.fetch = async (url, options) => {
     calls.push({ url: String(url), options });
     if (calls.length === 1) return successfulTurnstileResponse();
-    return { ok: true, status: 200 };
+    return { ok: true, status: 202, async json(){return {accepted:true,requestId:"6f96bb91-e248-4b37-8e15-2a4c73b41111",receiptVersion:1};} };
   };
   try {
     const response = responseRecorder();
@@ -192,7 +190,7 @@ test("escapes values for HTML and neutralizes spreadsheet formulas", async () =>
       body: validBody({ firstName: "<b>Mariana</b>", company: "=IMPORTXML(\"https://evil.test\")", projectDetails: "=HYPERLINK(\"https://evil.test\",\"ver\") descripción suficiente" }),
     }), response);
     assert.equal(response.statusCode, 200);
-    const payload = JSON.parse(calls[1].options.body);
+    const payload = JSON.parse(calls[1].options.body).makePayload;
     assert.equal(payload.safe.html.firstName, "&lt;b&gt;Mariana&lt;/b&gt;");
     assert.ok(payload.safe.sheet.projectDetails.startsWith("'="));
   } finally {
@@ -202,4 +200,35 @@ test("escapes values for HTML and neutralizes spreadsheet formulas", async () =>
     if (originalCrmUrl === undefined) delete process.env.CRM_INTAKE_URL; else process.env.CRM_INTAKE_URL = originalCrmUrl;
     if (originalCrmToken === undefined) delete process.env.CRM_INTAKE_TOKEN; else process.env.CRM_INTAKE_TOKEN = originalCrmToken;
   }
+});
+
+for (const scenario of ['missing-make','lost-receipt','conflict','network']) test(`durable intake: ${scenario}`,async()=>{
+ const originalFetch=globalThis.fetch;const saved={...process.env};let calls=0;
+ process.env.CRM_INTAKE_URL='https://crm.example.test/website-lead';process.env.CRM_INTAKE_TOKEN='test-ingest-token';
+ delete process.env.MAKE_CONTACT_WEBHOOK_URL;delete process.env.MAKE_CONTACT_WEBHOOK_TOKEN;
+ globalThis.fetch=async(url,options)=>{calls++;if(calls===1)return successfulTurnstileResponse();
+ assert.equal(url,'https://crm.example.test/website-lead');
+ const body=JSON.parse(options.body);assert.equal(body.contact.acceptedTerms,false);assert.equal(body.contact.authorizedDataTreatment,true);
+ if(scenario==='network')throw new Error('test timeout');
+ return {ok:scenario!=='conflict',status:scenario==='conflict'?409:202,json:async()=>scenario==='lost-receipt'?{}:{accepted:true,requestId:body.requestId,receiptVersion:1}};
+ };
+ try{const response=responseRecorder();await handler(request({headers:{'content-type':'application/json','x-forwarded-for':'203.0.113.'+({'missing-make':21,'lost-receipt':22,conflict:23,network:24}[scenario])},body:validBody()}),response);
+ assert.equal(response.statusCode,scenario==='missing-make'?200:scenario==='conflict'?409:502);assert.equal(calls,2);
+ }finally{globalThis.fetch=originalFetch;for(const key of Object.keys(process.env))if(!(key in saved))delete process.env[key];Object.assign(process.env,saved);}
+});
+
+test('retries preserve the submission ID and never call Make from the web backend',async()=>{
+ const original=globalThis.fetch,saved={...process.env};const submissions=[];
+ process.env.CRM_INTAKE_URL='https://crm.example.test/website-lead';process.env.CRM_INTAKE_TOKEN='test-ingest-token';
+ globalThis.fetch=async(url,options)=>{
+  if(url.includes('siteverify'))return successfulTurnstileResponse();
+  assert.equal(url,'https://crm.example.test/website-lead');const data=JSON.parse(options.body);submissions.push(data.requestId);
+  return {ok:true,status:202,json:async()=>({accepted:true,receiptVersion:1,requestId:data.requestId,duplicate:submissions.length>1})};
+ };
+ try{for(let i=0;i<2;i++){const response=responseRecorder();await handler(request({headers:{'content-type':'application/json','x-forwarded-for':'203.0.113.31'},body:validBody()}),response);assert.equal(response.statusCode,200);}assert.equal(submissions.length,2);assert.equal(submissions[0],submissions[1]);}
+ finally{globalThis.fetch=original;for(const key of Object.keys(process.env))if(!(key in saved))delete process.env[key];Object.assign(process.env,saved);}
+});
+for(const [key,value] of [['email','invalid'],['dataConsentGranted',false]])test(`rejects invalid ${key} before delivery`,async()=>{
+ const original=globalThis.fetch;let calls=0;globalThis.fetch=async()=>{calls++;return successfulTurnstileResponse();};
+ try{const response=responseRecorder();await handler(request({body:validBody({[key]:value})}),response);assert.equal(response.statusCode,400);assert.equal(calls,1);}finally{globalThis.fetch=original;}
 });

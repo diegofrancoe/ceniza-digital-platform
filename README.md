@@ -48,13 +48,13 @@ La interfaz es una SPA y el formulario cruza una frontera serverless:
 - `src/App.jsx` contiene las vistas, navegación, catálogo y formularios.
 - `src/styles.css` contiene los estilos globales y responsivos.
 - `src/components/TurnstileWidget.jsx` integra la verificación anti-bot en el formulario.
-- `api/contact.js` valida, limita y normaliza cada solicitud antes de enviarla a Make y al buzón seguro del CRM.
+- `api/contact.js` valida, limita y normaliza cada solicitud antes de enviarla al buzón seguro del CRM. La respuesta de Make se entrega desde una cola privada de Supabase.
 - `server/turnstile.js` verifica el token de Turnstile exclusivamente en el servidor.
 - `src/assets/` contiene únicamente las imágenes y videos utilizados por la aplicación.
 - `public/` contiene el icono y los archivos públicos de descubrimiento para buscadores.
 - `vercel.json` configura las rutas públicas y la caché de recursos versionados.
 
-El navegador solo llama a `/api/contact`. La función verifica método, tipo y tamaño del cuerpo, honeypot, tiempo mínimo, token Turnstile, consentimiento, campos y longitudes antes de construir payloads nuevos. La URL y el token obligatorio de Make, así como la credencial de ingreso al CRM, son variables exclusivas del servidor. El identificador de envío se conserva durante reintentos: el escenario de Make debe deduplicar por `submissionId`, usar `safe.html.*` dentro de HTML y `safe.sheet.*` al escribir hojas; nunca los campos originales en esos contextos.
+El navegador solo llama a `/api/contact`. La función verifica método, tipo y tamaño del cuerpo, honeypot, tiempo mínimo, token Turnstile, consentimiento, campos y longitudes antes de construir payloads nuevos. La credencial de ingreso al CRM es exclusiva del servidor web. Las credenciales de Make pertenecen al worker de Supabase, no al website. El identificador de envío se conserva durante reintentos: el escenario de Make debe deduplicar por `submissionId`, usar `safe.html.*` dentro de HTML y `safe.sheet.*` al escribir hojas; nunca los campos originales en esos contextos.
 
 ## Requisitos
 
@@ -79,8 +79,6 @@ La dirección local se mostrará en la salida de Vite.
 | `TURNSTILE_SECRET_KEY` | Servidor | Verifica los tokens del formulario. |
 | `TURNSTILE_EXPECTED_ACTION` | Servidor | Debe permanecer como `contact_form`. |
 | `TURNSTILE_ALLOWED_HOSTNAMES` | Servidor | Lista de dominios autorizados por comas. |
-| `MAKE_CONTACT_WEBHOOK_URL` | Servidor | Webhook privado que recibe solicitudes validadas. |
-| `MAKE_CONTACT_WEBHOOK_TOKEN` | Servidor | Encabezado privado obligatorio compartido con Make. |
 | `CRM_INTAKE_URL` | Servidor | URL de la función `website-lead`; nunca se expone al navegador. |
 | `CRM_INTAKE_TOKEN` | Servidor | Secreto aleatorio de al menos 32 caracteres, igual a `WEBSITE_LEAD_INGEST_TOKEN` en Supabase. |
 
@@ -125,3 +123,11 @@ El [cierre de sesión del 2 de septiembre de 2026](docs/sesiones/2026-09-02.md) 
 La interfaz, navegación, catálogo, formulario y frontera segura para Make están implementados. La versión está preparada para Vercel y cuenta con optimización de recursos, diseño responsivo, caché, archivos de descubrimiento, controles de cookies, consentimiento y protección anti-bot.
 
 Antes de activar el formulario en producción se deben configurar las variables de Turnstile y Make, añadir un límite durable en la capa de plataforma, comprobar que Make registra el lead y verificar los dos correos con datos sintéticos. El CRM, su autenticación y la base de datos permanecen en un repositorio privado independiente.
+
+## Recepción y respuestas automáticas (activación pendiente)
+
+El backend confirma éxito solo cuando Supabase devuelve un recibo duradero (`receiptVersion=1`) con el mismo requestId. Un fallo de Make no afecta a esa recepción. La función `website-lead` requiere la migración de recepción/cola del repositorio CRM antes de publicar esta web. No hay envío directo a Make desde este backend.
+
+Make conserva el payload y contenido existentes, pero su entrega se realiza desde un worker privado con reintentos. No debe activarse hasta comprobar la deduplicación por submissionId del escenario; HTTP por sí solo no garantiza exactamente una respuesta. El consentimiento almacenado corresponde al tratamiento de datos aceptado, sin inventar aceptación de términos adicionales.
+
+Las 15 pruebas del backend pasan con transportes aislados. Esto no certifica el recorrido real publicado, la persistencia SQL ni el envío real de Make. Consulte `docs/website-crm-lead-flow-report.md` en el repositorio `ceniza-crm` para orden de activación, pruebas pendientes y reversión.

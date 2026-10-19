@@ -66,7 +66,8 @@ export default async function handler(request, response) {
     return response.status(413).json({ error: "La solicitud supera el tamaño permitido." });
   }
 
-  const body = request.body && typeof request.body === "object" ? request.body : {};
+  const body = request.body && typeof request.body === "object" && !Array.isArray(request.body) ? request.body : {};
+  if (Buffer.byteLength(JSON.stringify(body), "utf8") > MAX_BODY_BYTES) return response.status(413).json({error: "La solicitud supera el tamaño permitido."});
   const elapsed = Date.now() - Number(body.startedAt);
 
   if (cleanString(body.website) || !Number.isFinite(elapsed) || elapsed < 1500) {
@@ -118,11 +119,9 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: "Uno de los campos supera la longitud permitida." });
   }
 
-  const webhookUrl = cleanString(process.env.MAKE_CONTACT_WEBHOOK_URL);
-  const webhookToken = cleanString(process.env.MAKE_CONTACT_WEBHOOK_TOKEN);
   const crmIntakeUrl = cleanString(process.env.CRM_INTAKE_URL);
   const crmIntakeToken = cleanString(process.env.CRM_INTAKE_TOKEN);
-  if (!webhookUrl || !webhookToken || !crmIntakeUrl || !crmIntakeToken) {
+  if (!crmIntakeUrl || !crmIntakeToken) {
     console.error("Falta una variable privada de la integración de contacto.");
     return response.status(503).json({ error: "El formulario no está disponible en este momento." });
   }
@@ -158,6 +157,7 @@ export default async function handler(request, response) {
   const crmPayload = {
     source: "contact-form",
     requestId: submissionId,
+    makePayload: payload,
     contact: {
       firstName,
       lastName,
@@ -168,32 +168,28 @@ export default async function handler(request, response) {
       address,
       projectDetails,
       authorizedDataTreatment: true,
-      acceptedTerms: true,
+      acceptedTerms: false,
+      dataPolicyVersion: DATA_POLICY_VERSION,
     },
   };
 
   try {
     const crmBody = JSON.stringify(crmPayload);
-    const [webhookResponse, crmResponse] = await Promise.all([
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-make-apikey": webhookToken },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      }),
-      fetch(crmIntakeUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-ceniza-ingest-token": crmIntakeToken,
-          "x-ceniza-client-fingerprint": createHmac("sha256", crmIntakeToken).update(clientIp).digest("hex"),
-        },
-        body: crmBody,
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      }),
-    ]);
-
-    if (!webhookResponse.ok || !crmResponse.ok) throw new Error(`Contact delivery failed: Make ${webhookResponse.status}; CRM ${crmResponse.status}`);
+    const crmResponse = await fetch(crmIntakeUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-ceniza-ingest-token": crmIntakeToken,
+        "x-ceniza-client-fingerprint": createHmac("sha256", crmIntakeToken).update(clientIp).digest("hex"),
+      },
+      body: crmBody,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    const receipt = await crmResponse.json().catch(() => null);
+    if (crmResponse.status === 409) return response.status(409).json({error: "Esta solicitud ya fue recibida con otros datos. Inicia una solicitud nueva."});
+    if (!crmResponse.ok || receipt?.accepted !== true || receipt.requestId !== submissionId || receipt.receiptVersion !== 1) {
+      throw new Error("El CRM no confirmó la recepción duradera de la solicitud.");
+    }
 
     return response.status(200).json({ ok: true, message: "Solicitud enviada correctamente." });
   } catch (error) {
