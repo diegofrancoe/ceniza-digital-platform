@@ -1,10 +1,14 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { websiteContactDetails } from "../shared/websiteContactDetails.js";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 import { verifyTurnstile } from "../server/turnstile.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_BODY_BYTES = 24 * 1024;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 6;
+// Temporary allowance for the verified video-preparation email, through October 22.
+const VIDEO_ALLOWANCE_UNTIL = Date.parse("2026-10-23T05:00:00Z");
+const VIDEO_EMAIL_FINGERPRINT = "6d820805aabf546e7828eb9829acabb1b153028482930e0faf46116cd7ae3951";
 const REQUEST_TIMEOUT_MS = 15000;
 const DATA_POLICY_VERSION = "2026-09-04";
 const MAX_LENGTHS = {
@@ -26,7 +30,7 @@ function getClientIp(request) {
     || "unknown";
 }
 
-function isRateLimited(key) {
+function rateLimitWait(key, requestId, maxRequests = RATE_LIMIT_MAX_REQUESTS) {
   const now = Date.now();
 
   if (requestBuckets.size > 1000) {
@@ -37,12 +41,24 @@ function isRateLimited(key) {
 
   const bucket = requestBuckets.get(key);
   if (!bucket || bucket.resetAt <= now) {
-    requestBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
+    requestBuckets.set(key, { requests: new Set([requestId]), resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return 0;
   }
 
-  bucket.count += 1;
-  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
+  if (bucket.requests.has(requestId)) return 0;
+  if (bucket.requests.size >= maxRequests) return Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+  bucket.requests.add(requestId);
+  return 0;
+}
+
+function tooManyRequests(response, seconds) {
+  const retryAfter = Math.min(86400, Math.max(1, Math.ceil(Number(seconds) || 900)));
+  const minutes = Math.ceil(retryAfter / 60);
+  response.setHeader("Retry-After", String(retryAfter));
+  return response.status(429).json({
+    error: `Has enviado varias solicitudes. Espera ${minutes} ${minutes === 1 ? "minuto" : "minutos"} antes de volver a enviar. Tus datos siguen en el formulario.`,
+    retryAfter,
+  });
 }
 
 function exceedsLength(value, key) {
@@ -85,11 +101,6 @@ export default async function handler(request, response) {
     });
   }
 
-  if (isRateLimited(clientIp)) {
-    response.setHeader("Retry-After", "3600");
-    return response.status(429).json({ error: "Has realizado varios intentos. Espera antes de volver a enviar." });
-  }
-
   const firstName = cleanString(body.firstName);
   const lastName = cleanString(body.lastName);
   const email = cleanString(body.email).toLowerCase();
@@ -119,6 +130,10 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: "Uno de los campos supera la longitud permitida." });
   }
 
+  const extra = websiteContactDetails(body);
+  if (extra.error) return response.status(400).json({error:extra.error});
+  if (body.intakeVersion === 2 && body.termsAccepted !== true) return response.status(400).json({error:'Acepta los términos y condiciones.'});
+
   const crmIntakeUrl = cleanString(process.env.CRM_INTAKE_URL);
   const crmIntakeToken = cleanString(process.env.CRM_INTAKE_TOKEN);
   if (!crmIntakeUrl || !crmIntakeToken) {
@@ -130,8 +145,13 @@ export default async function handler(request, response) {
   const submissionId = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedId)
     ? requestedId
     : randomUUID();
+  const videoAllowance = Date.now() < VIDEO_ALLOWANCE_UNTIL
+    && createHash("sha256").update(`email:${email}`).digest("hex") === VIDEO_EMAIL_FINGERPRINT;
+  const waitSeconds = rateLimitWait(videoAllowance ? `video:${clientIp}` : clientIp, submissionId, videoAllowance ? 100 : RATE_LIMIT_MAX_REQUESTS);
+  if (waitSeconds) return tooManyRequests(response, waitSeconds);
   const payload = {
     submissionId,
+    ...extra.fields,
     source: "ceniza-contact-form",
     submittedAt: new Date().toISOString(),
     firstName,
@@ -144,13 +164,13 @@ export default async function handler(request, response) {
     dataConsentGranted: true,
     dataPolicyVersion: DATA_POLICY_VERSION,
     safe: {
-      html: Object.fromEntries(Object.entries({ firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, String(value)
+      html: Object.fromEntries(Object.entries({ ...extra.fields, firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, String(value)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;")])),
-      sheet: Object.fromEntries(Object.entries({ firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, /^[\u0000-\u0020\u007f\u00a0\ufeff]*[=+\-@]/u.test(String(value)) || /^[\t\r\n]/u.test(String(value)) ? `'${value}` : value])),
+      sheet: Object.fromEntries(Object.entries({ ...extra.fields, firstName, lastName, email, phone, address, projectDetails, pageUrl, dataPolicyVersion: DATA_POLICY_VERSION }).map(([key, value]) => [key, /^[\u0000-\u0020\u007f\u00a0\ufeff]*[=+\-@]/u.test(String(value)) || /^[\t\r\n]/u.test(String(value)) ? `'${value}` : value])),
     },
   };
 
@@ -163,12 +183,13 @@ export default async function handler(request, response) {
       lastName,
       email,
       phone,
-      company: "",
+      ...extra.fields,
+      company: extra.fields.company || "",
       socials: "",
       address,
       projectDetails,
       authorizedDataTreatment: true,
-      acceptedTerms: false,
+      acceptedTerms: body.termsAccepted === true,
       dataPolicyVersion: DATA_POLICY_VERSION,
     },
   };
@@ -186,6 +207,7 @@ export default async function handler(request, response) {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     const receipt = await crmResponse.json().catch(() => null);
+    if (crmResponse.status === 429) return tooManyRequests(response, crmResponse.headers.get("Retry-After"));
     if (crmResponse.status === 409) return response.status(409).json({error: "Esta solicitud ya fue recibida con otros datos. Inicia una solicitud nueva."});
     if (!crmResponse.ok || receipt?.accepted !== true || receipt.requestId !== submissionId || receipt.receiptVersion !== 1) {
       throw new Error("El CRM no confirmó la recepción duradera de la solicitud.");

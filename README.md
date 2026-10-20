@@ -131,3 +131,9 @@ El backend confirma éxito solo cuando Supabase devuelve un recibo duradero (`re
 Make conserva el payload y contenido existentes, pero su entrega se realiza desde un worker privado con reintentos. No debe activarse hasta comprobar la deduplicación por submissionId del escenario; HTTP por sí solo no garantiza exactamente una respuesta. El consentimiento almacenado corresponde al tratamiento de datos aceptado, sin inventar aceptación de términos adicionales.
 
 Las 15 pruebas del backend pasan con transportes aislados. Esto no certifica el recorrido real publicado, la persistencia SQL ni el envío real de Make. Consulte `docs/website-crm-lead-flow-report.md` en el repositorio `ceniza-crm` para orden de activación, pruebas pendientes y reversión.
+
+### Formulario de contacto v2
+
+Incluye tipo de cliente/empresa, servicio y fecha de evento (día, rango o por definir), sin presupuesto. `Teléfono` conserva ese nombre y se usa también para WhatsApp, con aclaración visible. El contrato `shared/websiteContactDetails.js` se aplica tanto en el formulario como en el backend y está reflejado en el receptor CRM. Las solicitudes v1 siguen siendo compatibles. No confundir la fecha del evento con la del seguimiento interno. Se requiere publicar primero el receptor/CRM compatible y después esta web. Las pruebas usan datos ficticios y proveedores simulados; no activan correos.
+
+Publicación y aceptación real con datos ficticios verificadas el 19 de octubre de 2026. Los correos automáticos de Make permanecen inactivos; la recepción y conversión del CRM funcionan por separado.

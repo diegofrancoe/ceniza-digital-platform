@@ -1,3 +1,4 @@
+import { websiteContactDetails } from "../shared/websiteContactDetails.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import TurnstileWidget from "./components/TurnstileWidget.jsx";
 import heroSoftboxOff from "./assets/ceniza-godox-qrp70-left-off-grid.jpg";
@@ -2699,6 +2700,9 @@ function ContactFaqSection() {
 }
 
 function ContactPage() {
+  const [clientType,setClientType] = useState('');
+  const [eventDateStatus,setEventDateStatus] = useState('undecided');
+
   const [contactSubmissionState, setContactSubmissionState] = useState({
     status: "idle",
     message: "",
@@ -2739,10 +2743,19 @@ function ContactPage() {
       requestId: form.dataset.requestId || (form.dataset.requestId = crypto.randomUUID()),
       source: "ceniza-contact-form",
       submittedAt: new Date().toISOString(),
+      intakeVersion: 2,
+      clientType,
+      company: formValues.empresa ?? '',
+      serviceInterest: formValues.servicio ?? '',
+      eventDateStatus,
+      eventStartDate: eventDateStatus === 'defined' ? formValues.fechaInicio ?? '' : '',
+      eventEndDate: eventDateStatus === 'defined' ? formValues.fechaFin ?? '' : '',
+      termsAccepted: formValues.autorizacion_terminos === 'on',
       firstName: formValues.nombre ?? "",
       lastName: formValues.apellido ?? "",
       email: formValues.correo ?? "",
       phone: formValues.telefono ?? "",
+      city: formValues.ciudad ?? "",
       address: formValues.direccion ?? "",
       projectDetails: formValues.proyecto ?? "",
       pageUrl: window.location.href,
@@ -2752,6 +2765,9 @@ function ContactPage() {
       startedAt: formStartedAt.current,
       turnstileToken,
     };
+
+    const extra = websiteContactDetails(payload);
+    if (extra.error) {setContactSubmissionState({status:'error',message:extra.error});return;}
 
     setContactSubmissionState({
       status: "loading",
@@ -2766,6 +2782,7 @@ function ContactPage() {
         message: "Proyecto enviado. Te responderemos lo antes posible.",
       });
       form.reset();
+      setClientType('');setEventDateStatus('undecided');
     } catch (error) {
       setContactSubmissionState({
         status: "error",
@@ -2790,7 +2807,7 @@ function ContactPage() {
               Hablemos de tu <span>proyecto</span>
             </h1>
             <p className="services-page-lead">
-              Cuéntanos la fecha, locación y tipo de producción. Te proponemos el setup adecuado.
+              Cuéntanos qué necesitas. Si la fecha o los detalles aún están por definir, te ayudamos a concretarlos.
             </p>
           </div>
 
@@ -2812,13 +2829,29 @@ function ContactPage() {
                 <input name="apellido" type="text" autoComplete="family-name" required />
               </label>
               <label>
+                Tipo de cliente
+                <select name="tipoCliente" value={clientType} onChange={e=>setClientType(e.target.value)} required>
+                  <option value="">Selecciona una opción</option><option value="individual">Persona natural</option><option value="company">Empresa</option>
+                </select>
+              </label>
+              {clientType==='company' && <label>Nombre de la empresa<input name="empresa" autoComplete="organization" maxLength={160} required /></label>}
+              <label>
                 Correo
                 <input name="correo" type="email" autoComplete="email" required />
               </label>
               <label>
                 Teléfono
-                <input name="telefono" type="tel" autoComplete="tel" required />
+                <input name="telefono" type="tel" autoComplete="tel" maxLength={40} placeholder="+57 300 123 4567" aria-describedby="contact-phone-help" required />
+                <small id="contact-phone-help" className="contact-field-help">Usaremos este número para contactarte por llamada o WhatsApp.</small>
               </label>
+              <label>Ciudad<input name="ciudad" type="text" autoComplete="address-level2" maxLength={120} required /></label>
+              <label className="contact-form-wide">Servicio de interés
+                <select name="servicio" required><option value="">Selecciona una opción</option><option value="production">Producción audiovisual</option><option value="rental">Alquiler de equipos</option><option value="advice">Necesito asesoría</option></select>
+              </label>
+              <label className="contact-form-wide">Fecha del evento o proyecto
+                <select name="fechaEstado" value={eventDateStatus} onChange={e=>setEventDateStatus(e.target.value)}><option value="undecided">Todavía no está definida</option><option value="defined">Ya tengo una fecha o rango</option></select>
+              </label>
+              {eventDateStatus==='defined' && <><label>Fecha de inicio<input name="fechaInicio" type="date" required /></label><label>Fecha final (si dura varios días)<input name="fechaFin" type="date" /></label></>}
               <label className="contact-form-wide">
                 Dirección
                 <input name="direccion" type="text" autoComplete="street-address" />
@@ -2828,7 +2861,9 @@ function ContactPage() {
                 <textarea
                   name="proyecto"
                   rows="6"
-                  placeholder="Tipo de evento o producción, ciudad, fecha, locación, número de personas y referencias visuales."
+                  minLength={20}
+                  maxLength={2400}
+                  placeholder="¿Qué quieres realizar? Cuéntanos el lugar, duración, equipos o entregables que necesitas. Está bien si todavía no tienes todos los detalles."
                   required
                 />
               </label>

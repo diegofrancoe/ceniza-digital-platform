@@ -232,3 +232,14 @@ for(const [key,value] of [['email','invalid'],['dataConsentGranted',false]])test
  const original=globalThis.fetch;let calls=0;globalThis.fetch=async()=>{calls++;return successfulTurnstileResponse();};
  try{const response=responseRecorder();await handler(request({body:validBody({[key]:value})}),response);assert.equal(response.statusCode,400);assert.equal(calls,1);}finally{globalThis.fetch=original;}
 });
+
+test('structured intake forwards all new fields, same phone for WhatsApp and truthful terms without a budget',async()=>{
+ const originalFetch=globalThis.fetch;let received;
+ const saved={CRM_INTAKE_URL:process.env.CRM_INTAKE_URL,CRM_INTAKE_TOKEN:process.env.CRM_INTAKE_TOKEN};
+ process.env.CRM_INTAKE_URL='https://crm.example/website-lead';process.env.CRM_INTAKE_TOKEN='private-test-token';
+ globalThis.fetch=async (url,options)=>{if(String(url).includes('siteverify'))return successfulTurnstileResponse();received=JSON.parse(options.body);return {ok:true,status:202,json:async()=>({accepted:true,requestId:received.requestId,receiptVersion:1})};};
+ try{
+  const response=responseRecorder();await handler(request({headers:{'content-type':'application/json','x-forwarded-for':'203.0.113.230'},body:validBody({intakeVersion:2,clientType:'company',company:'Empresa ficticia',serviceInterest:'production',eventDateStatus:'defined',eventStartDate:'2026-12-01',eventEndDate:'2026-12-03',termsAccepted:true,phoneIsWhatsapp:false,budget:999999})}),response);
+  assert.equal(response.statusCode,200);assert.equal(received.contact.company,'Empresa ficticia');assert.equal(received.contact.phoneIsWhatsapp,true);assert.equal(received.contact.acceptedTerms,true);assert.equal(received.contact.eventEndDate,'2026-12-03');assert.equal(received.contact.serviceInterest,'production');assert.equal(received.contact.phone,'+57 300 000 0000');assert.equal('budget' in received.contact,false);assert.equal('budget' in received.makePayload,false);
+ }finally{globalThis.fetch=originalFetch;for(const [key,value] of Object.entries(saved)){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
+});

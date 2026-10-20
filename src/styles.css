@@ -15088,3 +15088,9 @@ a {
     animation: none;
   }
 }
+
+/* Contact intake: native controls follow the existing editorial form design. */
+.contact-page-shell .contact-form select { width:100%; min-width:0; padding:12px 0 14px; color:#191714; border:0; border-bottom:1px solid rgba(25,23,20,.24); border-radius:0; background:transparent; font:inherit; font-size:.96rem; letter-spacing:normal; }
+.contact-page-shell .contact-form select:focus-visible { outline:2px solid #bd8b00; outline-offset:4px; }
+.contact-page-shell .contact-field-help { font-size:.75rem; line-height:1.5; letter-spacing:normal; text-transform:none; font-weight:400; color:#615d54; }
+.contact-page-shell .contact-form-grid { align-items:start; }
